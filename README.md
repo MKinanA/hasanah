@@ -2,12 +2,16 @@
 Aplikasi manajemen tersentralisasi untuk kepanitiaan dan kegiatan internal Masjid Al-Hasanah.
 
 ## Fitur
-- ### Otentikasi User
+- ### Otentikasi User (Backend Logic)
   User bisa login dan logout menggunakan akun dengan memasukkan username dan password.
 
 ## Untuk Ditambahkan
+- ### Tampilan Frontend
+  Tampilan frontend saat ini belum ada.
 - ### Pendataan Zakat dan Fidyah
   Untuk memudahkan pendataan zakat dan fidyah setiap Bulan Ramadhan.
+- ### Export Data ke PDF
+  Export data zakat dan fidyah ke PDF untuk memudahkan perekapan data.
 
 ## Struktur Repositori
 - ### Backend
@@ -18,4 +22,4 @@ Aplikasi manajemen tersentralisasi untuk kepanitiaan dan kegiatan internal Masji
 Akses masing-masing subfolder untuk informasi lebih lanjut.
 
 ---
-By [Muhammad Kinan Ahsan](https://github.com/mkinana), jamaah [Masjid Al-Hasanah](https://instagram.com/khasanahmeruya)
+By [Muhammad Kinan Ahsan](https://github.com/mkinana), jamaah [Masjid Al-Hasanah](https://instagram.com/khasanahmeruya).
