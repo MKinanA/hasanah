@@ -1,5 +1,4 @@
-# Hasanah Internal
-Aplikasi manajemen tersentralisasi untuk kepanitiaan dan kegiatan internal Masjid Al-Hasanah.
+# Hasanah
 
 ## Fitur
 - ### Otentikasi User (Backend Logic)
@@ -22,4 +21,3 @@ Aplikasi manajemen tersentralisasi untuk kepanitiaan dan kegiatan internal Masji
 Akses masing-masing subfolder untuk informasi lebih lanjut.
 
 ---
-By [Muhammad Kinan Ahsan](https://github.com/mkinana), jamaah [Masjid Al-Hasanah](https://instagram.com/khasanahmeruya).

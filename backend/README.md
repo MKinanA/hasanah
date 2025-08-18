@@ -1,5 +1,4 @@
 # Backend
-Backend untuk aplikasi Hasanah Internal.
 
 ## TODO
 - Menambahkan dokumentasi
