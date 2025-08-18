@@ -1,0 +1,74 @@
+:root {
+    --dark: 15, 15, 15;
+    --light: 239, 239, 239;
+    --fg-color: var(--dark);
+    --bg-color: var(--light);
+    --shadow-opacity: 75%;
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 100%;
+    transition: all 0.25s ease-out;
+    scroll-behavior: smooth;
+    color: rgb(var(--fg-color));
+    fill: currentColor;
+    object-fit: cover;
+}
+
+html, body {
+    background: rgb(var(--bg-color));
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+body > * {
+    position: fixed;
+    height: 100vh;
+    width: 100vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: hidden;
+}
+
+/* #screens-bank */
+/* #inactive-screens */
+
+#screens-bank, #inactive-screens {
+    display: none;
+}
+
+/* #active-screens */
+
+#active-screens {
+    background: rgb(var(--bg-color));
+}
+
+/* .screen */
+
+.screen {
+    position: absolute;
+    height: 100vh;
+    width: 100vw;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: top left;
+    background: rgb(var(--bg-color));
+    box-shadow: 0 0 0 1000000vmax rgba(var(--dark), var(--shadow-opacity));
+    overflow: auto;
+}
+
+.screen.moving-in, .screen.moving-out {
+    scale: 25%;
+    opacity: 0;
+}
+
+.screen.transparent {
+    background: rgba(var(--dark), var(--shadow-opacity));
+}
