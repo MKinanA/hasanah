@@ -77,7 +77,7 @@ class User:
             cursor.execute('SELECT * FROM user WHERE id = ?', (id,))
             row = cursor.fetchone()
             if row: return User(row[1], row[2], row[3], id=row[0])
-    
+
     @staticmethod
     async def get_all() -> list[User]:
         with db_connect() as conn:
@@ -140,7 +140,7 @@ class JenisAkses:
             cursor.execute('SELECT akses FROM jenis_akses WHERE id = ?', (id,))
             row = cursor.fetchone()
             if row: return row[0]
-    
+
     @staticmethod
     def get_id_by_akses(akses: str) -> int | None:
         with db_connect() as conn:
@@ -148,7 +148,7 @@ class JenisAkses:
             cursor.execute('SELECT id FROM jenis_akses WHERE akses = ?', (akses.lower(),))
             row = cursor.fetchone()
             if row: return row[0]
-    
+
     @staticmethod
     def add_akses(akses: str) -> None:
         if not (type(akses) == str and 1 <= len(akses) <= 64 and akses.islower()):
