@@ -131,7 +131,7 @@ function onPopState(event) {
     if (Math.abs(prevState.index - event.state.index) > 1) {
         ignorePopState = true;
         history.go(prevState.index - event.state.index);
-        window.alert('Maaf,\nMohon melakukan navigasi satu-per-satu, jangan lebih dari satu langkah sekaligus.\n\nIni untuk memastikan aplikasi berjalan dengan benar dan bisa menangani navigasi anda dengan baik.\n\nNavigasi yang baru saja anda lakukan telah diblokir dan anda belum berpindah halaman.');
+        window.alert('Maaf,\nMohon melakukan navigasi satu-per-satu, jangan lebih dari satu langkah sekaligus.\n\nIni untuk memastikan aplikasi berjalan dengan benar dan bisa menangani navigasi anda dengan baik.\n\nNavigasi yang baru saja anda lakukan telah dibatalkan dan anda belum berpindah halaman atau keadaan.');
         return;
     };
 
