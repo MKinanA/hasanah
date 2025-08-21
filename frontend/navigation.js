@@ -17,7 +17,7 @@ const screensBank = '#screens-bank',
     initScreen = 'home';
 
 let started = false,
-    prevState = {},
+    currState = {},
     ignorePopState = false;
 
 function main(event) {
@@ -63,11 +63,12 @@ function navigate(screen, data = null, forceNewStack = false, withBackBlocker = 
         withBackBlocker: withBackBlocker,
         prevStates: prevStates
     };
-    if (inactiveScreen != null && !replace) {
+    if (inactiveScreen != null && !replace && manipulateHistory) {
         ignorePopState = true;
         history.forward();
     };
-    if (manipulateHistory) !replace ? history.pushState(state, '') : history.replaceState(state, '');
+    manipulateHistory && (!replace ? history.pushState(state, '') : history.replaceState(state, ''));
+    if (manipulateHistory) currState = history.state;
 
     screenElement.id = id;
     screenElement.classList.add(movingInClass.substring(1));
@@ -82,8 +83,6 @@ function navigate(screen, data = null, forceNewStack = false, withBackBlocker = 
             screenElement.classList.remove(movingInClass.substring(1));
         });
     });
-
-    prevState = state;
 
     if (withBackBlocker) blockBack();
 
@@ -103,7 +102,7 @@ function blockBack() {
     state.index = typeof state.index == 'number' ? state.index + 1 : 1;
     state.withBackBlocker = false;
     history.pushState(state, '');
-    prevState = state;
+    currState = state;
     log(`Function blockBack finished, created a back blocker for screen ${history.state.screen}`);
 };
 
@@ -119,11 +118,20 @@ function goBackDespiteBackBlocker() {
 
 function onPopState(event) {
     log('Function onPopState invoked');
+    const prevState = currState;
+    currState = event.state;
 
     if (ignorePopState) {
         ignorePopState = false;
         log('popState ignored');
-        prevState = event.state;
+        currState = event.state;
+        return;
+    };
+
+    if (Math.abs(prevState.index - event.state.index) > 1) {
+        ignorePopState = true;
+        history.go(prevState.index - event.state.index);
+        window.alert('Maaf,\nMohon melakukan navigasi satu-per-satu, jangan lebih dari satu langkah sekaligus.\n\nIni untuk memastikan aplikasi berjalan dengan benar dan bisa menangani navigasi anda dengan baik.\n\nNavigasi yang baru saja anda lakukan telah diblokir dan anda belum berpindah halaman.');
         return;
     };
 
@@ -134,9 +142,6 @@ function onPopState(event) {
             let index = prevState.index, targetElement;
             while (true) {
                 targetElement = [...document.querySelectorAll(`${activeScreens} > ${screenClass}:not(${movingOutClass})`)].at(-1) ?? null;
-                /* log(`${event.state.id}: Iterations left = ${index}`);
-                log(`${event.state.id}: targetElement.id = ${targetElement.id}`);
-                log(`${event.state.id}: event.state.id = ${event.state.id}`); */ // TODO: Temporary
                 if (targetElement == null || targetElement.id == event.state.id) break;
                 targetElement.classList.add(movingOutClass.substring(1));
                 (toMove => setTimeout(() => {
@@ -154,38 +159,24 @@ function onPopState(event) {
             window.confirm('Apakah anda yakin ingin kembali? Perubahan yang anda buat di halaman ini bisa hilang.') ? history.back() : history.forward();
         };
     } else if ((event.state.index ?? 0) > (prevState.index ?? 0)) {
-        if (event.state.purpose == statePurposes[0]) {
-            let skippedIndexes = (event.state.index ?? 0) - (prevState.index ?? 0);
-            while (--skippedIndexes > 0) {
-                console.log(event.state.prevStates);
-                const state = event.state.prevStates[prevState.index + ((event.state.index ?? 0) - (prevState.index ?? 0) - skippedIndexes)];
-                if (state.purpose == statePurposes[0]) navigate(state.screen, state.data, undefined, undefined, undefined, undefined, false, state);
-            }; // TODO: Di sini masih ada bug di forward navigation
-            /* if (skippedIndexes > 1) {
-                history.go(-skippedIndexes);
-                const goForwardOneByOne = recursionsLeft => {
-                    if (recursionsLeft <= 0) return;
-                    setTimeout(() => {
-                        history.forward();
-                        goForwardOneByOne(recursionsLeft - 1);
-                    }, 0);
-                };
-                goForwardOneByOne();
-                return;
-            }; */
+        /* let skippedIndexes = (event.state.index ?? 0) - (prevState.index ?? 0);
+        while (--skippedIndexes > 0) {
+            const state = event.state.prevStates[prevState.index + ((event.state.index ?? 0) - (prevState.index ?? 0) - skippedIndexes)];
+            if (state.purpose == statePurposes[0]) navigate(state.screen, state.data, undefined, undefined, undefined, undefined, false, state);
+        }; */
 
+        if (event.state.purpose == statePurposes[0]) {
             navigate(event.state.screen, undefined, undefined, undefined, undefined, true);
             const stateWithBackBlocker = history.state;
             stateWithBackBlocker.withBackBlocker = event.state.withBackBlocker;
             history.replaceState(stateWithBackBlocker, '');
+            currState = history.state;
             log(`event.state.withBackBlocker = ${event.state.withBackBlocker}`);
             if (event.state.withBackBlocker) history.forward();
         } else if (event.state.purpose == statePurposes[2]) {
             null; // Tidak perlu melakukan apa-apa jika state merupakan back blocker, karena state back blocker tidak merubah tampilan
         };
     } else return;
-
-    prevState = event.state;
 
     log('Function onPopState finished');
 };
