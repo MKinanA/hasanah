@@ -59,7 +59,7 @@ body > * {
     left: 50%;
     transform: translate(-50%, -50%);
     transform-origin: top left;
-    background: rgb(var(--bg-color));
+    background: rgba(var(--dark), var(--shadow-opacity));
     box-shadow: 0 0 0 150vmax rgba(var(--dark), var(--shadow-opacity));
     overflow: auto;
 }
@@ -69,8 +69,4 @@ body > * {
     border-radius: 16px;
     opacity: 0;
     pointer-events: none;
-}
-
-.screen.transparent {
-    background: rgba(var(--dark), var(--shadow-opacity));
 }
