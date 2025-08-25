@@ -159,12 +159,6 @@ function onPopState(event) {
             window.confirm('Apakah anda yakin ingin kembali? Perubahan yang anda buat di halaman ini bisa hilang.') ? history.back() : history.forward();
         };
     } else if ((event.state.index ?? 0) > (prevState.index ?? 0)) {
-        /* let skippedIndexes = (event.state.index ?? 0) - (prevState.index ?? 0);
-        while (--skippedIndexes > 0) {
-            const state = event.state.prevStates[prevState.index + ((event.state.index ?? 0) - (prevState.index ?? 0) - skippedIndexes)];
-            if (state.purpose == statePurposes[0]) navigate(state.screen, state.data, undefined, undefined, undefined, undefined, false, state);
-        }; */
-
         if (event.state.purpose == statePurposes[0]) {
             navigate(event.state.screen, undefined, undefined, undefined, undefined, true);
             const stateWithBackBlocker = history.state;
