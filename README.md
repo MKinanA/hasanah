@@ -7,10 +7,10 @@
 ## Untuk Ditambahkan
 - ### Tampilan Frontend
   Tampilan frontend saat ini belum ada.
-- ### Pendataan Zakat dan Fidyah
-  Untuk memudahkan pendataan zakat dan fidyah setiap Bulan Ramadhan.
+- ### Pendataan ZIS & Fidyah
+  Penerimaan dan pendataan zakat, infaq, shadaqah, dan fidyah di bulan Ramadhan. Termasuk data muzaki dan mustahiq (penerima) zakat.
 - ### Export Data ke PDF
-  Export data zakat dan fidyah ke PDF untuk memudahkan perekapan data.
+  Export data zakat, dll termasuk muzaki dan mustahiq masing-masing ke pdf.
 
 ## Struktur Repositori
 - ### Backend
