@@ -167,9 +167,7 @@ function onPopState(event) {
             currState = history.state;
             log(`event.state.withBackBlocker = ${event.state.withBackBlocker}`);
             if (event.state.withBackBlocker) history.forward();
-        } else if (event.state.purpose == statePurposes[2]) {
-            null; // Tidak perlu melakukan apa-apa jika state merupakan back blocker, karena state back blocker tidak merubah tampilan
-        };
+        } else if (event.state.purpose == statePurposes[2]); // Tidak perlu melakukan apa-apa jika state merupakan back blocker, karena state back blocker tidak merubah tampilan
     } else return;
 
     log('Function onPopState finished');
