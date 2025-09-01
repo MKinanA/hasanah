@@ -1,9 +1,8 @@
-const screensBank = '#screens-bank',
-    inactiveScreens = '#inactive-screens',
-    activeScreens = '#active-screens',
+const /*inactiveScreens = '#inactive-screens',*/
+    /*activeScreens = '#active-screens',*/
     screenClass = '.screen',
     movingInClass = '.moving-in',
-    movingOutClass = '.moving-out',
+    inactiveClass = '.inactive',
     transitionDurationMilliseconds = 250,
     statePurposes = [
         'change screen',
@@ -12,9 +11,8 @@ const screensBank = '#screens-bank',
     ],
     appStartedOnScreenIndex = history.state != null ? history.state.screenIndex ?? 0 : 0,
     uncreatedScreenIndexes = [...Array(appStartedOnScreenIndex)].map((_, index) => index),
-    screenHandlers = {},
     log = message => console.log(`Hasanah Internal: ${message}`),
-    initScreen = 'home';
+    initScreen = 'init';
 
 let started = false,
     currState = {},
@@ -26,6 +24,8 @@ function main(event) {
     if (history.state != null ? typeof history.state.screen == 'string' : false) navigate(history.state.screen, undefined, undefined, undefined, false, true);
     else navigate(initScreen, undefined, undefined, undefined, false, true);
 };
+
+function removeAllElements(elements) {elements.forEach(element => element.remove());};
 
 function generateScreenId() {
     let id;
@@ -45,10 +45,15 @@ function navigate(screen, data = null, forceNewStack = false, withBackBlocker = 
 
     uncreatedScreenIndexes.includes(index) && uncreatedScreenIndexes.splice(uncreatedScreenIndexes.findIndex(value => value == index));
 
-    const inactiveScreen = !forceNewStack ? document.querySelector(`${inactiveScreens} > ${screenClass}[data-screen="${screen}"]:last-child`) : null;
-    const screenElement = inactiveScreen ?? document.querySelector(`${screensBank} > ${screenClass}[data-screen="${screen}"]`).cloneNode(true);
-    if (inactiveScreen == null) document.querySelector(inactiveScreens).innerHTML = null;
-    if (screenElement == null) return;
+    const firstInactiveScreen = [...document.querySelectorAll(`body > ${screenClass}${inactiveClass}`)].at(0);
+    const inactiveScreen = !forceNewStack && firstInactiveScreen && firstInactiveScreen.getAttribute('src') == `screens/${screen}` ? firstInactiveScreen : null;
+    const screenElement = inactiveScreen ?? document.createElement('iframe');
+    if (inactiveScreen == null) {
+        removeAllElements(document.querySelectorAll(`body > ${inactiveClass}`));
+        screenElement.setAttribute('src', `screens/${screen}`);
+        screenElement.classList.add(screenClass.substring(1), inactiveClass.substring(1));
+        document.body.appendChild(screenElement);
+    };
 
     const id = customState != null && [null, undefined, ''].includes(customState.id) ? customState.id : replace && history.state != null && ![null, undefined, ''].includes(history.state.id) ? history.state.id : (![null, undefined, ''].includes(screenElement.id) ? screenElement.id : generateScreenId());
 
@@ -64,29 +69,23 @@ function navigate(screen, data = null, forceNewStack = false, withBackBlocker = 
         prevStates: prevStates
     };
     if (inactiveScreen != null && !replace && manipulateHistory) {
+        log('Target screen to navigate exists as the most recent inactive screen, doing a forward navigation instead.')
         ignorePopState = true;
         history.forward();
     };
     manipulateHistory && (!replace ? history.pushState(state, '') : history.replaceState(state, ''));
     if (manipulateHistory) currState = history.state;
 
+    replace && ((toRemove) => toRemove && setTimeout(() => toRemove.remove(), transitionDurationMilliseconds))(document.querySelector(`body > ${screenClass}:not(${inactiveClass})[id=${id}]`));
     screenElement.id = id;
-    screenElement.classList.add(movingInClass.substring(1));
-    log(`replace = ${replace}, ${activeScreens} > ${screenClass}:not(${movingOutClass}) exists = ${document.querySelector(`${activeScreens} > ${screenClass}:not(${movingOutClass})`) != null}, ${activeScreens} children = ${document.querySelector(activeScreens).childElementCount}`);
-    if (replace && document.querySelector(`${activeScreens} > ${screenClass}:not(${movingOutClass})`) != null) [...document.querySelectorAll(`${activeScreens} > ${screenClass}:not(${movingOutClass})`)].at(-1).insertAdjacentElement('afterend', screenElement);
-    else if (replace && document.querySelector(activeScreens).childElementCount > 0) document.querySelector(`${activeScreens} > *`).insertAdjacentElement('beforebegin', screenElement);
-    else document.querySelector(activeScreens).append(screenElement);
+    log(`replace = ${replace}, body > ${screenClass}:not(${inactiveClass}) exists = ${document.querySelector(`body > ${screenClass}:not(${inactiveClass})`) != null}, body children = ${document.body.childElementCount}`);
+    ((toActivate) => setTimeout(() => {
+        toActivate.classList.remove(inactiveClass.substring(1));
+    }, 0))(screenElement)
 
-    if (!animate) screenElement.classList.remove(movingInClass.substring(1));
-    else requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-            screenElement.classList.remove(movingInClass.substring(1));
-        });
-    });
+    withBackBlocker && blockBack();
 
-    if (withBackBlocker) blockBack();
-
-    ((screenName, freshScreen) => (freshScreen && typeof screenHandlers[screenName] == 'function') && setTimeout(() => screenHandlers[screenName](state), 0))(screen, inactiveScreen == null);
+    ignorePopState = false;
 
     log(`Function navigate finished, navigated to ${screen}${withBackBlocker ? ' with back blocker' : ''}`);
 };
@@ -141,13 +140,9 @@ function onPopState(event) {
         if (prevState.purpose == statePurposes[0]) {
             let index = prevState.index, targetElement;
             while (true) {
-                targetElement = [...document.querySelectorAll(`${activeScreens} > ${screenClass}:not(${movingOutClass})`)].at(-1) ?? null;
+                targetElement = [...document.querySelectorAll(`body > ${screenClass}:not(${inactiveClass})`)].at(-1) ?? null;
                 if (targetElement == null || targetElement.id == event.state.id) break;
-                targetElement.classList.add(movingOutClass.substring(1));
-                (toMove => setTimeout(() => {
-                    document.querySelector(inactiveScreens).append(toMove);
-                    toMove.classList.remove(movingOutClass.substring(1));
-                }, transitionDurationMilliseconds))(targetElement);
+                targetElement.classList.add(inactiveClass.substring(1));
                 if (--index < 0) break;
             };
             if (uncreatedScreenIndexes.includes(event.state.index)) {
@@ -156,7 +151,7 @@ function onPopState(event) {
                 navigate(event.state.screen, event.state.data, undefined, undefined, false, true);
             };
         } else if (prevState.purpose == statePurposes[2]) {
-            window.confirm('Apakah anda yakin ingin kembali? Perubahan yang anda buat di halaman ini bisa hilang.') ? history.back() : history.forward();
+            window.confirm(prevState.backBlockerMessage ?? 'Apakah anda yakin ingin kembali? Perubahan yang anda buat di halaman ini bisa hilang.') ? history.back() : history.forward();
         };
     } else if ((event.state.index ?? 0) > (prevState.index ?? 0)) {
         if (event.state.purpose == statePurposes[0]) {
@@ -170,24 +165,10 @@ function onPopState(event) {
         } else if (event.state.purpose == statePurposes[2]); // Tidak perlu melakukan apa-apa jika state merupakan back blocker, karena state back blocker tidak merubah tampilan
     } else return;
 
+    ignorePopState = false;
+
     log('Function onPopState finished');
 };
 
 document.addEventListener('DOMContentLoaded', main);
 window.addEventListener('popstate', onPopState);
-
-/* class Screen extends HTMLDivElement {
-    static observedAttributes = ['id', 'class'];
-    constructor() {super()};
-    connectedCallback() {
-        if ([...document.querySelector(activeScreens).children].includes(this) && ![null, undefined, ''].includes(this.id));
-    };
-    disconnectedCallback() {
-        if (![
-            ...document.querySelector(activeScreens).children,
-            ...document.querySelector(inactiveScreens).children,
-        ].includes(this) || [null, undefined, ''].includes(this.id));
-    };
-    attributeChangedCallback(name, oldValue, newValue) {};
-};
-customElements.define('screen', Screen, {'extends': 'div'}); */

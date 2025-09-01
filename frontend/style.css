@@ -34,17 +34,17 @@ body > * {
     transform: translate(-50%, -50%);
     transform-origin: top left;
     background: rgba(var(--dark), var(--shadow-opacity));
-    box-shadow: 0 0 0 50vmax rgba(var(--dark), var(--shadow-opacity));
+    box-shadow: 0 0 0 25vmax rgba(var(--dark), var(--shadow-opacity));
     overflow: auto;
 }
 
-.screen.moving-in, .screen.moving-out {
-    scale: 50%;
+.screen.inactive {
+    scale: 75%;
     border-radius: calc(16 * var(--scaling-factor));
     opacity: 0;
     pointer-events: none;
 }
 
-.screen:not(.moving-out):not(:last-child):not(:has(+ .moving-out)) {
+.screen:not(.inactive):not(:last-child):not(:has(+ .inactive)) {
     scale: 125%;
 }
