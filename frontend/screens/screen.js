@@ -12,13 +12,15 @@ if (false) /* TODO: Delete this temporary `if (false)` blocker */ try { // This 
     catch {window.location.replace('/');}; // This redirects the client away as this window if the previous one throws an error
 };
 
+const app = window.parent;
+
 document.addEventListener('DOMContentLoaded', () => {
     const backButton = document.querySelector('body > main > button#back-button');
-    if (window.parent.history.state != null && (window.parent.history.state.index ?? 0) > 0) {
-        backButton.addEventListener('click', () => window.parent.history.back());
+    if (app.history.state != null && (app.history.state.index ?? 0) > 0) {
+        backButton.addEventListener('click', () => app.history.back());
         backButton.removeAttribute('hidden');
     }
-    else backButton.setAttribute('hidden', '');
+    else backButton && backButton.setAttribute('hidden', '');
 });
 
 window.addEventListener('load', () => {
