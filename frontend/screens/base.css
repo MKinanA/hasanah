@@ -1,0 +1,154 @@
+@import '../base.css';
+
+:root {
+    --gap-1: calc(36 * var(--scaling-factor));
+    --gap-2: calc(28 * var(--scaling-factor));
+    --gap-3: calc(20 * var(--scaling-factor));
+    --gap-4: calc(12 * var(--scaling-factor));
+    --gap-5: calc(4 * var(--scaling-factor));
+    --padding-1: calc(16 * var(--scaling-factor));
+    --padding-2: calc(12 * var(--scaling-factor));
+    --padding-3: calc(8 * var(--scaling-factor));
+    --font-size-1: calc(24 * var(--scaling-factor));
+    --font-size-2: calc(22 * var(--scaling-factor));
+    --font-size-3: calc(20 * var(--scaling-factor));
+    --font-size-4: calc(18 * var(--scaling-factor));
+    --font-size-5: calc(16 * var(--scaling-factor));
+    --x-padding-vw-1: 256;
+    --x-padding-width-1: calc(0 * (var(--x-padding-vw-1) / 100));
+    --x-padding-vw-2: calc(2560 + var(--x-padding-vw-1));
+    --x-padding-width-2: calc(8 * (var(--x-padding-vw-2) / 100));
+    --x-padding: max(16 * var(--scaling-factor), calc(((var(--x-padding-width-2) - var(--x-padding-width-1)) / (var(--x-padding-vw-2) - var(--x-padding-vw-1))) * 100vw + ((var(--x-padding-width-1) - ((var(--x-padding-width-2) - var(--x-padding-width-1)) / (var(--x-padding-vw-2) - var(--x-padding-vw-1))) * var(--x-padding-vw-1)) * 1px)));
+    --y-padding: var(--gap-1);
+    --top-button-size: calc(32 * var(--scaling-factor));
+}
+
+body {
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-color: rgba(var(--fg-color), 50%) transparent;
+    scrollbar-width: thin;
+}
+
+body > main {
+    width: 100vw;
+    padding: var(--y-padding) var(--x-padding);
+    overflow: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    align-content: center;
+    gap: var(--gap-1);
+    background: rgb(var(--bg-color));
+}
+
+body > main div {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    align-content: center;
+    width: 100%;
+    overflow: visible;
+}
+:is(body, div).gap-1 {gap: var(--gap-1);}
+:is(body, div).gap-2, body > main div {gap: var(--gap-2);}
+:is(body, div).gap-3, body > main div div {gap: var(--gap-3);}
+:is(body, div).gap-4, body > main div div div {gap: var(--gap-4);}
+:is(body, div).gap-5, body > main div div div div {gap: var(--gap-5);}
+
+:is(body, div) .align-start {align-self: flex-start;}
+:is(body, div) .align-end {align-self: flex-end;}
+
+h1 {font-size: var(--font-size-1); font-weight: 700;}
+h2 {font-size: var(--font-size-2); font-weight: 500;}
+h3 {font-size: var(--font-size-3); font-weight: 500;}
+p {font-size: var(--font-size-4); font-weight: 400; line-height: 125%;}
+small {font-size: var(--font-size-5); font-weight: 400; line-height: 125%;}
+a {
+    color: color-mix(in srgb, rgb(var(--fg-color)), rgb(0, 0, 255));
+    text-decoration: underline;
+    font-weight: 500;
+    border-radius: calc(2 * var(--scaling-factor));
+    overflow: visible;
+}
+body > main > * {text-align: center;}
+body > main > :is(h1, h2, h3, h4, h5, h6, p, small):first-child {
+    line-height: var(--top-button-size);
+    text-align: left;
+    width: 100%;
+}
+button, :not(h1, h2, h3, h4, h5, h6, p, small, span) > a {
+    font-size: var(--font-size-4);
+    font-weight: 500;
+    padding: var(--padding-1);
+    line-height: 100%;
+    background: rgb(var(--primary-color));
+    cursor: pointer;
+    color: rgb(var(--bg-color));
+    width: 100%;
+    border-radius: var(--padding-3);
+    text-decoration: none;
+}
+button.secondary {background: rgba(var(--fg-color), 75%);}
+button.inactive {opacity: 50%; pointer-events: none; cursor: default;}
+button.danger {background: rgb(255, 0, 0);}
+.faded {opacity: 50%;}
+
+input {
+    font-size: var(--font-size-4);
+    font-weight: 400;
+    padding: var(--padding-1);
+    line-height: 100%;
+    width: 100%;
+    border-radius: var(--padding-3);
+    background: rgb(var(--subtler-bg-color));
+}
+
+form {width: 100%;}
+
+body > main > button:is(#back-button, #menu-button) {
+    position: fixed;
+    top: var(--y-padding);
+    width: var(--top-button-size);
+    height: var(--top-button-size);
+    border-radius: 100%;
+    cursor: pointer;
+    background: rgba(var(--bg-color), 75%);
+    box-shadow: 0 0 calc(4 * var(--scaling-factor)) 0 rgba(var(--bg-color), 75%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    align-content: center;
+    overflow: visible;
+    padding: 0;
+}
+body > main > button#back-button {left: var(--x-padding);}
+body > main > button#menu-button {right: var(--x-padding);}
+body > main > button:is(#back-button, #menu-button) > svg {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+}
+body > main > button#menu-button > svg {
+    width: 80%;
+    height: 80%;
+}
+body > main:has(> button#back-button:not([hidden])) > :is(h1, h2, h3, h4, h5, h6, p, small):first-child {
+    padding-left: calc(var(--top-button-size) + var(--gap-1));
+}
+body > main:has(> button#menu-button:not([hidden])) > :is(h1, h2, h3, h4, h5, h6, p, small):first-child {
+    padding-right: calc(var(--top-button-size) + var(--gap-1));
+}
+
+/* @media (min-width: 256px) {:root {--x-padding: 6vw;}}
+@media (min-width: 512px) {:root {--x-padding: 8vw;}}
+@media (min-width: 768px) {:root {--x-padding: 10vw;}}
+@media (min-width: 1024px) {:root {--x-padding: 12vw;}}
+@media (min-width: 1280px) {:root {--x-padding: 14vw;}}
+@media (min-width: 1536px) {:root {--x-padding: 16vw;}}
+@media (min-width: 1792px) {:root {--x-padding: 18vw;}}
+@media (min-width: 2048px) {:root {--x-padding: 20vw;}}
+@media (min-width: 2304px) {:root {--x-padding: 22vw;}}
+@media (min-width: 2560px) {:root {--x-padding: 24vw;}} */

@@ -175,3 +175,19 @@ function onPopState(event) {
 
 document.addEventListener('DOMContentLoaded', main);
 window.addEventListener('popstate', onPopState);
+
+/* class Screen extends HTMLDivElement {
+    static observedAttributes = ['id', 'class'];
+    constructor() {super()};
+    connectedCallback() {
+        if ([...document.querySelector(activeScreens).children].includes(this) && ![null, undefined, ''].includes(this.id));
+    };
+    disconnectedCallback() {
+        if (![
+            ...document.querySelector(activeScreens).children,
+            ...document.querySelector(inactiveScreens).children,
+        ].includes(this) || [null, undefined, ''].includes(this.id));
+    };
+    attributeChangedCallback(name, oldValue, newValue) {};
+};
+customElements.define('screen', Screen, {'extends': 'div'}); */
