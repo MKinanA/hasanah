@@ -170,5 +170,5 @@ function onPopState(event) {
     log('Function onPopState finished');
 };
 
-document.addEventListener('DOMContentLoaded', main);
+window.addEventListener('load', main);
 window.addEventListener('popstate', onPopState);
