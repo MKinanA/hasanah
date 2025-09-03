@@ -37,7 +37,7 @@
     -webkit-tap-highlight-color: transparent;
 }
 
-:root, body {
+:root, html, body {
     background: rgb(var(--bg-color));
     height: 100dvh;
     width: 100dvw;
