@@ -79,9 +79,7 @@ function navigate(screen, data = null, forceNewStack = false, withBackBlocker = 
     replace && ((toRemove) => toRemove && setTimeout(() => toRemove.remove(), transitionDurationMilliseconds))(document.querySelector(`body > ${screenClass}:not(${inactiveClass})[id=${id}]`));
     screenElement.id = id;
     log(`replace = ${replace}, body > ${screenClass}:not(${inactiveClass}) exists = ${document.querySelector(`body > ${screenClass}:not(${inactiveClass})`) != null}, body children = ${document.body.childElementCount}`);
-    ((toActivate) => setTimeout(() => {
-        toActivate.classList.remove(inactiveClass.substring(1));
-    }, 0))(screenElement)
+    ((toActivate) => requestAnimationFrame(() => requestAnimationFrame(() => toActivate.classList.remove(inactiveClass.substring(1)))))(screenElement)
 
     withBackBlocker && blockBack();
 
