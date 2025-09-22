@@ -19,8 +19,9 @@ body > * {
     }
 }
 
-body::before {
+body::before, body::after {
     content: '';
+    display: none;
     position: fixed;
     width: calc(64 * var(--scaling-factor));
     height: calc(64 * var(--scaling-factor));
@@ -35,18 +36,9 @@ body::before {
     animation: 1s linear infinite spin;
 }
 
-/* #screens-bank */
-/* #inactive-screens */
+body:not(:has(> .screen:not(.inactive)))::before {display: block;}
 
-#screens-bank, #inactive-screens {
-    display: none;
-}
-
-/* #active-screens */
-
-#active-screens {
-    background: rgb(var(--bg-color));
-}
+body:has(> .screen:not(.inactive).loading:not(:has(+ .screen/*:not(.inactive)*/)))::after {display: block;} /* TODO: here ng*/
 
 /* .screen */
 
@@ -59,7 +51,6 @@ body::before {
     transform: translate(-50%, -50%);
     transform-origin: top left;
     background: rgba(var(--dark), var(--shadow-opacity));
-    box-shadow: 0 0 0 25vmax rgba(var(--dark), var(--shadow-opacity));
     overflow: auto;
 }
 
@@ -70,6 +61,6 @@ body::before {
     pointer-events: none;
 }
 
-.screen:not(.inactive):not(:last-child):not(:has(+ .inactive)) {
-    scale: 125%;
+.screen:not(.inactive):has(+ .screen.inactive), .screen:not(.inactive) + .screen.inactive, .screen:not(:has(+ .screen)) {
+    box-shadow: 0 0 0 25vmax rgba(var(--dark), var(--shadow-opacity));
 }

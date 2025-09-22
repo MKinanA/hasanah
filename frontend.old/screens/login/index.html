@@ -1,6 +1,7 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
     <head>
+        <base>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Login</title>
@@ -8,32 +9,26 @@
         <script src="../screen.js"></script>
     </head>
     <body><main>
-        <p>Daftar</p>
+        <p>Login</p>
         <div class="gap-3">
             <h1>Selamat Datang</h1>
-            <p>Silahkan daftar untuk membuat akun baru terlebih dahulu.</p>
+            <p>Silahkan login ke akun anda terlebih dahulu.</p>
         </div>
         <form action=""><div class="gap-1">
             <div class="gap-3">
                 <div class="gap-5">
-                    <p class="align-start">Username</p>
-                    <input name="username" type="text" placeholder="Masukkan username">
+                    <label for="username" class="align-start"><p>Username</p></label>
+                    <input name="username" type="text" placeholder="Masukkan username anda">
                 </div>
                 <div class="gap-5">
-                    <p class="align-start">Password</p>
-                    <input name="password" type="password" placeholder="Masukkan password">
-                </div>
-                <div class="gap-5">
-                    <p class="align-start">Ulangi password</p>
-                    <input name="confirm-password" type="password" placeholder="Masukkan kembali password">
+                    <label for="password" class="align-start"><p>Password</p></label>
+                    <input name="password" type="password" placeholder="Masukkan password anda">
+                    <small class="align-start"><a href="">Lupa password</a></small>
                 </div>
             </div>
-            <div class="gap-5">
-                <small>Setelah mendaftar, mohon tunggu sampai admin memberikan anda akses ke aplikasi.</small>
-                <button>Daftar</button>
-            </div>
+            <button onclick="app.navigate('dummy-home'); return false;">Login</button>
         </div></form>
-        <small>Sudah punya akun? Silahkan <a onclick="app.navigate('login')">login</a>.</small>
+        <small>Belum punya akun? Silahkan <a onclick="app.navigate('daftar')">daftar</a> terlebih dahulu.</small>
         <button id="menu-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 10a2 2 0 1 0 0 4 2 2 0 1 0 0-4M12 16a2 2 0 1 0 0 4 2 2 0 1 0 0-4M12 4a2 2 0 1 0 0 4 2 2 0 1 0 0-4"></path></svg></button>
         <button id="back-button"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M11.79 6.29 6.09 12l5.7 5.71 1.42-1.42L9.91 13H18v-2H9.91l3.3-3.29z"></path></svg></button>
     </main></body>

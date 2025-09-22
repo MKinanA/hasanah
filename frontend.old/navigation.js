@@ -37,6 +37,19 @@ function generateScreenId() {
     return id;
 };
 
+async function injectIframeScreen(iframeScreenElement, screenName, data) {
+    iframeScreenElement.classList.add('loading');
+    iframeScreenElement.dataset.screen = screenName;
+    const contentSrc = await fetch(`../screens/${screenName}`);
+    if (contentSrc.status.toString().substring(0, 1) == '2') {
+        const content = (await contentSrc.text())
+            .replace('<base>', '<base-placeholder>') // TODO: Temporary
+            .replace('<base-placeholder>', `<base href="screens/${screenName}/">`)
+            .replace('<data-placeholder>', `<script>const data = ${data !== undefined ? `JSON.parse('${JSON.stringify(data)}')` : 'undefined'};</script>`);
+        iframeScreenElement.srcdoc = content;
+    } else iframeScreenElement.srcdoc = 'Not found nigga';
+}
+
 function navigate(screen, data = null, forceNewStack = false, withBackBlocker = false, animate = true, replace = false, manipulateHistory = true, customState = null) {
     log('Function navigate invoked');
     const index = customState != null && customState.index != undefined ? customState.index : (history.state != null ? (history.state.index ?? 0) : 0) + (!replace ? 1 : 0),
@@ -46,13 +59,13 @@ function navigate(screen, data = null, forceNewStack = false, withBackBlocker = 
     uncreatedScreenIndexes.includes(index) && uncreatedScreenIndexes.splice(uncreatedScreenIndexes.findIndex(value => value == index));
 
     const firstInactiveScreen = [...document.querySelectorAll(`body > ${screenClass}${inactiveClass}`)].at(0);
-    const inactiveScreen = !forceNewStack && firstInactiveScreen && firstInactiveScreen.getAttribute('src') == `screens/${screen}` ? firstInactiveScreen : null;
+    const inactiveScreen = !forceNewStack && firstInactiveScreen && firstInactiveScreen.dataset.screen == screen ? firstInactiveScreen : null;
     const screenElement = inactiveScreen ?? document.createElement('iframe');
     if (inactiveScreen == null) {
         removeAllElements(document.querySelectorAll(`body > ${inactiveClass}`));
-        screenElement.setAttribute('src', `screens/${screen}`);
         screenElement.classList.add(screenClass.substring(1), inactiveClass.substring(1));
         document.body.appendChild(screenElement);
+        injectIframeScreen(screenElement, screen);
     };
 
     const id = customState != null && [null, undefined, ''].includes(customState.id) ? customState.id : replace && history.state != null && ![null, undefined, ''].includes(history.state.id) ? history.state.id : (![null, undefined, ''].includes(screenElement.id) ? screenElement.id : generateScreenId());
