@@ -1,1 +1,1 @@
-from . import apps, models, seeders, helpers, main, run_schema_and_seed
+from . import apps, models, seeders, helpers, run_schema_and_seed, main
