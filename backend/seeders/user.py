@@ -1,8 +1,9 @@
 from dotenv import load_dotenv as env
 from os import getenv
-from models import User, JenisAkses
+from ..models.user import User, JenisAkses
+from ..helpers.log import log
 
-def seed() -> None:
+async def seed() -> None:
     env()
 
     JenisAkses.add_akses('seluruhnya')
@@ -12,12 +13,14 @@ def seed() -> None:
         nama=str(getenv('NAMA_AKUN_ADMIN')),
         password=str(getenv('PASSWORD_AKUN_ADMIN')),
     )
-    _ = admin.save()
-    _ = admin.grant_akses('seluruhnya')
+    await admin.save()
+    await admin.grant_akses('seluruhnya')
 
     dummy_user = User(
         username='user',
         nama='User Dummy',
         password='12345678',
     )
-    _ = dummy_user.save()
+    await dummy_user.save()
+
+print(log(__name__, 'loaded')) # log

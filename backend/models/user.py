@@ -1,6 +1,7 @@
 from __future__ import annotations
 import sqlite3 as sql
 from passlib.hash import pbkdf2_sha256 as crypt
+from ..helpers.log import log
 
 def db_connect() -> sql.Connection: return sql.connect('.db')
 
@@ -170,3 +171,5 @@ class ZIS:
     class Pemasukan: pass
 
 with db_connect() as conn: pass
+
+print(log(__name__, 'loaded')) # log

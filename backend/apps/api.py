@@ -1,12 +1,15 @@
+from __future__ import annotations
+from typing import Union
 from dotenv import load_dotenv as env
 from asyncio import Lock
 from fastapi import FastAPI, Request, Response
 from fastapi.responses import RedirectResponse as Redirect, JSONResponse as JSON
 from starlette.middleware.base import RequestResponseEndpoint
 from starlette.exceptions import HTTPException
-from models import User
+from backend.models.user import User
 from time import time
 from secrets import token_hex as generate_token
+from ..helpers.log import log
 
 # {} Exception Classes Declaration
 
@@ -25,7 +28,7 @@ LOGIN_SESSIONS_TEMPLATE = {
     'last_activity': float,
     'tokens': [
         str,
-        str | None
+        Union[str, None]
     ],
 }
 SESSION_EXPIRES_AFTER = 60 * 60 * 24 * 7
@@ -78,7 +81,7 @@ HTTPEXCEPTION_TO_NORMAL_EXCEPTION = {
 # {} Preparations
 
 env()
-app = FastAPI()
+api = FastAPI()
 login_sessions = []
 login_sessions_lock = Lock()
 
@@ -98,7 +101,7 @@ async def new_session(username: str) -> str:
         })
     return new_token
 
-async def authenticate(token: str) -> tuple[User, str]:
+async def authenticate(token: str) -> 'tuple[User, str]':
     user = None
     new_token = None
     index = 0
@@ -128,14 +131,14 @@ async def end_session(token: str) -> None:
                 break
             index += 1
 
-def as_user_and_token(authentication) -> tuple[User, str]:
+def as_user_and_token(authentication) -> 'tuple[User, str]':
     print(authentication)
-    if type(authentication) != tuple or len(authentication) != 2 or type(authentication[0]) != User or type(authentication[1]) != str: raise TypeError(f'Invalid type for authentication, {type(authentication)} != {tuple[User, str]}')
+    if type(authentication) != tuple or len(authentication) != 2 or type(authentication[0]) != User or type(authentication[1]) != str: raise TypeError(f'Invalid type for authentication, {type(authentication)} != tuple[User, str]')
     return authentication
 
 # {} Exception & Error Handlers
 
-@app.exception_handler(Exception)
+@api.exception_handler(Exception)
 async def exception_handler(request: Request, exception: Exception) -> Response:
     response = {
         'type': 'error',
@@ -156,12 +159,12 @@ async def exception_handler(request: Request, exception: Exception) -> Response:
     if token: response['token'] = token
     return JSON(status_code=exception_type['code'] if exception_found else 500, content=response)
 
-@app.exception_handler(HTTPException)
+@api.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exception: HTTPException) -> None: raise HTTPEXCEPTION_TO_NORMAL_EXCEPTION[exception.status_code] if exception.status_code in HTTPEXCEPTION_TO_NORMAL_EXCEPTION.keys() else Exception(f'Terjadi kesalahan {exception.status_code} dari permintaan yang tidak bisa ditangani oleh server.')
 
 # {} Middleware (HTTP)
 
-@app.middleware('http')
+@api.middleware('http')
 async def middleware(request: Request, handler: RequestResponseEndpoint) -> Response:
     if request.method.lower() == 'post':
         if request.url.path.strip('/') not in NO_AUTH_PATHS:
@@ -175,10 +178,10 @@ async def middleware(request: Request, handler: RequestResponseEndpoint) -> Resp
 
 # {} Route Handlers
 
-@app.get('/')
+@api.get('/')
 async def root(request: Request, response: Response): return Redirect(url='https://mkinana.github.io', status_code=307)
 
-@app.post('/login')
+@api.post('/login')
 async def login(request: Request, response: Response):
     form = await request.form()
     username = form.get('username')
@@ -206,7 +209,7 @@ async def login(request: Request, response: Response):
         'token': new_token
     }
 
-@app.post('/logout')
+@api.post('/logout')
 async def logout(request: Request, response: Response):
     await end_session(as_user_and_token(request.state.authentication)[1])
     return {
@@ -217,7 +220,7 @@ async def logout(request: Request, response: Response):
 
 # {} Test (# TODO: delete these tests)
 
-@app.post('/do-something-as-authenticated-user')
+@api.post('/do-something-as-authenticated-user')
 async def do_something_as_authenticated_user(request: Request, response: Response):
     user, new_token = as_user_and_token(request.state.authentication)
     return {
@@ -226,3 +229,5 @@ async def do_something_as_authenticated_user(request: Request, response: Respons
         'message': f'You did something as {user.nama}. Now get your new token.',
         'token': new_token
     }
+
+print(log(__name__, 'loaded')) # log
