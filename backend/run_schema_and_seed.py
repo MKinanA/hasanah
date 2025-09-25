@@ -11,6 +11,6 @@ async def run_schema_and_seed():
 
     for seeder in dir(seeders): await eval(f'{seeders.__name__}.{seeder}.seed()') if 'seed' in dir(eval(f'{seeders.__name__}.{seeder}')) else None
 
-print(log(__name__, 'loaded')) # log
+print(log(__name__, 'loaded')) # File load log
 
 if __name__ == '__main__': run(run_schema_and_seed())

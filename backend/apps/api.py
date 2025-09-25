@@ -230,4 +230,4 @@ async def do_something_as_authenticated_user(request: Request, response: Respons
         'token': new_token
     }
 
-print(log(__name__, 'loaded')) # log
+print(log(__name__, 'loaded')) # File load log

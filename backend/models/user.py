@@ -172,4 +172,4 @@ class ZIS:
 
 with db_connect() as conn: pass
 
-print(log(__name__, 'loaded')) # log
+print(log(__name__, 'loaded')) # File load log

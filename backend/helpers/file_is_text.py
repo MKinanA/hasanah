@@ -13,4 +13,4 @@ def file_is_text(path: Path | str) -> bool:
                 break
     return is_text
 
-print(log(__name__, 'loaded')) # log
+print(log(__name__, 'loaded')) # File load log

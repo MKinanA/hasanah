@@ -27,4 +27,4 @@ class CustomStaticFiles(StaticFiles):
         if path.is_file() and 'format' in path.parts[-1].split('.') and file_is_text(path): path = format_and_cache(path, Path(str(self.directory))/'cache')
         return super().get_response(str(path), scope)
 
-print(log(__name__, 'loaded')) # log
+print(log(__name__, 'loaded')) # File load log
