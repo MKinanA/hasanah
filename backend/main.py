@@ -12,3 +12,4 @@ app.mount('/', CustomStaticFiles(directory=FRONTEND_DIRECTORY, html=True))
 
 print(log(__name__, 'loaded')) # File load log
 print(log(__name__, f'{FRONTEND_DIRECTORY = }'))
+print(log(__name__, f'{__package__ = }'))
