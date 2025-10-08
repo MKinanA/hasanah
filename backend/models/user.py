@@ -30,18 +30,21 @@ class User:
     def id(self, value: int | None) -> None:
         self.validate_id(value)
         self.__id = value
+
     @property
     def username(self) -> str: return self.__username
     @username.setter
     def username(self, value: str) -> None:
         self.validate_username(value)
         self.__username = value
+
     @property
     def nama(self) -> str: return self.__nama
     @nama.setter
     def nama(self, value: str) -> None:
         self.validate_nama(value)
         self.__nama = value
+
     @property
     def password(self) -> str: return self.__password
     def verify_password(self, password: str) -> bool: return crypt.verify(password, self.__password)
@@ -161,15 +164,6 @@ class JenisAkses:
             cursor.execute('INSERT INTO jenis_akses (akses) VALUES (?)', (akses.lower(),))
             conn.commit()
 
-class ZIS:
-    class InvalidAmount(Exception): pass
-    class InvalidDate(Exception): pass
-    class InvalidType(Exception): pass
-    class InvalidNama(Exception): pass
-    class InvalidNumber(Exception): pass
-
-    class Pemasukan: pass
-
-with db_connect() as conn: pass
+with db_connect(): pass
 
 print(log(__name__, 'loaded')) # File load log
