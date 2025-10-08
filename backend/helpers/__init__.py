@@ -1,1 +1,1 @@
-from . import log, custom_format
+from . import log, custom_html_templating, file_is_text
