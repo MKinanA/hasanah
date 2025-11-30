@@ -1,0 +1,11 @@
+.env
+__pycache__
+.db
+rencana.md
+__test__
+__test__.*
+cache
+*.private.*
+*.unused.*
+tempCodeRunnerFile.py
+.python-version
