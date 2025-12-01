@@ -1,0 +1,1 @@
+select_command = lambda **kwargs: ('SELECT * FROM user' + ((' WHERE ' + ', '.join(f'{key} = ?' for key in kwargs))if len(kwargs) > 0 else ''), (*kwargs.values(),))
