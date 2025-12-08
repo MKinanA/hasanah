@@ -2,3 +2,4 @@ fastapi
 dotenv
 passlib
 colorama
+lxml
