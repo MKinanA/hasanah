@@ -116,7 +116,7 @@ async def authenticate(token: str) -> 'tuple[User, str]':
                     login_sessions[index]['tokens'][0] = new_token = generate_token(32)
                 else: new_token = session['tokens'][0]
                 login_sessions[index]['last_activity'] = time()
-                user = await User.get_by_username(session['username'])
+                user = await User.get(username=session['username'])
                 break
             index += 1
     if type(user) != User or type(new_token) != str: raise TokenNotFound('Sesi tidak ditemukan atau sudah kadaluarsa, silahkan login dan dapatkan token baru.')
@@ -193,7 +193,7 @@ async def login(request: Request, response: Response):
             'error': 'Permintaan Buruk',
             'message': 'Data yang dikirimkan tidak sesuai.'
         }
-    user = await User.get_by_username(username)
+    user = await User.get(username=username)
     if type(user) != User or not user.verify_password(password):
         response.status_code = 401
         return {
