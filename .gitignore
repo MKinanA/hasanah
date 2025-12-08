@@ -9,3 +9,4 @@ cache
 *.unused.*
 tempCodeRunnerFile.py
 .python-version
+dev_venv
