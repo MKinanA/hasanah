@@ -1,6 +1,6 @@
 .env
 __pycache__
-.db
+.db*
 rencana.md
 __test__
 __test__.*
