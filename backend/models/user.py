@@ -2,8 +2,12 @@ from __future__ import annotations
 import sqlite3 as sql
 from passlib.hash import pbkdf2_sha256 as crypt
 from ..helpers.log import log
+from ..helpers.sql_things import select_command as select
 
-def db_connect() -> sql.Connection: return sql.connect('.db')
+def db_connect() -> sql.Connection:
+    conn = sql.connect('.db')
+    conn.row_factory = sql.Row
+    return conn
 
 ALLOWED_CHARACTERS_FOR_USER_USERNAME = 'abcdefghijklmnopqrstuvwxyz0123456789_.-'
 PASSWORD_HASHING_ROUNDS = 10_000
@@ -75,28 +79,20 @@ class User:
             conn.commit()
 
     @staticmethod
-    async def get_by_id(id: int) -> User | None:
+    async def get(**kwargs) -> User | None:
         with db_connect() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM user WHERE id = ?', (id,))
+            cursor.execute(*select(**kwargs))
             row = cursor.fetchone()
             if row: return User(row[1], row[2], row[3], id=row[0])
 
     @staticmethod
-    async def get_all() -> list[User]:
+    async def get_all(**kwargs) -> list[User]:
         with db_connect() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT * FROM user')
+            cursor.execute(*select(**kwargs))
             rows = cursor.fetchall()
             return [User(row[1], row[2], row[3], id=row[0]) for row in rows]
-
-    @staticmethod
-    async def get_by_username(username: str) -> User | None:
-        with db_connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute('SELECT * FROM user WHERE username = ?', (username,))
-            row = cursor.fetchone()
-            if row: return User(row[1], row[2], row[3], id=row[0])
 
     async def delete(self) -> None:
         if self.__id is None: return
