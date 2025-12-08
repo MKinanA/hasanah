@@ -226,7 +226,7 @@ async def do_something_as_authenticated_user(request: Request, response: Respons
     return {
         'type': 'success',
         'success': 'Did Something',
-        'message': f'You did something as {user.nama}. Now get your new token.',
+        'message': f'You did something as {user.name}. Now get your new token.',
         'token': new_token
     }
 

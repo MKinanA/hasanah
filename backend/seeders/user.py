@@ -10,7 +10,7 @@ async def seed() -> None:
 
     admin = User(
         username=str(getenv('USERNAME_AKUN_ADMIN')),
-        nama=str(getenv('NAMA_AKUN_ADMIN')),
+        name=str(getenv('NAMA_AKUN_ADMIN')),
         password=str(getenv('PASSWORD_AKUN_ADMIN')),
     )
     await admin.save()
@@ -18,7 +18,7 @@ async def seed() -> None:
 
     dummy_user = User(
         username='user',
-        nama='User Dummy',
+        name='User Dummy',
         password='12345678',
     )
     await dummy_user.save()

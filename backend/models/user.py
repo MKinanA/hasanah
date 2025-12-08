@@ -18,14 +18,14 @@ class User:
     class InvalidPassword(Exception): pass
     class InexistentUser(Exception): pass
 
-    def __init__(self, username: str, nama: str, password: str, id: int | None = None) -> None:
+    def __init__(self, username: str, name: str, password: str, id: int | None = None) -> None:
         self.validate_id(id)
         self.validate_username(username)
-        self.validate_nama(nama)
+        self.validate_name(name)
         self.validate_password(password)
         self.__id = id
         self.__username = username
-        self.__nama = nama
+        self.__name = name
         self.__password = password if crypt.identify(password) else crypt.using(rounds=PASSWORD_HASHING_ROUNDS).hash(password)
 
     @property
@@ -43,11 +43,11 @@ class User:
         self.__username = value
 
     @property
-    def nama(self) -> str: return self.__nama
-    @nama.setter
-    def nama(self, value: str) -> None:
-        self.validate_nama(value)
-        self.__nama = value
+    def name(self) -> str: return self.__name
+    @name.setter
+    def name(self, value: str) -> None:
+        self.validate_name(value)
+        self.__name = value
 
     @property
     def password(self) -> str: return self.__password
@@ -57,13 +57,13 @@ class User:
         self.validate_password(value)
         self.__password = value if crypt.identify(value) else crypt.using(rounds=PASSWORD_HASHING_ROUNDS).hash(value)
 
-    def __repr__(self) -> str: return f'User(\n    id = {self.__id},\n    username = \'{self.__username}\',\n    nama = \'{self.__nama}\',\n    password = \'{self.__password}\'\n)'
+    def __repr__(self) -> str: return f'User(\n    id = {self.__id},\n    username = \'{self.__username}\',\n    name = \'{self.__name}\',\n    password = \'{self.__password}\'\n)'
 
     def validate_id(self, value) -> None:
         if not (type(value) in (int, type(None)) and (value is None or value > 0)): raise ValueError('ID harus berupa integer positif atau None.')
     def validate_username(self, value) -> None:
         if not (type(value) == str and 1 <= len(value) <= 64 and all(c in ALLOWED_CHARACTERS_FOR_USER_USERNAME for c in value)): raise self.InvalidUsername('Username harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil, angka, underscore (_), titik (.), dan strip (-).')
-    def validate_nama(self, value) -> None:
+    def validate_name(self, value) -> None:
         if not (type(value) == str and 1 <= len(value) <= 64): raise self.InvalidName('Nama harus berupa string dengan panjang 1-64 karakter.')
     def validate_password(self, value) -> None:
         if crypt.identify(value): return
@@ -73,9 +73,9 @@ class User:
         with db_connect() as conn:
             cursor = conn.cursor()
             if self.__id is None:
-                cursor.execute('INSERT INTO user (username, nama, password) VALUES (?, ?, ?)', (self.__username, self.__nama, self.__password))
+                cursor.execute('INSERT INTO user (username, name, password) VALUES (?, ?, ?)', (self.__username, self.__name, self.__password))
                 self.__id = cursor.lastrowid
-            else: cursor.execute('UPDATE user SET username = ?, nama = ?, password = ? WHERE id = ?', (self.__username, self.__nama, self.__password, self.__id))
+            else: cursor.execute('UPDATE user SET username = ?, name = ?, password = ? WHERE id = ?', (self.__username, self.__name, self.__password, self.__id))
             conn.commit()
 
     @staticmethod

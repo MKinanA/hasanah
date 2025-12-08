@@ -4,7 +4,7 @@ PRAGMA journal_mode=WAL;
 CREATE TABLE user (
     id INTEGER PRIMARY KEY NOT NULL,
     username TEXT NOT NULL UNIQUE CHECK (username = lower(username)),
-    nama TEXT NOT NULL,
+    name TEXT NOT NULL,
     password TEXT NOT NULL
 );
 
