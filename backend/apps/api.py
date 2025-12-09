@@ -179,9 +179,6 @@ async def middleware(request: Request, handler: RequestResponseEndpoint) -> Resp
 
 # {} Route Handlers
 
-@api.get('/')
-async def root(request: Request, response: Response): return Redirect(url='https://mkinana.github.io', status_code=307)
-
 @api.post('/login')
 async def login(request: Request, response: Response):
     form = await request.form()
