@@ -22,6 +22,7 @@ class MethodNotAllowed(Exception): pass
 
 # {} Const Declarations
 
+ROUTE_PREFIX = 'api'
 LOGIN_SESSIONS_TEMPLATE = {
     'username': str,
     'login_time': float,
@@ -33,9 +34,9 @@ LOGIN_SESSIONS_TEMPLATE = {
 }
 SESSION_EXPIRES_AFTER = 60 * 60 * 24 * 7
 NO_AUTH_PATHS = [
-    '',
-    'login',
-    'test'
+    f'{ROUTE_PREFIX}/',
+    f'{ROUTE_PREFIX}/login',
+    f'{ROUTE_PREFIX}/test'
 ]
 EXCEPTION_STATUS_CODES = {
     RequiredDataIncompleteOrInvalid: {
