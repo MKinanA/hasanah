@@ -1,10 +1,13 @@
 from dotenv import load_dotenv as env
 from os import getenv
+from pathlib import Path
 from ..models.user import User, JenisAkses
 from ..helpers.log import log
 
+PATH = Path(__file__).parent
+
 async def seed() -> None:
-    env()
+    env(PATH.parent/'.env')
 
     JenisAkses.add_akses('seluruhnya')
 

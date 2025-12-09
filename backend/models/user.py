@@ -1,11 +1,14 @@
 from __future__ import annotations
+from pathlib import Path
 import sqlite3 as sql
 from passlib.hash import pbkdf2_sha256 as crypt
 from ..helpers.log import log
 from ..helpers.sql_things import select_command as select
 
+PATH = Path(__file__).parent
+
 def db_connect() -> sql.Connection:
-    conn = sql.connect('.db')
+    conn = sql.connect(PATH.parent/'.db')
     conn.row_factory = sql.Row
     return conn
 

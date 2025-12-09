@@ -1,15 +1,18 @@
+from pathlib import Path
 import sqlite3 as sql
-from backend import seeders
+from . import seeders
 from asyncio import run
 from .helpers.log import log
 
+PATH = Path(__file__).parent
+
 async def run_schema_and_seed():
-    with sql.connect('.db') as conn:
+    with sql.connect(PATH/'.db') as conn:
         cursor = conn.cursor()
-        cursor.executescript(open('schema.sql', 'r').read())
+        cursor.executescript(open(PATH/'schema.sql', 'r').read())
         conn.commit()
 
-    for seeder in dir(seeders): await eval(f'{seeders.__name__}.{seeder}.seed()') if 'seed' in dir(eval(f'{seeders.__name__}.{seeder}')) else None
+    for seeder in dir(seeders): await eval(f'seeders.{seeder}.seed()') if 'seed' in dir(eval(f'seeders.{seeder}')) else None
 
 print(log(__name__, 'loaded')) # File load log
 
