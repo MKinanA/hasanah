@@ -140,7 +140,7 @@ class JenisAkses:
     def get_akses_by_id(id: int) -> str | None:
         with db_connect() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT akses FROM jenis_akses WHERE id = ?', (id,))
+            cursor.execute('SELECT akses FROM access WHERE id = ?', (id,))
             row = cursor.fetchone()
             if row: return row[0]
 
@@ -148,7 +148,7 @@ class JenisAkses:
     def get_id_by_akses(akses: str) -> int | None:
         with db_connect() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT id FROM jenis_akses WHERE akses = ?', (akses.lower(),))
+            cursor.execute('SELECT id FROM access WHERE akses = ?', (akses.lower(),))
             row = cursor.fetchone()
             if row: return row[0]
 
@@ -158,9 +158,9 @@ class JenisAkses:
             raise JenisAkses.InvalidAccess('Akses harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
         with db_connect() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT COUNT(*) FROM jenis_akses WHERE akses = ?', (akses.lower(),))
+            cursor.execute('SELECT COUNT(*) FROM access WHERE akses = ?', (akses.lower(),))
             if cursor.fetchone()[0] > 0: return
-            cursor.execute('INSERT INTO jenis_akses (akses) VALUES (?)', (akses.lower(),))
+            cursor.execute('INSERT INTO access (akses) VALUES (?)', (akses.lower(),))
             conn.commit()
 
 with db_connect(): pass
