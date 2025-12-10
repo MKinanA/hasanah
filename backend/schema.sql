@@ -10,12 +10,12 @@ CREATE TABLE user (
 
 CREATE TABLE access (
     id INTEGER PRIMARY KEY NOT NULL,
-    akses TEXT NOT NULL CHECK (akses = lower(akses))
+    name TEXT NOT NULL UNIQUE CHECK (name = lower(name))
 );
 
-CREATE TABLE r_akses_user (
+CREATE TABLE r_user_access (
     id INTEGER PRIMARY KEY NOT NULL,
     user INTEGER NOT NULL REFERENCES user(id) ON DELETE CASCADE,
-    akses INTEGER NOT NULL REFERENCES access(id) ON DELETE CASCADE,
-    UNIQUE (user, akses)
+    access INTEGER NOT NULL REFERENCES access(id) ON DELETE CASCADE,
+    UNIQUE (user, access)
 );

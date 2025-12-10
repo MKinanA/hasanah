@@ -1,7 +1,7 @@
 from dotenv import load_dotenv as env
 from os import getenv
 from pathlib import Path
-from ..models.user import User, JenisAkses
+from ..models.user import User, Access
 from ..helpers.log import log
 
 PATH = Path(__file__).parent
@@ -9,7 +9,7 @@ PATH = Path(__file__).parent
 async def seed() -> None:
     env(PATH.parent/'.env')
 
-    JenisAkses.add_akses('seluruhnya')
+    Access.add_access('seluruhnya')
 
     admin = User(
         username=str(getenv('USERNAME_AKUN_ADMIN')),
@@ -17,7 +17,7 @@ async def seed() -> None:
         password=str(getenv('PASSWORD_AKUN_ADMIN')),
     )
     await admin.save()
-    await admin.grant_akses('seluruhnya')
+    await admin.grant_access('seluruhnya')
 
     dummy_user = User(
         username='user',

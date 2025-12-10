@@ -106,61 +106,61 @@ class User:
             self.__id = None
 
     @property
-    async def akses(self) -> list:
+    async def accesses(self) -> list:
         if self.__id is None: raise self.InexistentUser('User ini tidak ada di database, mungkin belum disimpan atau sudah dihapus.')
         with db_connect() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT akses FROM r_akses_user WHERE user = ?', (self.__id,))
-            return [JenisAkses.get_akses_by_id(row[0]) for row in cursor.fetchall()]
+            cursor.execute('SELECT access FROM r_user_access WHERE user = ?', (self.__id,))
+            return [Access.get_access_by_id(row[0]) for row in cursor.fetchall()]
 
-    async def grant_akses(self, akses: str) -> None:
+    async def grant_access(self, access: str) -> None:
         if self.__id is None: raise self.InexistentUser('User ini tidak ada di database, mungkin belum disimpan atau sudah dihapus.')
-        id_akses = JenisAkses.get_id_by_akses(akses)
-        if id_akses is None: raise JenisAkses.InvalidAccess(f'Akses "{akses}" tidak valid.')
+        access_id = Access.get_id_by_name(access)
+        if access_id is None: raise Access.InvalidAccess(f'Akses "{access}" tidak valid.')
         with db_connect() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT COUNT(*) FROM r_akses_user WHERE user = ? AND akses = ?', (self.__id, id_akses))
+            cursor.execute('SELECT COUNT(*) FROM r_user_access WHERE user = ? AND access = ?', (self.__id, access_id))
             if cursor.fetchone()[0] > 0: return
-            cursor.execute('INSERT INTO r_akses_user (user, akses) VALUES (?, ?)', (self.__id, id_akses))
+            cursor.execute('INSERT INTO r_user_access (user, access) VALUES (?, ?)', (self.__id, access_id))
             conn.commit()
 
-    async def revoke_akses(self, akses: str) -> None:
+    async def revoke_access(self, access: str) -> None:
         if self.__id is None: raise self.InexistentUser('User ini tidak ada di database, mungkin belum disimpan atau sudah dihapus.')
-        id_akses = JenisAkses.get_id_by_akses(akses)
-        if id_akses is None: raise JenisAkses.InvalidAccess(f'Akses "{akses}" tidak valid.')
+        access_id = Access.get_id_by_name(access)
+        if access_id is None: raise Access.InvalidAccess(f'Akses "{access}" tidak valid.')
         with db_connect() as conn:
             cursor = conn.cursor()
-            cursor.execute('DELETE FROM r_akses_user WHERE user = ? AND akses = ?', (self.__id, id_akses))
+            cursor.execute('DELETE FROM r_user_access WHERE user = ? AND access = ?', (self.__id, access_id))
             conn.commit()
 
-class JenisAkses:
+class Access:
     class InvalidAccess(Exception): pass
 
     @staticmethod
-    def get_akses_by_id(id: int) -> str | None:
+    def get_access_by_id(id: int) -> str | None:
         with db_connect() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT akses FROM access WHERE id = ?', (id,))
+            cursor.execute('SELECT access FROM access WHERE id = ?', (id,))
             row = cursor.fetchone()
             if row: return row[0]
 
     @staticmethod
-    def get_id_by_akses(akses: str) -> int | None:
+    def get_id_by_name(access: str) -> int | None:
         with db_connect() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT id FROM access WHERE akses = ?', (akses.lower(),))
+            cursor.execute('SELECT id FROM access WHERE name = ?', (access.lower(),))
             row = cursor.fetchone()
             if row: return row[0]
 
     @staticmethod
-    def add_akses(akses: str) -> None:
-        if not (type(akses) == str and 1 <= len(akses) <= 64 and akses.islower()):
-            raise JenisAkses.InvalidAccess('Akses harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
+    def add_access(access: str) -> None:
+        if not (type(access) == str and 1 <= len(access) <= 64 and access.islower()):
+            raise Access.InvalidAccess('Akses harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
         with db_connect() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT COUNT(*) FROM access WHERE akses = ?', (akses.lower(),))
+            cursor.execute('SELECT COUNT(*) FROM access WHERE name = ?', (access.lower(),))
             if cursor.fetchone()[0] > 0: return
-            cursor.execute('INSERT INTO access (akses) VALUES (?)', (akses.lower(),))
+            cursor.execute('INSERT INTO access (name) VALUES (?)', (access.lower(),))
             conn.commit()
 
 with db_connect(): pass
