@@ -111,7 +111,7 @@ class User:
         with db_connect() as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT access FROM r_user_access WHERE user = ?', (self.__id,))
-            return [Access.get_access_by_id(row[0]) for row in cursor.fetchall()]
+            return [Access.get_name_by_id(row[0]) for row in cursor.fetchall()]
 
     async def grant_access(self, access: str) -> None:
         if self.__id is None: raise self.InexistentUser('User ini tidak ada di database, mungkin belum disimpan atau sudah dihapus.')
@@ -137,7 +137,7 @@ class Access:
     class InvalidAccess(Exception): pass
 
     @staticmethod
-    def get_access_by_id(id: int) -> str | None:
+    def get_name_by_id(id: int) -> str | None:
         with db_connect() as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT access FROM access WHERE id = ?', (id,))
