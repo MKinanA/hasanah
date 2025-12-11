@@ -111,11 +111,11 @@ class User:
         with db_connect() as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT access FROM r_user_access WHERE user = ?', (self.__id,))
-            return [Access.get_name_by_id(row[0]) for row in cursor.fetchall()]
+            return [await Access.get_name_by_id(row[0]) for row in cursor.fetchall()]
 
     async def grant_access(self, access: str) -> None:
         if self.__id is None: raise self.InexistentUser('User ini tidak ada di database, mungkin belum disimpan atau sudah dihapus.')
-        access_id = Access.get_id_by_name(access)
+        access_id = await Access.get_id_by_name(access)
         if access_id is None: raise Access.InvalidAccess(f'Akses "{access}" tidak valid.')
         with db_connect() as conn:
             cursor = conn.cursor()
@@ -126,7 +126,7 @@ class User:
 
     async def revoke_access(self, access: str) -> None:
         if self.__id is None: raise self.InexistentUser('User ini tidak ada di database, mungkin belum disimpan atau sudah dihapus.')
-        access_id = Access.get_id_by_name(access)
+        access_id = await Access.get_id_by_name(access)
         if access_id is None: raise Access.InvalidAccess(f'Akses "{access}" tidak valid.')
         with db_connect() as conn:
             cursor = conn.cursor()
@@ -137,15 +137,15 @@ class Access:
     class InvalidAccess(Exception): pass
 
     @staticmethod
-    def get_name_by_id(id: int) -> str | None:
+    async def get_name_by_id(id: int) -> str | None:
         with db_connect() as conn:
             cursor = conn.cursor()
-            cursor.execute('SELECT access FROM access WHERE id = ?', (id,))
+            cursor.execute('SELECT name FROM access WHERE id = ?', (id,))
             row = cursor.fetchone()
             if row: return row[0]
 
     @staticmethod
-    def get_id_by_name(access: str) -> int | None:
+    async def get_id_by_name(access: str) -> int | None:
         with db_connect() as conn:
             cursor = conn.cursor()
             cursor.execute('SELECT id FROM access WHERE name = ?', (access.lower(),))
@@ -153,7 +153,7 @@ class Access:
             if row: return row[0]
 
     @staticmethod
-    def add_access(access: str) -> None:
+    async def add_access(access: str) -> None:
         if not (type(access) == str and 1 <= len(access) <= 64 and access.islower()):
             raise Access.InvalidAccess('Akses harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
         with db_connect() as conn:
