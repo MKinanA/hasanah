@@ -1,4 +1,3 @@
-from __future__ import annotations
 from os import listdir
 from fastapi.staticfiles import StaticFiles
 from fastapi import Response

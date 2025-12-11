@@ -1,8 +1,7 @@
-from __future__ import annotations
 from passlib.hash import pbkdf2_sha256 as crypt
 from ..helpers.db_connect import db_connect
 from ..helpers.log import log
-from ..helpers.sql_commands import select_command as select
+from ..helpers import sql_commands as sql
 
 ALLOWED_CHARACTERS_FOR_USER_USERNAME = 'abcdefghijklmnopqrstuvwxyz0123456789_.-'
 PASSWORD_HASHING_ROUNDS = 10_000
@@ -13,7 +12,7 @@ class User:
     class InvalidPassword(Exception): pass
     class InexistentUser(Exception): pass
 
-    def __init__(self, username: str, name: str, password: str, id: int | None = None) -> None:
+    def __init__(self, username: str, name: str, password: str, id: 'int | None' = None) -> None:
         self.validate_id(id)
         self.validate_username(username)
         self.validate_name(name)
@@ -24,9 +23,9 @@ class User:
         self.__password = password if crypt.identify(password) else crypt.using(rounds=PASSWORD_HASHING_ROUNDS).hash(password)
 
     @property
-    def id(self) -> int | None: return self.__id
+    def id(self) -> 'int | None': return self.__id
     @id.setter
-    def id(self, value: int | None) -> None:
+    def id(self, value: 'int | None') -> None:
         self.validate_id(value)
         self.__id = value
 
@@ -74,18 +73,18 @@ class User:
             await conn.commit()
 
     @staticmethod
-    async def get(**kwargs) -> User | None:
+    async def get(**kwargs) -> 'User | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*select(**kwargs))
+            await cursor.execute(*sql.select(**kwargs))
             row = await cursor.fetchone()
             if row: return User(row[1], row[2], row[3], id=row[0])
 
     @staticmethod
-    async def get_all(**kwargs) -> list[User]:
+    async def get_all(**kwargs) -> 'list[User]':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*select(**kwargs))
+            await cursor.execute(*sql.select(**kwargs))
             rows = await cursor.fetchall()
             return [User(row[1], row[2], row[3], id=row[0]) for row in rows]
 
@@ -129,7 +128,7 @@ class Access:
     class InvalidAccess(Exception): pass
 
     @staticmethod
-    async def get_name_by_id(id: int) -> str | None:
+    async def get_name_by_id(id: int) -> 'str | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
             await cursor.execute('SELECT name FROM access WHERE id = ?', (id,))
@@ -137,7 +136,7 @@ class Access:
             if row: return row[0]
 
     @staticmethod
-    async def get_id_by_name(access: str) -> int | None:
+    async def get_id_by_name(access: str) -> 'int | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
             await cursor.execute('SELECT id FROM access WHERE name = ?', (access.lower(),))

@@ -1,4 +1,3 @@
-from __future__ import annotations
 from typing import Union
 from dotenv import load_dotenv as env
 from asyncio import Lock
