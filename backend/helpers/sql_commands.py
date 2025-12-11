@@ -1,4 +1,4 @@
-def select(table: str, **where): return (f'SELECT * FROM {table}' + ((' WHERE ' + ' AND '.join(f'{key} = ?' for key in where)) if len(where) > 0 else ''), (*where.values(),))
+def select(table: str, columns: 'list | None' = None, **where): return (f'SELECT {"*" if columns is None else ", ".join(columns)} FROM {table}' + ((' WHERE ' + ' AND '.join(f'{key} = ?' for key in where)) if len(where) > 0 else ''), (*where.values(),))
 def insert(table: str, **values): return (f'INSERT INTO {table} ({", ".join(values)}) VALUES ({", ".join("?" * len(values))})', (*values.values(),))
 def update(table: str, where: 'dict | None' = None, **set): return (f'UPDATE {table}' + ((' SET ' + ", ".join(f"{key} = ?" for key in set)) if len(set) > 0 else '') + ((' WHERE ' + ' AND '.join(f'{key} = ?' for key in where)) if where is not None and len(where) > 0 else ''), (*set.values(), *(where.values() if where is not None else ())))
 def delete(table: str, **where): return (f'DELETE FROM {table}' + ((' WHERE ' + ' AND '.join(f'{key} = ?' for key in where)) if len(where) > 0 else ''), (*where.values(),))
