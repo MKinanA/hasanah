@@ -67,16 +67,16 @@ class User:
         async with db_connect() as conn:
             cursor = await conn.cursor()
             if self.__id is None:
-                await cursor.execute('INSERT INTO user (username, name, password) VALUES (?, ?, ?)', (self.__username, self.__name, self.__password))
+                await cursor.execute(*sql.insert('user', username=self.__username, name=self.__name, password=self.__password))
                 self.__id = cursor.lastrowid
-            else: await cursor.execute('UPDATE user SET username = ?, name = ?, password = ? WHERE id = ?', (self.__username, self.__name, self.__password, self.__id))
+            else: await cursor.execute(*sql.update('user', {'id': self.__id}, username=self.__username, name=self.__name, password=self.__password))
             await conn.commit()
 
     @staticmethod
     async def get(**kwargs) -> 'User | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select(**kwargs))
+            await cursor.execute(*sql.select('user', **kwargs))
             row = await cursor.fetchone()
             if row: return User(row[1], row[2], row[3], id=row[0])
 
@@ -84,7 +84,7 @@ class User:
     async def get_all(**kwargs) -> 'list[User]':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select(**kwargs))
+            await cursor.execute(*sql.select('user', **kwargs))
             rows = await cursor.fetchall()
             return [User(row[1], row[2], row[3], id=row[0]) for row in rows]
 
@@ -92,7 +92,7 @@ class User:
         if self.__id is None: return
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute('DELETE FROM user WHERE id = ?', (self.__id,))
+            await cursor.execute(*sql.delete('user', id=self.__id))
             await conn.commit()
             self.__id = None
 
@@ -101,7 +101,7 @@ class User:
         if self.__id is None: raise self.InexistentUser('User ini tidak ada di database, mungkin belum disimpan atau sudah dihapus.')
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute('SELECT access FROM r_user_access WHERE user = ?', (self.__id,))
+            await cursor.execute(*sql.select('r_user_access', ['access'], user=self.__id))
             return [await Access.get_name_by_id(row[0]) for row in await cursor.fetchall()]
 
     async def grant_access(self, access: str) -> None:
@@ -110,9 +110,9 @@ class User:
         if access_id is None: raise Access.InvalidAccess(f'Akses "{access}" tidak valid.')
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute('SELECT COUNT(*) FROM r_user_access WHERE user = ? AND access = ?', (self.__id, access_id))
+            await cursor.execute(*sql.select('r_user_access', ['COUNT(*)'], user=self.__id, access=access_id))
             if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
-            await cursor.execute('INSERT INTO r_user_access (user, access) VALUES (?, ?)', (self.__id, access_id))
+            await cursor.execute(*sql.insert('r_user_access', user=self.__id, access=access_id))
             await conn.commit()
 
     async def revoke_access(self, access: str) -> None:
@@ -121,7 +121,7 @@ class User:
         if access_id is None: raise Access.InvalidAccess(f'Akses "{access}" tidak valid.')
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute('DELETE FROM r_user_access WHERE user = ? AND access = ?', (self.__id, access_id))
+            await cursor.execute(*sql.delete('r_user_access', user=self.__id, access=access_id))
             await conn.commit()
 
 class Access:
@@ -131,7 +131,7 @@ class Access:
     async def get_name_by_id(id: int) -> 'str | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute('SELECT name FROM access WHERE id = ?', (id,))
+            await cursor.execute(*sql.select('access', ['name'], id=id))
             row = await cursor.fetchone()
             if row: return row[0]
 
@@ -139,7 +139,7 @@ class Access:
     async def get_id_by_name(access: str) -> 'int | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute('SELECT id FROM access WHERE name = ?', (access.lower(),))
+            await cursor.execute(*sql.select('access', ['id'], name=access.lower()))
             row = await cursor.fetchone()
             if row: return row[0]
 
@@ -149,7 +149,7 @@ class Access:
             raise Access.InvalidAccess('Akses harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute('SELECT COUNT(*) FROM access WHERE name = ?', (access.lower(),))
+            await cursor.execute(*sql.select('access', ['COUNT(*)'], name=access.lower()))
             if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
-            await cursor.execute('INSERT INTO access (name) VALUES (?)', (access.lower(),))
+            await cursor.execute(*sql.insert('access', name=access.lower()))
             await conn.commit()
