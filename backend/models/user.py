@@ -2,7 +2,7 @@ from __future__ import annotations
 from passlib.hash import pbkdf2_sha256 as crypt
 from ..helpers.db_connect import db_connect
 from ..helpers.log import log
-from ..helpers.sql_things import select_command as select
+from ..helpers.sql_commands import select_command as select
 
 ALLOWED_CHARACTERS_FOR_USER_USERNAME = 'abcdefghijklmnopqrstuvwxyz0123456789_.-'
 PASSWORD_HASHING_ROUNDS = 10_000
