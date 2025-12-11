@@ -5,3 +5,5 @@ dotenv
 passlib
 colorama
 lxml
+aiosqlite
+aiofiles
