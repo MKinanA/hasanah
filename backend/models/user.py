@@ -154,5 +154,3 @@ class Access:
             if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
             await cursor.execute('INSERT INTO access (name) VALUES (?)', (access.lower(),))
             await conn.commit()
-
-print(log(__name__, 'loaded')) # File load log

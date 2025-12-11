@@ -9,5 +9,3 @@ def file_is_text(path: Path | str) -> bool:
             try: chunk.decode()
             except UnicodeDecodeError: return False
     return True
-
-print(log(__name__, 'loaded')) # File load log

@@ -28,5 +28,3 @@ from ..helpers.log import log
 #         return response
 
 CustomStaticFiles = StaticFiles
-
-print(log(__name__, 'loaded')) # File load log

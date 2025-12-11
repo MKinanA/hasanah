@@ -227,5 +227,3 @@ async def do_something_as_authenticated_user(request: Request, response: Respons
         'message': f'You did something as {user.name}. Now get your new token.',
         'token': new_token
     }
-
-print(log(__name__, 'loaded')) # File load log

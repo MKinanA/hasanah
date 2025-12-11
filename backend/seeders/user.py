@@ -23,5 +23,3 @@ async def seed() -> None:
         password='12345678',
     )
     await dummy_user.save()
-
-print(log(__name__, 'loaded')) # File load log

@@ -20,5 +20,3 @@ def file_is_templatable_html(path: Path | str) -> bool:
 
 def custom_html_templating(path: Path | str) -> str:
     html = parse(path)
-
-print(log(__name__, 'loaded')) # File load log
