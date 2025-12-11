@@ -1,16 +1,8 @@
 from __future__ import annotations
-from pathlib import Path
-import sqlite3 as sql
 from passlib.hash import pbkdf2_sha256 as crypt
+from ..helpers.db_connect import db_connect
 from ..helpers.log import log
 from ..helpers.sql_things import select_command as select
-
-PATH = Path(__file__).parent
-
-def db_connect() -> sql.Connection:
-    conn = sql.connect(PATH.parent/'.db')
-    conn.row_factory = sql.Row
-    return conn
 
 ALLOWED_CHARACTERS_FOR_USER_USERNAME = 'abcdefghijklmnopqrstuvwxyz0123456789_.-'
 PASSWORD_HASHING_ROUNDS = 10_000
@@ -73,96 +65,94 @@ class User:
         if not (type(value) == str and 8 <= len(value) <= 64): raise self.InvalidPassword('Password harus berupa string dengan panjang 8-64 karakter.')
 
     async def save(self) -> None:
-        with db_connect() as conn:
-            cursor = conn.cursor()
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
             if self.__id is None:
-                cursor.execute('INSERT INTO user (username, name, password) VALUES (?, ?, ?)', (self.__username, self.__name, self.__password))
+                await cursor.execute('INSERT INTO user (username, name, password) VALUES (?, ?, ?)', (self.__username, self.__name, self.__password))
                 self.__id = cursor.lastrowid
-            else: cursor.execute('UPDATE user SET username = ?, name = ?, password = ? WHERE id = ?', (self.__username, self.__name, self.__password, self.__id))
-            conn.commit()
+            else: await cursor.execute('UPDATE user SET username = ?, name = ?, password = ? WHERE id = ?', (self.__username, self.__name, self.__password, self.__id))
+            await conn.commit()
 
     @staticmethod
     async def get(**kwargs) -> User | None:
-        with db_connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute(*select(**kwargs))
-            row = cursor.fetchone()
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute(*select(**kwargs))
+            row = await cursor.fetchone()
             if row: return User(row[1], row[2], row[3], id=row[0])
 
     @staticmethod
     async def get_all(**kwargs) -> list[User]:
-        with db_connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute(*select(**kwargs))
-            rows = cursor.fetchall()
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute(*select(**kwargs))
+            rows = await cursor.fetchall()
             return [User(row[1], row[2], row[3], id=row[0]) for row in rows]
 
     async def delete(self) -> None:
         if self.__id is None: return
-        with db_connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute('DELETE FROM user WHERE id = ?', (self.__id,))
-            conn.commit()
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute('DELETE FROM user WHERE id = ?', (self.__id,))
+            await conn.commit()
             self.__id = None
 
     @property
     async def accesses(self) -> list:
         if self.__id is None: raise self.InexistentUser('User ini tidak ada di database, mungkin belum disimpan atau sudah dihapus.')
-        with db_connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute('SELECT access FROM r_user_access WHERE user = ?', (self.__id,))
-            return [await Access.get_name_by_id(row[0]) for row in cursor.fetchall()]
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute('SELECT access FROM r_user_access WHERE user = ?', (self.__id,))
+            return [await Access.get_name_by_id(row[0]) for row in await cursor.fetchall()]
 
     async def grant_access(self, access: str) -> None:
         if self.__id is None: raise self.InexistentUser('User ini tidak ada di database, mungkin belum disimpan atau sudah dihapus.')
         access_id = await Access.get_id_by_name(access)
         if access_id is None: raise Access.InvalidAccess(f'Akses "{access}" tidak valid.')
-        with db_connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute('SELECT COUNT(*) FROM r_user_access WHERE user = ? AND access = ?', (self.__id, access_id))
-            if cursor.fetchone()[0] > 0: return
-            cursor.execute('INSERT INTO r_user_access (user, access) VALUES (?, ?)', (self.__id, access_id))
-            conn.commit()
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute('SELECT COUNT(*) FROM r_user_access WHERE user = ? AND access = ?', (self.__id, access_id))
+            if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
+            await cursor.execute('INSERT INTO r_user_access (user, access) VALUES (?, ?)', (self.__id, access_id))
+            await conn.commit()
 
     async def revoke_access(self, access: str) -> None:
         if self.__id is None: raise self.InexistentUser('User ini tidak ada di database, mungkin belum disimpan atau sudah dihapus.')
         access_id = await Access.get_id_by_name(access)
         if access_id is None: raise Access.InvalidAccess(f'Akses "{access}" tidak valid.')
-        with db_connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute('DELETE FROM r_user_access WHERE user = ? AND access = ?', (self.__id, access_id))
-            conn.commit()
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute('DELETE FROM r_user_access WHERE user = ? AND access = ?', (self.__id, access_id))
+            await conn.commit()
 
 class Access:
     class InvalidAccess(Exception): pass
 
     @staticmethod
     async def get_name_by_id(id: int) -> str | None:
-        with db_connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute('SELECT name FROM access WHERE id = ?', (id,))
-            row = cursor.fetchone()
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute('SELECT name FROM access WHERE id = ?', (id,))
+            row = await cursor.fetchone()
             if row: return row[0]
 
     @staticmethod
     async def get_id_by_name(access: str) -> int | None:
-        with db_connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute('SELECT id FROM access WHERE name = ?', (access.lower(),))
-            row = cursor.fetchone()
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute('SELECT id FROM access WHERE name = ?', (access.lower(),))
+            row = await cursor.fetchone()
             if row: return row[0]
 
     @staticmethod
     async def add_access(access: str) -> None:
         if not (type(access) == str and 1 <= len(access) <= 64 and access.islower()):
             raise Access.InvalidAccess('Akses harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
-        with db_connect() as conn:
-            cursor = conn.cursor()
-            cursor.execute('SELECT COUNT(*) FROM access WHERE name = ?', (access.lower(),))
-            if cursor.fetchone()[0] > 0: return
-            cursor.execute('INSERT INTO access (name) VALUES (?)', (access.lower(),))
-            conn.commit()
-
-with db_connect(): pass
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute('SELECT COUNT(*) FROM access WHERE name = ?', (access.lower(),))
+            if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
+            await cursor.execute('INSERT INTO access (name) VALUES (?)', (access.lower(),))
+            await conn.commit()
 
 print(log(__name__, 'loaded')) # File load log
