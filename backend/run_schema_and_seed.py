@@ -11,8 +11,10 @@ async def run_schema_and_seed():
         cursor = conn.cursor()
         cursor.executescript(open(PATH/'schema.sql', 'r').read())
         conn.commit()
+    print(log(__name__, 'Schema applied.'))
 
     for seeder in dir(seeders): await eval(f'seeders.{seeder}.seed()') if 'seed' in dir(eval(f'seeders.{seeder}')) else None
+    print(log(__name__, 'Seeding completed.'))
 
 print(log(__name__, 'loaded')) # File load log
 
