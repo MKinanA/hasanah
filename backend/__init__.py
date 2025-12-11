@@ -1,12 +1,12 @@
 from . import apps, models, seeders, helpers, run_schema_and_seed
 
 from fastapi import FastAPI
-from pathlib import Path
 from .apps.api import api
 from .apps.custom_static_files import CustomStaticFiles
+from .helpers.get_package_path import get_package_path
 from .helpers.log import log
 
-FRONTEND_DIRECTORY = Path(__file__).parent.parent / 'frontend' # `../frontend/`
+FRONTEND_DIRECTORY = get_package_path(__name__, __file__).parent / 'frontend' # `../frontend/`
 
 app = FastAPI()
 app.mount('/api', api)
