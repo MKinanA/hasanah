@@ -128,6 +128,14 @@ class Access:
     class InvalidAccess(Exception): pass
 
     @staticmethod
+    async def get_all() -> 'dict[int, str]':
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute(*sql.select('access', ['id', 'name']))
+            rows = await cursor.fetchall()
+            return {row['id']: row['name'] for row in rows}
+
+    @staticmethod
     async def get_name_by_id(id: int) -> 'str | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
@@ -144,7 +152,7 @@ class Access:
             if row: return row[0]
 
     @staticmethod
-    async def add_access(access: str) -> None:
+    async def create(access: str) -> None:
         if not (type(access) == str and 1 <= len(access) <= 64 and access.islower()):
             raise Access.InvalidAccess('Akses harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
         async with db_connect() as conn:
@@ -152,4 +160,11 @@ class Access:
             await cursor.execute(*sql.select('access', ['COUNT(*)'], name=access.lower()))
             if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
             await cursor.execute(*sql.insert('access', name=access.lower()))
+            await conn.commit()
+
+    @staticmethod
+    async def delete(access: str) -> None:
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute(*sql.delete('access', name=access.lower()))
             await conn.commit()
