@@ -78,7 +78,7 @@ class User:
             cursor = await conn.cursor()
             await cursor.execute(*sql.select('user', **kwargs))
             row = await cursor.fetchone()
-            if row: return User(row[1], row[2], row[3], id=row[0])
+            if row: return User(row['username'], row['name'], row['password'], id=row['id'])
 
     @staticmethod
     async def get_all(**kwargs) -> 'list[User]':
@@ -86,7 +86,7 @@ class User:
             cursor = await conn.cursor()
             await cursor.execute(*sql.select('user', **kwargs))
             rows = await cursor.fetchall()
-            return [User(row[1], row[2], row[3], id=row[0]) for row in rows]
+            return [User(row['username'], row['name'], row['password'], id=row['id']) for row in rows]
 
     async def delete(self) -> None:
         if self.__id is None: return
@@ -102,7 +102,7 @@ class User:
         async with db_connect() as conn:
             cursor = await conn.cursor()
             await cursor.execute(*sql.select('r_user_access', ['access'], user=self.__id))
-            return [await Access.get_name_by_id(row[0]) for row in await cursor.fetchall()]
+            return [await Access.get_name_by_id(row['access']) for row in await cursor.fetchall()]
 
     async def grant_access(self, access: str) -> None:
         if self.__id is None: raise self.InexistentUser('User ini tidak ada di database, mungkin belum disimpan atau sudah dihapus.')
@@ -141,7 +141,7 @@ class Access:
             cursor = await conn.cursor()
             await cursor.execute(*sql.select('access', ['name'], id=id))
             row = await cursor.fetchone()
-            if row: return row[0]
+            if row: return row['name']
 
     @staticmethod
     async def get_id_by_name(access: str) -> 'int | None':
@@ -149,7 +149,7 @@ class Access:
             cursor = await conn.cursor()
             await cursor.execute(*sql.select('access', ['id'], name=access.lower()))
             row = await cursor.fetchone()
-            if row: return row[0]
+            if row: return row['id']
 
     @staticmethod
     async def create(access: str) -> None:
