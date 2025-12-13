@@ -1,3 +1,6 @@
+from time import time
+from secrets import token_urlsafe as generate_token
+from hashlib import sha256 as hash
 from passlib.hash import pbkdf2_sha256 as crypt
 from ..helpers.db_connect import db_connect
 from ..helpers.log import log
@@ -5,6 +8,8 @@ from ..helpers import sql_commands as sql
 
 ALLOWED_CHARACTERS_FOR_USER_USERNAME = 'abcdefghijklmnopqrstuvwxyz0123456789_.-'
 PASSWORD_HASHING_ROUNDS = 10_000
+TOKEN_NBYTES = 16
+SESSION_LIFETIME = 60 * 60 * 24 * 7
 
 class User:
     class InvalidUsername(Exception): pass
@@ -76,7 +81,7 @@ class User:
     async def get(**kwargs) -> 'User | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select('user', **kwargs))
+            await cursor.execute(*sql.select('user', ['id', 'username', 'name', 'password'], **kwargs))
             row = await cursor.fetchone()
             if row: return User(row['username'], row['name'], row['password'], id=row['id'])
 
@@ -153,8 +158,7 @@ class Access:
 
     @staticmethod
     async def create(access: str) -> None:
-        if not (type(access) == str and 1 <= len(access) <= 64 and access.islower()):
-            raise Access.InvalidAccess('Akses harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
+        if not (type(access) == str and 1 <= len(access) <= 64 and access.islower()): raise Access.InvalidAccess('Akses harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
         async with db_connect() as conn:
             cursor = await conn.cursor()
             await cursor.execute(*sql.select('access', ['COUNT(*)'], name=access.lower()))
@@ -167,4 +171,32 @@ class Access:
         async with db_connect() as conn:
             cursor = await conn.cursor()
             await cursor.execute(*sql.delete('access', name=access.lower()))
+            await conn.commit()
+
+class Session:
+
+    @staticmethod
+    async def validate(token: str) -> 'User | None':
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute('UPDATE user_session SET last_active = ? WHERE token = ? AND last_active + ? >= ? RETURNING user', (int(time()), hash(token.encode()).hexdigest(), SESSION_LIFETIME, int(time())))
+            row = await cursor.fetchone()
+            await conn.commit()
+            if row: return await User.get(id=row['user'])
+
+    @staticmethod
+    async def create(user: User, token_nbytes: int = TOKEN_NBYTES) -> str:
+        if user.id is None: raise User.InexistentUser()
+        token = generate_token(token_nbytes)
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute(*sql.insert('user_session', user=user.id, token=hash(token.encode()).hexdigest(), last_active=int(time())))
+            await conn.commit()
+        return token
+
+    @staticmethod
+    async def delete(token: str) -> None:
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute(*sql.delete('user_session', token=hash(token.encode()).hexdigest()))
             await conn.commit()

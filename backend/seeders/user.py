@@ -7,7 +7,7 @@ from ..helpers.log import log
 async def seed() -> None:
     env(get_package_path(__name__, __file__)/'.env')
 
-    await Access.add_access('seluruhnya')
+    await Access.create('seluruhnya')
 
     admin = User(
         username=str(getenv('USERNAME_AKUN_ADMIN')),
