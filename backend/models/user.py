@@ -133,6 +133,11 @@ class User:
             await cursor.execute(*sql.delete('r_user_access', user=self.__id, access=access_id))
             await conn.commit()
 
+    @staticmethod
+    async def get_by_session_token(token: str) -> 'User | None': return await Session.validate(token)
+
+    async def create_session(self, token_nbytes: int = TOKEN_NBYTES) -> str: return await Session.create(self, token_nbytes)
+
 class Access:
     class InvalidAccess(Exception): pass
 
