@@ -9,7 +9,7 @@ from .helpers.log import log
 FRONTEND_DIRECTORY = get_package_path(__name__, __file__).parent / 'frontend' # `../frontend/`
 
 app = FastAPI()
-app.mount('/api', api)
+app.include_router(api, prefix='/api')
 app.mount('/', CustomStaticFiles(directory=FRONTEND_DIRECTORY, html=True))
 
 print(log(__name__, f'{FRONTEND_DIRECTORY = }'))
