@@ -209,3 +209,10 @@ class Session:
             cursor = await conn.cursor()
             await cursor.execute(*sql.delete('user_session', token=hash(token.encode()).hexdigest()))
             await conn.commit()
+
+    @staticmethod
+    async def clean_expired() -> None:
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute('DELETE FROM user_session WHERE last_active + ? < ?', (SESSION_LIFETIME, int(time())))
+            await conn.commit()
