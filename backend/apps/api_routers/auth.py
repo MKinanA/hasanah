@@ -30,5 +30,20 @@ async def login(request: Request, response: Response) -> dict:
         response.status_code = 401
         return mkresp('error', 'Tidak Terotorisasi', 'Username atau password salah.')
 
-    token = await Session.create(user)
+    token = await user.create_session()
     return mkresp('success', 'Sesi Dimulai', 'Login berhasil, sesi baru telah dibuat.', token=token)
+
+@router.post('/logout')
+async def logout(request: Request, response: Response) -> dict:
+    form = await request.form()
+    token = form.get('token')
+
+    if type(token) != str:
+        response.status_code = 400
+        return mkresp('error', 'Permintaan Buruk', 'Token sesi tidak valid.')
+    if await Session.authenticate(token) is None:
+        response.status_code = 401
+        return mkresp('error', 'Tidak Terotorisasi', 'Sesi tidak ditemukan, token mungkin sudah kedaluwarsa.')
+
+    await Session.delete(token)
+    return mkresp('success', 'Sesi Diakhiri', 'Logout berhasil, sesi telah dihapus.')

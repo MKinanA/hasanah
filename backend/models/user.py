@@ -134,7 +134,7 @@ class User:
             await conn.commit()
 
     @staticmethod
-    async def get_by_session_token(token: str) -> 'User | None': return await Session.validate(token)
+    async def get_by_session_auth(token: str) -> 'User | None': return await Session.authenticate(token)
 
     async def create_session(self, token_nbytes: int = TOKEN_NBYTES) -> str: return await Session.create(self, token_nbytes)
 
@@ -185,7 +185,7 @@ class Access:
 class Session:
 
     @staticmethod
-    async def validate(token: str) -> 'User | None':
+    async def authenticate(token: str) -> 'User | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
             await cursor.execute('UPDATE user_session SET last_active = ? WHERE token = ? AND last_active + ? >= ? RETURNING user', (int(time()), hash(token.encode()).hexdigest(), SESSION_LIFETIME, int(time())))
