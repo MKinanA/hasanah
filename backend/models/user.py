@@ -58,15 +58,19 @@ class User:
 
     def __repr__(self) -> str: return f'User(\n    id = {self.__id},\n    username = \'{self.__username}\',\n    name = \'{self.__name}\',\n    password = \'{self.__password}\'\n)'
 
-    def validate_id(self, value) -> None:
+    @staticmethod
+    def validate_id(value) -> None:
         if not (type(value) in (int, type(None)) and (value is None or value > 0)): raise ValueError('ID harus berupa integer positif atau None.')
-    def validate_username(self, value) -> None:
-        if not (type(value) == str and 1 <= len(value) <= 64 and all(c in ALLOWED_CHARACTERS_FOR_USER_USERNAME for c in value)): raise self.InvalidUsername('Username harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil, angka, underscore (_), titik (.), dan strip (-).')
-    def validate_name(self, value) -> None:
-        if not (type(value) == str and 1 <= len(value) <= 64): raise self.InvalidName('Nama harus berupa string dengan panjang 1-64 karakter.')
-    def validate_password(self, value) -> None:
+    @staticmethod
+    def validate_username(value) -> None:
+        if not (type(value) == str and 1 <= len(value) <= 64 and all(c in ALLOWED_CHARACTERS_FOR_USER_USERNAME for c in value)): raise User.InvalidUsername('Username harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil, angka, underscore (_), titik (.), dan strip (-).')
+    @staticmethod
+    def validate_name(value) -> None:
+        if not (type(value) == str and 1 <= len(value) <= 64): raise User.InvalidName('Nama harus berupa string dengan panjang 1-64 karakter.')
+    @staticmethod
+    def validate_password(value) -> None:
         if crypt.identify(value): return
-        if not (type(value) == str and 8 <= len(value) <= 64): raise self.InvalidPassword('Password harus berupa string dengan panjang 8-64 karakter.')
+        if not (type(value) == str and 8 <= len(value) <= 64): raise User.InvalidPassword('Password harus berupa string dengan panjang 8-64 karakter.')
 
     async def save(self) -> None:
         async with db_connect() as conn:
