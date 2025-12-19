@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Request, Response
+from fastapi import APIRouter, Request, Response, Depends
 from ...models.user import User, Session
 from ...helpers.api_response import api_response as mkresp
+
+async def auth(request: Request) -> 'User | None': return await User.get_by_session_auth(token) if type(token := (await request.form()).get('token')) == str else None
 
 router = APIRouter()
 
@@ -34,14 +36,14 @@ async def login(request: Request, response: Response) -> dict:
     return mkresp('success', 'Sesi Dimulai', 'Login berhasil, sesi baru telah dibuat.', token=token)
 
 @router.post('/logout')
-async def logout(request: Request, response: Response) -> dict:
+async def logout(request: Request, response: Response, user: User = Depends(auth)) -> dict:
     form = await request.form()
     token = form.get('token')
 
     if type(token) != str:
         response.status_code = 400
         return mkresp('error', 'Permintaan Buruk', 'Token sesi tidak valid.')
-    if await Session.authenticate(token) is None:
+    if user is None:
         response.status_code = 401
         return mkresp('error', 'Tidak Terotorisasi', 'Sesi tidak ditemukan, token mungkin sudah kedaluwarsa.')
 
