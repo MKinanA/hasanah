@@ -196,7 +196,9 @@ class Session:
     @staticmethod
     async def create(user: User, token_nbytes: int = TOKEN_NBYTES) -> str:
         if user.id is None: raise User.InexistentUser()
-        token = generate_token(token_nbytes)
+        while True:
+            token = generate_token(token_nbytes)
+            if await Session.authenticate(token) is None: break
         async with db_connect() as conn:
             cursor = await conn.cursor()
             await cursor.execute(*sql.insert('user_session', user=user.id, token=hash(token.encode()).hexdigest(), last_active=int(time())))
