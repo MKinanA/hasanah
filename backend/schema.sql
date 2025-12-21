@@ -2,6 +2,7 @@ PRAGMA foreign_keys = ON;
 -- PRAGMA journal_mode = WAL;
 
 CREATE TABLE kv_store (
+    id INTEGER PRIMARY KEY,
     key TEXT PRIMARY KEY,
     value TEXT NOT NULL
 );
@@ -30,3 +31,10 @@ CREATE TABLE user_session (
     token TEXT NOT NULL UNIQUE,
     last_active INTEGER NOT NULL DEFAULT (strftime('%s', 'now'))
 );
+
+CREATE TABLE zis_payments (
+)
+
+CREATE TABLE zis_payment_versions
+
+CREATE TABLE zis_payment_lines
