@@ -192,9 +192,11 @@ class Session:
             row = await cursor.fetchone()
             await conn.commit()
             if row: return await User.get(id=row['user'])
+            await Session.clean_expired()
 
     @staticmethod
     async def create(user: User, token_nbytes: int = TOKEN_NBYTES) -> str:
+        await Session.clean_expired()
         if user.id is None: raise User.InexistentUser()
         while True:
             token = generate_token(token_nbytes)
@@ -207,6 +209,7 @@ class Session:
 
     @staticmethod
     async def delete(token: str) -> None:
+        await Session.clean_expired()
         async with db_connect() as conn:
             cursor = await conn.cursor()
             await cursor.execute(*sql.delete('user_session', token=hash(token.encode()).hexdigest()))
