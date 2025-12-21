@@ -8,7 +8,7 @@ from ..helpers import sql_commands as sql
 
 ALLOWED_CHARACTERS_FOR_USER_USERNAME = 'abcdefghijklmnopqrstuvwxyz0123456789_.-'
 PASSWORD_HASHING_ROUNDS = 10_000
-TOKEN_NBYTES = 16
+TOKEN_NBYTES = 64
 SESSION_LIFETIME = 60 * 60 * 24 * 7
 
 class User:
