@@ -48,7 +48,7 @@ CREATE TABLE zis_payment_version (
     note TEXT,
     created_at INTEGER NOT NULL DEFAULT (strftime('%s', 'now')),
     created_by INTEGER NOT NULL REFERENCES user(id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    is_deleted INTEGER NOT NULL DEFAULT 0 CHECK (is_deleted IN (0,1)),
+    is_deleted INTEGER NOT NULL DEFAULT FALSE CHECK (is_deleted IN (TRUE, FALSE)),
     CONSTRAINT number_or_email_required CHECK (payer_number IS NOT NULL OR payer_email IS NOT NULL),
     UNIQUE (payment, version)
 );
