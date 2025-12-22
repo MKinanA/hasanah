@@ -165,9 +165,9 @@ class Access:
             row = await cursor.fetchone()
             if row: return row['id']
 
-    @staticmethod
-    async def create(access: str) -> None:
-        if not (type(access) == str and 1 <= len(access) <= 64 and access.islower()): raise Access.InvalidAccess('Akses harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
+    @classmethod
+    async def create(cls, access: str) -> None:
+        if not (type(access) == str and 1 <= len(access) <= 64 and access.islower()): raise cls.InvalidAccess('Akses harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
         async with db_connect() as conn:
             cursor = await conn.cursor()
             await cursor.execute(*sql.select('access', ['COUNT(*)'], name=access.lower()))
