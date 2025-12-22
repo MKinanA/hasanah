@@ -179,6 +179,7 @@ class Access:
     async def delete(access: str) -> None:
         async with db_connect() as conn:
             cursor = await conn.cursor()
+            await cursor.execute(*sql.delete('access', name=access))
             await cursor.execute(*sql.delete('access', name=access.lower()))
             await conn.commit()
 
