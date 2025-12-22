@@ -56,7 +56,7 @@ class User:
         self.validate_password(value)
         self.__password = value if crypt.identify(value) else crypt.using(rounds=PASSWORD_HASHING_ROUNDS).hash(value)
 
-    def __repr__(self) -> str: return f'User(\n    id = {self.__id},\n    username = \'{self.__username}\',\n    name = \'{self.__name}\',\n    password = \'{self.__password}\'\n)'
+    def __repr__(self) -> str: return f'{type(self).__name__}(\n    id = {self.__id},\n    username = \'{self.__username}\',\n    name = \'{self.__name}\',\n    password = \'{self.__password}\'\n)'
 
     @staticmethod
     def validate_id(value) -> None:
