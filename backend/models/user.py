@@ -61,16 +61,16 @@ class User:
     @staticmethod
     def validate_id(value) -> None:
         if not (type(value) in (int, type(None)) and (value is None or value > 0)): raise ValueError('ID harus berupa integer positif atau None.')
-    @staticmethod
-    def validate_username(value) -> None:
-        if not (type(value) == str and 1 <= len(value) <= 64 and all(c in ALLOWED_CHARACTERS_FOR_USER_USERNAME for c in value)): raise User.InvalidUsername('Username harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil, angka, underscore (_), titik (.), dan strip (-).')
-    @staticmethod
-    def validate_name(value) -> None:
-        if not (type(value) == str and 1 <= len(value) <= 64): raise User.InvalidName('Nama harus berupa string dengan panjang 1-64 karakter.')
-    @staticmethod
-    def validate_password(value) -> None:
+    @classmethod
+    def validate_username(cls, value) -> None:
+        if not (type(value) == str and 1 <= len(value) <= 64 and all(c in ALLOWED_CHARACTERS_FOR_USER_USERNAME for c in value)): raise cls.InvalidUsername('Username harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil, angka, underscore (_), titik (.), dan strip (-).')
+    @classmethod
+    def validate_name(cls, value) -> None:
+        if not (type(value) == str and 1 <= len(value) <= 64): raise cls.InvalidName('Nama harus berupa string dengan panjang 1-64 karakter.')
+    @classmethod
+    def validate_password(cls, value) -> None:
         if crypt.identify(value): return
-        if not (type(value) == str and 8 <= len(value) <= 64): raise User.InvalidPassword('Password harus berupa string dengan panjang 8-64 karakter.')
+        if not (type(value) == str and 8 <= len(value) <= 64): raise cls.InvalidPassword('Password harus berupa string dengan panjang 8-64 karakter.')
 
     async def save(self) -> None:
         async with db_connect() as conn:
@@ -81,21 +81,21 @@ class User:
             else: await cursor.execute(*sql.update('user', {'id': self.__id}, username=self.__username, name=self.__name, password=self.__password))
             await conn.commit()
 
-    @staticmethod
-    async def get(**kwargs) -> 'User | None':
+    @classmethod
+    async def get(cls, **kwargs) -> 'User | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
             await cursor.execute(*sql.select('user', ['id', 'username', 'name', 'password'], **kwargs))
             row = await cursor.fetchone()
-            if row: return User(row['username'], row['name'], row['password'], id=row['id'])
+            if row: return cls(row['username'], row['name'], row['password'], id=row['id'])
 
-    @staticmethod
-    async def get_all(**kwargs) -> 'list[User]':
+    @classmethod
+    async def get_all(cls, **kwargs) -> 'list[User]':
         async with db_connect() as conn:
             cursor = await conn.cursor()
             await cursor.execute(*sql.select('user', **kwargs))
             rows = await cursor.fetchall()
-            return [User(row['username'], row['name'], row['password'], id=row['id']) for row in rows]
+            return [cls(row['username'], row['name'], row['password'], id=row['id']) for row in rows]
 
     async def delete(self) -> None:
         if self.__id is None: return
