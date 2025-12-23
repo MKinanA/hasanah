@@ -1,4 +1,4 @@
-from ..helpers.db_connect import db_connect
+from ..helpers.db_connect import db_connect, Cursor
 from ..helpers.log import log
 from ..helpers import sql_commands as sql
 
@@ -67,7 +67,8 @@ class PaymentLine:
     def validate_note(cls, value):
         if not (type(value) in (str, type(None)) and ((len(value) > 0) if type(value) == str else True)): raise cls.InvalidNote('Catatan harus berupa string yang tidak kosong atau tidak sama sekali.')
 
-    async def save(self) -> None:
+    async def insert(self, cursor: Cursor, payment_version: int) -> None:
+        assert self.__id is None, 'This payment line is already created (it has an id).'
         await self.validate_category_exists(self.__category)
         async with db_connect() as conn:
             cursor = await conn.cursor()
@@ -96,43 +97,67 @@ class PaymentCategory:
     class InvalidCategory(Exception): http_status_code = 400
 
     @staticmethod
-    async def get_all() -> 'dict[int, str]':
-        async with db_connect() as conn:
-            cursor = await conn.cursor()
-            await cursor.execute(*sql.select('zis_payment_category', ['id', 'name']))
+    async def get_all(cursor: 'Cursor | None' = None) -> 'dict[int, str]':
+        command = sql.select('zis_payment_category', ['id', 'name'])
+        if isinstance(cursor, Cursor):
+            await cursor.execute(*command)
             rows = await cursor.fetchall()
-            return {row['id']: row['name'] for row in rows}
+        else:
+            async with db_connect() as conn:
+                cursor = await conn.cursor()
+                await cursor.execute(*command)
+                rows = await cursor.fetchall()
+        return {row['id']: row['name'] for row in rows}
 
     @staticmethod
-    async def get_name_by_id(id: int) -> 'str | None':
-        async with db_connect() as conn:
-            cursor = await conn.cursor()
-            await cursor.execute(*sql.select('zis_payment_category', ['name'], id=id))
+    async def get_name_by_id(id: int, cursor: 'Cursor | None' = None) -> 'str | None':
+        command = sql.select('zis_payment_category', ['name'], id=id)
+        if isinstance(cursor, Cursor):
+            await cursor.execute(*command)
             row = await cursor.fetchone()
-            if row: return row['name']
+        else:
+            async with db_connect() as conn:
+                cursor = await conn.cursor()
+                await cursor.execute(*command)
+                row = await cursor.fetchone()
+        if row: return row['name']
 
     @staticmethod
-    async def get_id_by_name(category: str) -> 'int | None':
-        async with db_connect() as conn:
-            cursor = await conn.cursor()
-            await cursor.execute(*sql.select('zis_payment_category', ['id'], name=category.lower()))
+    async def get_id_by_name(category: str, cursor: 'Cursor | None' = None) -> 'int | None':
+        command = sql.select('zis_payment_category', ['id'], name=category.lower())
+        if isinstance(cursor, Cursor):
+            await cursor.execute(*command)
             row = await cursor.fetchone()
-            if row: return row['id']
+        else:
+            async with db_connect() as conn:
+                cursor = await conn.cursor()
+                await cursor.execute(*command)
+                row = await cursor.fetchone()
+        if row: return row['id']
 
     @classmethod
-    async def create(cls, category: str) -> None:
+    async def create(cls, category: str, cursor: 'Cursor | None' = None) -> None:
         if not (type(category) == str and 1 <= len(category) <= 64 and category.islower()): raise cls.InvalidCategory('Kategori harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
-        async with db_connect() as conn:
-            cursor = await conn.cursor()
-            await cursor.execute(*sql.select('zis_payment_category', ['COUNT(*)'], name=category.lower()))
+        select_command = sql.select('zis_payment_category', ['COUNT(*)'], name=category.lower())
+        insert_command = sql.insert('zis_payment_category', name=category.lower())
+        if isinstance(cursor, Cursor):
+            await cursor.execute(*select_command)
             if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
-            await cursor.execute(*sql.insert('zis_payment_category', name=category.lower()))
-            await conn.commit()
+            await cursor.execute(*insert_command)
+        else:
+            async with db_connect() as conn:
+                cursor = await conn.cursor()
+                await cursor.execute(*select_command)
+                if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
+                await cursor.execute(*insert_command)
+                await conn.commit()
 
     @staticmethod
-    async def delete(category: str) -> None:
-        async with db_connect() as conn:
-            cursor = await conn.cursor()
-            await cursor.execute(*sql.delete('zis_payment_category', name=category))
-            await cursor.execute(*sql.delete('zis_payment_category', name=category.lower()))
-            await conn.commit()
+    async def delete(category: str, cursor: 'Cursor | None' = None) -> None:
+        command = sql.delete('zis_payment_category', name=(category, category.lower()))
+        if isinstance(cursor, Cursor): await cursor.execute(*command)
+        else:
+            async with db_connect() as conn:
+                cursor = await conn.cursor()
+                await cursor.execute(*command)
+                await conn.commit()
