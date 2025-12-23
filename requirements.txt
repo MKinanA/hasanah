@@ -7,3 +7,4 @@ colorama
 lxml
 aiosqlite
 aiofiles
+jinja2
