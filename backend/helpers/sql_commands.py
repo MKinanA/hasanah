@@ -5,11 +5,3 @@ def delete(table: str, **where): return (f'DELETE FROM {table}' + where_clause(*
 
 def where_clause(**conditions): return (' WHERE ' + ' AND '.join(f'{key} {"IN" if type(value) in (list, tuple) else "="} {("(" + ", ".join("?" * len(value)) + ")") if type(value) in (list, tuple) else "?"}' for key, value in conditions.items())) if len(conditions) > 0 else ''
 def flatten(*values): return [value for sub in values for value in (sub if type(sub) in (list, tuple) else [sub])]
-
-if __name__ == '__main__': # Tests
-    print(*select('users', ['id', 'name'], id=1, status='active'), sep=';    ')
-    print(*insert('users', id=1, status='active'), sep=';    ')
-    print(*update('users', {'id': 1, 'status': 'active'}, id=1, status='inactive'), sep=';    ')
-    print(*delete('users', id=1, status='inactive'), sep=';    ')
-    print(*select('users', ['id', 'name'], id=1, status=('active', 'inactive')), sep=';    ')
-    print(*select('users', ['id', 'name'], id=1, country=('Indonesia', 'Malaysia', 'Singapore', 'Timor Leste')), sep=';    ')
