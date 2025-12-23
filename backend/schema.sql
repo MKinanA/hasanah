@@ -1,4 +1,5 @@
 PRAGMA foreign_keys = ON;
+PRAGMA synchronous = FULL;
 -- PRAGMA journal_mode = WAL;
 
 CREATE TABLE kv_store (
