@@ -1,5 +1,6 @@
 from contextlib import asynccontextmanager
 import aiosqlite as sql
+from aiosqlite import Connection, Cursor
 from .get_package_path import get_package_path
 
 @asynccontextmanager
