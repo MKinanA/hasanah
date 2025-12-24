@@ -1,5 +1,5 @@
 def api_response(type: str, elaboration: str, message: str, **data) -> dict:
-    assert type in ('success', 'error'), 'Invalid type'
+    if type not in ('success', 'error'): raise ValueError('Invalid type')
     return {
         'type': type,
         type: elaboration,
