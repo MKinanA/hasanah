@@ -1,0 +1,1 @@
+def is_uuid(value: str) -> bool: return (lambda part: len(part) == 5 and all(len(p) == l for p, l in zip(part, [8, 4, 4, 4, 12])))(str(value).split('-'))
