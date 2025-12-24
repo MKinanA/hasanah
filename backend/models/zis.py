@@ -1,12 +1,42 @@
+from uuid import uuid4 as uuid
 from ..models.user import User
 from ..helpers.db_connect import db_connect, Cursor
 from ..helpers.log import log
 from ..helpers import sql_commands as sql
+from ..helpers.is_uuid import is_uuid
 
 class Payment:
     class PaymentNotFound(Exception): http_status_code = 404
 
-    def __init__(self): pass
+    def __init__(self, uuid: str, id: int):
+        self.__id = id
+        self.__uuid = uuid
+
+    @property
+    def id(self) -> int: return self.__id
+    @property
+    def uuid(self) -> str: return self.__uuid
+
+    # def __repr__(self) -> str: pass
+
+    @staticmethod
+    def validate_id(value) -> None:
+        if not (type(value) == int and value > 0): raise ValueError('`id` must be a positive integer.')
+    @staticmethod
+    def validate_uuid(value) -> None:
+        if not (type(value) == str and is_uuid(value)): raise ValueError('`uuid` must be a string of a valid UUID.')
+
+    @classmethod
+    async def get_by_uuid(cls, uuid: str) -> 'Payment | None':
+        cls.validate_uuid(uuid)
+        return Payment(str(), int()) # TODO: Fetch from DB
+
+    @property
+    async def latest(self) -> 'PaymentVersion | None': return await self.version()
+    async def version(self, version: 'int | None' = None) -> 'PaymentVersion | None':
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute(*sql.select('zis_payment_version', payment=self.__id, version=version, is_deleted=0 if version is None else (0, 1)))
 
 class PaymentVersion:
     class InexistentPayment(Exception): http_status_code = 404
