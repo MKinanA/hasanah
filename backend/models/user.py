@@ -76,16 +76,16 @@ class User:
         async with db_connect() as conn:
             cursor = await conn.cursor()
             if self.__id is None:
-                await cursor.execute(*sql.insert('user', username=self.__username, name=self.__name, password=self.__password))
+                await cursor.execute(*sql.insert('user', values={'username': self.__username, 'name': self.__name, 'password': self.__password}))
                 self.__id = cursor.lastrowid
-            else: await cursor.execute(*sql.update('user', {'id': self.__id}, username=self.__username, name=self.__name, password=self.__password))
+            else: await cursor.execute(*sql.update('user', where={'id': self.__id}, set={'username': self.__username, 'name': self.__name, 'password': self.__password}))
             await conn.commit()
 
     @classmethod
     async def get(cls, **kwargs) -> 'User | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select('user', ['id', 'username', 'name', 'password'], **kwargs))
+            await cursor.execute(*sql.select('user', columns=('id', 'username', 'name', 'password'), where=kwargs))
             row = await cursor.fetchone()
             if row: return cls(row['username'], row['name'], row['password'], id=row['id'])
 
@@ -93,7 +93,7 @@ class User:
     async def get_all(cls, **kwargs) -> 'list[User]':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select('user', **kwargs))
+            await cursor.execute(*sql.select('user', columns=('id', 'username', 'name', 'password'), where=kwargs))
             rows = await cursor.fetchall()
             return [cls(row['username'], row['name'], row['password'], id=row['id']) for row in rows]
 
@@ -101,7 +101,7 @@ class User:
         if self.__id is None: return
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.delete('user', id=self.__id))
+            await cursor.execute(*sql.delete('user', where={'id': self.__id}))
             await conn.commit()
             self.__id = None
 
@@ -110,7 +110,7 @@ class User:
         if self.__id is None: raise self.InexistentUser('User ini tidak ada di database, mungkin belum disimpan atau sudah dihapus.')
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select('r_user_access', ['access'], user=self.__id))
+            await cursor.execute(*sql.select('r_user_access', columns='access', where={'user': self.__id}))
             return [await Access.get_name_by_id(row['access']) for row in await cursor.fetchall()]
 
     async def grant_access(self, access: str) -> None:
@@ -119,9 +119,9 @@ class User:
         if access_id is None: raise Access.InvalidAccess(f'Akses "{access}" tidak valid.')
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select('r_user_access', ['COUNT(*)'], user=self.__id, access=access_id))
+            await cursor.execute(*sql.select('r_user_access', columns='COUNT(*)', where={'user': self.__id, 'access': access_id}))
             if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
-            await cursor.execute(*sql.insert('r_user_access', user=self.__id, access=access_id))
+            await cursor.execute(*sql.insert('r_user_access', values={'user': self.__id, 'access': access_id}))
             await conn.commit()
 
     async def revoke_access(self, access: str) -> None:
@@ -130,7 +130,7 @@ class User:
         if access_id is None: raise Access.InvalidAccess(f'Akses "{access}" tidak valid.')
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.delete('r_user_access', user=self.__id, access=access_id))
+            await cursor.execute(*sql.delete('r_user_access', where={'user': self.__id, 'access': access_id}))
             await conn.commit()
 
     @staticmethod
@@ -145,7 +145,7 @@ class Access:
     async def get_all() -> 'dict[int, str]':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select('access', ['id', 'name']))
+            await cursor.execute(*sql.select('access', columns=('id', 'name')))
             rows = await cursor.fetchall()
             return {row['id']: row['name'] for row in rows}
 
@@ -153,7 +153,7 @@ class Access:
     async def get_name_by_id(id: int) -> 'str | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select('access', ['name'], id=id))
+            await cursor.execute(*sql.select('access', columns='name', where={'id': id}))
             row = await cursor.fetchone()
             if row: return row['name']
 
@@ -161,7 +161,7 @@ class Access:
     async def get_id_by_name(access: str) -> 'int | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select('access', ['id'], name=access.lower()))
+            await cursor.execute(*sql.select('access', columns='id', where={'name': access.lower()}))
             row = await cursor.fetchone()
             if row: return row['id']
 
@@ -170,17 +170,16 @@ class Access:
         if not (type(access) == str and 1 <= len(access) <= 64 and access.islower()): raise cls.InvalidAccess('Akses harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select('access', ['COUNT(*)'], name=access.lower()))
+            await cursor.execute(*sql.select('access', columns='COUNT(*)', where={'name': access.lower()}))
             if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
-            await cursor.execute(*sql.insert('access', name=access.lower()))
+            await cursor.execute(*sql.insert('access', values={'name': access.lower()}))
             await conn.commit()
 
     @staticmethod
     async def delete(access: str) -> None:
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.delete('access', name=access))
-            await cursor.execute(*sql.delete('access', name=access.lower()))
+            await cursor.execute(*sql.delete('access', where={'name': (access, access.lower())}))
             await conn.commit()
 
 class Session:
@@ -204,7 +203,7 @@ class Session:
             if await Session.authenticate(token) is None: break
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.insert('user_session', user=user.id, token=hash(token.encode()).hexdigest(), last_active=int(time())))
+            await cursor.execute(*sql.insert('user_session', values={'user': user.id, 'token': hash(token.encode()).hexdigest(), 'last_active': int(time())}))
             await conn.commit()
         return token
 
@@ -213,7 +212,7 @@ class Session:
         await Session.clean_expired()
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.delete('user_session', token=hash(token.encode()).hexdigest()))
+            await cursor.execute(*sql.delete('user_session', where={'token': hash(token.encode()).hexdigest()}))
             await conn.commit()
 
     @staticmethod

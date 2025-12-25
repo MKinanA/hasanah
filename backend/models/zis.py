@@ -36,7 +36,7 @@ class Payment:
     async def version(self, version: 'int | None' = None) -> 'PaymentVersion | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select('zis_payment_version', payment=self.__id, version=version, is_deleted=0 if version is None else (0, 1)))
+            await cursor.execute(*sql.select('zis_payment_version', where={'payment': self.__id, 'version': version, 'is_deleted': 0 if version is None else (0, 1)}))
 
 class PaymentVersion:
     class InexistentPayment(Exception): http_status_code = 404
@@ -149,7 +149,7 @@ class PaymentVersion:
         if self.__version is not None: raise RuntimeError('Can\'t insert a payment version that already has an `version`.')
         await self.validate_created_by_access(self.__created_by)
         latest_version = 1 # TODO: Fetch latest version from DB
-        await cursor.execute(*sql.insert('zis_payment_version', payment=payment, version=latest_version, payer_name=self.__payer_name, payer_number=self.__payer_number, payer_email=self.__payer_email, payer_address=self.__payer_address, note=self.__note, created_at=self.__created_at, created_by=self.__created_by.id, is_deleted=self.__is_deleted))
+        await cursor.execute(*sql.insert('zis_payment_version', values={'payment': payment, 'version': latest_version, 'payer_name': self.__payer_name, 'payer_number': self.__payer_number, 'payer_email': self.__payer_email, 'payer_address': self.__payer_address, 'note': self.__note, 'created_at': self.__created_at, 'created_by': self.__created_by.id, 'is_deleted': self.__is_deleted}))
         self.__id = cursor.lastrowid
         self.__payment = payment
         self.__version = latest_version
@@ -218,7 +218,7 @@ class PaymentLine:
         if self.__id is not None: raise RuntimeError('Can\'t insert a payment line that already has an `id`.')
         if self.__payment_version is not None: raise RuntimeError('Can\'t insert a payment line that already has an `payment_version`.')
         await self.validate_category_exists(self.__category, cursor=cursor)
-        await cursor.execute(*sql.insert('zis_payment_line', payment_version=payment_version, payer_name=self.__payer_name, category=await PaymentCategory.get_id_by_name(self.__category, cursor=cursor), amount=self.__amount, note=self.__note))
+        await cursor.execute(*sql.insert('zis_payment_line', values={'payment_version': payment_version, 'payer_name': self.__payer_name, 'category': await PaymentCategory.get_id_by_name(self.__category, cursor=cursor), 'amount': self.__amount, 'note': self.__note}))
         self.__id = cursor.lastrowid
         self.__payment_version = payment_version
 
@@ -227,7 +227,7 @@ class PaymentCategory:
 
     @staticmethod
     async def get_all(cursor: 'Cursor | None' = None) -> 'dict[int, str]':
-        command = sql.select('zis_payment_category', ['id', 'name'])
+        command = sql.select('zis_payment_category', columns=('id', 'name'))
         if isinstance(cursor, Cursor):
             await cursor.execute(*command)
             rows = await cursor.fetchall()
@@ -240,7 +240,7 @@ class PaymentCategory:
 
     @staticmethod
     async def get_name_by_id(id: int, cursor: 'Cursor | None' = None) -> 'str | None':
-        command = sql.select('zis_payment_category', ['name'], id=id)
+        command = sql.select('zis_payment_category', columns='name', where={'id': id})
         if isinstance(cursor, Cursor):
             await cursor.execute(*command)
             row = await cursor.fetchone()
@@ -253,7 +253,7 @@ class PaymentCategory:
 
     @staticmethod
     async def get_id_by_name(category: str, cursor: 'Cursor | None' = None) -> 'int | None':
-        command = sql.select('zis_payment_category', ['id'], name=category.lower())
+        command = sql.select('zis_payment_category', columns='id', where={'name': category.lower()})
         if isinstance(cursor, Cursor):
             await cursor.execute(*command)
             row = await cursor.fetchone()
@@ -267,8 +267,8 @@ class PaymentCategory:
     @classmethod
     async def create(cls, category: str, cursor: 'Cursor | None' = None) -> None:
         if not (type(category) == str and 1 <= len(category) <= 64 and category.islower()): raise cls.InvalidCategory('Kategori harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
-        select_command = sql.select('zis_payment_category', ['COUNT(*)'], name=category.lower())
-        insert_command = sql.insert('zis_payment_category', name=category.lower())
+        select_command = sql.select('zis_payment_category', columns='COUNT(*)', where={'name': category.lower()})
+        insert_command = sql.insert('zis_payment_category', values={'name': category.lower()})
         if isinstance(cursor, Cursor):
             await cursor.execute(*select_command)
             if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
@@ -283,7 +283,7 @@ class PaymentCategory:
 
     @staticmethod
     async def delete(category: str, cursor: 'Cursor | None' = None) -> None:
-        command = sql.delete('zis_payment_category', name=(category, category.lower()))
+        command = sql.delete('zis_payment_category', where={'name': (category, category.lower())})
         if isinstance(cursor, Cursor): await cursor.execute(*command)
         else:
             async with db_connect() as conn:
