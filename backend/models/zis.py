@@ -7,6 +7,7 @@ from ..helpers.is_uuid import is_uuid
 
 class Payment:
     class PaymentNotFound(Exception): http_status_code = 404
+    class IncompleteOrInvalidPaymentDetails(Exception): http_status_code = 400
 
     def __init__(self, uuid: str, id: int):
         self.__id = id
@@ -27,16 +28,62 @@ class Payment:
         if not (type(value) == str and is_uuid(value)): raise ValueError('`uuid` must be a string of a valid UUID.')
 
     @classmethod
-    async def get_by_uuid(cls, uuid: str) -> 'Payment | None':
-        cls.validate_uuid(uuid)
-        return Payment(str(), int()) # TODO: Fetch from DB
+    async def get(cls, **kwargs) -> 'Payment | None':
+        cls.validate_id(kwargs['id']) if 'id' in kwargs else None
+        cls.validate_uuid(kwargs['uuid']) if 'uuid' in kwargs else None
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute(*sql.select('zis_payment', where=kwargs))
+            row = await cursor.fetchone()
+            if row: return cls(row['uuid'], row['id'])
+
+    @classmethod
+    async def get_all(cls, **kwargs) -> 'list[Payment]':
+        cls.validate_id(kwargs['id']) if 'id' in kwargs else None
+        cls.validate_uuid(kwargs['uuid']) if 'uuid' in kwargs else None
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute(*sql.select('zis_payment', where=kwargs))
+            rows = await cursor.fetchall()
+            return [cls(row['uuid'], row['id']) for row in rows]
 
     @property
-    async def latest(self) -> 'PaymentVersion | None': return await self.version()
+    async def latest(self) -> 'PaymentVersion':
+        version = await self.version()
+        if version is None: raise RuntimeError('Payment has no versions.')
+        return version
     async def version(self, version: 'int | None' = None) -> 'PaymentVersion | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(*sql.select('zis_payment_version', where={'payment': self.__id, 'version': version, 'is_deleted': 0 if version is None else (0, 1)}))
+            if isinstance(version, int): await cursor.execute(*sql.select('zis_payment_version', where={'payment': self.__id, 'version': version}))
+            else: await cursor.execute(*(lambda pair: (pair[0] + ' ORDER BY version DESC', pair[1]))(sql.select('zis_payment_version', where={'payment': self.__id})))
+            row = await cursor.fetchone()
+        if row:
+            created_by = await User.get(id=row['created_by'])
+            if created_by is None: raise RuntimeError('`created_by` user not found.')
+            return PaymentVersion(payment=row['payment'], version=row['version'], payer_name=row['payer_name'], payer_number=row['payer_number'], payer_email=row['payer_email'], payer_address=row['payer_address'], note=row['note'], created_at=row['created_at'], created_by=created_by, is_deleted=row['is_deleted'], id=row['id'])
+
+    @classmethod
+    async def new(cls, details: dict) -> 'Payment':
+        try:
+            version = PaymentVersion(payment=None, version=None, payer_name=details['payer_name'], payer_number=details['payer_number'] if 'payer_number' in details else None, payer_email=details['payer_email'] if 'payer_email' in details else None, payer_address=details['payer_address'], note=details['note'] if 'note' in details else None, created_at=None, created_by=details['created_by'], is_deleted=details['is_deleted'] if 'is_deleted' in details else False)
+            lines = (*(PaymentLine(payment_version=None, payer_name=line['payer_name'], category=line['category'], amount=line['amount'], note=line['note'] if 'note' in line else None) for line in details['lines']),)
+        except Exception as e: raise cls.IncompleteOrInvalidPaymentDetails(f'Payment details are incomplete or invalid.\n{type(e).__name__}: {e}') from e
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            while True:
+                new_uuid = str(uuid())
+                await cursor.execute(*sql.select('zis_payment', where={'uuid': new_uuid}))
+                if await cursor.fetchone() is None: break
+            await cursor.execute(*sql.insert('zis_payment', values={'uuid': new_uuid}))
+            payment = cursor.lastrowid
+            if not isinstance(payment, int): raise RuntimeError('Failed to retrieve new payment ID after insertion.')
+            await version.insert(payment, cursor)
+            if not isinstance(version.id, int): raise RuntimeError('Failed to retrieve new payment version ID after insertion.')
+            for line in lines: await line.insert(version.id, cursor)
+            await conn.commit()
+        return cls(new_uuid, payment)
+
 
 class PaymentVersion:
     class InexistentPayment(Exception): http_status_code = 404
