@@ -1,4 +1,5 @@
 from uuid import uuid4 as uuid
+from aiosqlite import IntegrityError
 from ..models.user import User
 from ..helpers.db_connect import db_connect, Cursor
 from ..helpers.log import log
@@ -68,14 +69,16 @@ class Payment:
         try:
             version = PaymentVersion(payment=None, version=None, payer_name=details['payer_name'], payer_number=details['payer_number'] if 'payer_number' in details else None, payer_email=details['payer_email'] if 'payer_email' in details else None, payer_address=details['payer_address'], note=details['note'] if 'note' in details else None, created_at=None, created_by=details['created_by'], is_deleted=details['is_deleted'] if 'is_deleted' in details else False)
             lines = (*(PaymentLine(payment_version=None, payer_name=line['payer_name'], category=line['category'], amount=line['amount'], note=line['note'] if 'note' in line else None) for line in details['lines']),)
-        except Exception as e: raise cls.IncompleteOrInvalidPaymentDetails(f'Payment details are incomplete or invalid.\n{type(e).__name__}: {e}') from e
+        except Exception as e: raise cls.IncompleteOrInvalidPaymentDetails(f'Payment details are incomplete or invalid, or another error was thrown while parsing them.\n{type(e).__name__}: {e}') from e
         async with db_connect() as conn:
             cursor = await conn.cursor()
             while True:
-                new_uuid = str(uuid())
-                await cursor.execute(*sql.select('zis_payment', where={'uuid': new_uuid}))
-                if await cursor.fetchone() is None: break
-            await cursor.execute(*sql.insert('zis_payment', values={'uuid': new_uuid}))
+                try:
+                    new_uuid = str(uuid())
+                    await cursor.execute(*sql.insert('zis_payment', values={'uuid': new_uuid}))
+                    break
+                except IntegrityError as e:
+                    if getattr(e, 'sqlite_errorname', None) != 'SQLITE_CONSTRAINT_UNIQUE': raise
             payment = cursor.lastrowid
             if not isinstance(payment, int): raise RuntimeError('Failed to retrieve new payment ID after insertion.')
             await version.insert(payment, cursor)
@@ -195,7 +198,9 @@ class PaymentVersion:
         if self.__payment is not None: raise RuntimeError('Can\'t insert a payment version that already has an `payment`.')
         if self.__version is not None: raise RuntimeError('Can\'t insert a payment version that already has an `version`.')
         await self.validate_created_by_access(self.__created_by)
-        latest_version = 1 # TODO: Fetch latest version from DB
+        await cursor.execute(*(lambda pair: (pair[0] + ' ORDER BY version DESC', pair[1]))(sql.select('zis_payment_version', where={'payment': self.__id})))
+        last_version = await cursor.fetchone()
+        latest_version = (last_version['version'] if last_version else 0) + 1
         await cursor.execute(*sql.insert('zis_payment_version', values={'payment': payment, 'version': latest_version, 'payer_name': self.__payer_name, 'payer_number': self.__payer_number, 'payer_email': self.__payer_email, 'payer_address': self.__payer_address, 'note': self.__note, 'created_at': self.__created_at, 'created_by': self.__created_by.id, 'is_deleted': self.__is_deleted}))
         self.__id = cursor.lastrowid
         self.__payment = payment
