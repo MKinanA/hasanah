@@ -1,1 +1,1 @@
-from . import auth, test
+from . import dependencies, auth, test

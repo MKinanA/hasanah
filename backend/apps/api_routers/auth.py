@@ -1,13 +1,12 @@
 from fastapi import APIRouter, Request, Response, Depends
 from ...models.user import User, Session
 from ...helpers.api_response import api_response as mkresp
-from ...helpers.api_dependencies import auth
+from .dependencies import auth, json_body
 
 router = APIRouter()
 
 @router.post('/login')
-async def login(request: Request, response: Response) -> dict:
-    body = await request.json()
+async def login(request: Request, response: Response, body: dict = Depends(json_body)) -> dict:
     username = body.get('username')
     password = body.get('password')
 
@@ -35,8 +34,7 @@ async def login(request: Request, response: Response) -> dict:
     return mkresp('success', 'Sesi Dimulai', 'Login berhasil, sesi baru telah dibuat.', token=token)
 
 @router.post('/logout')
-async def logout(request: Request, response: Response, user: User = Depends(auth)) -> dict:
-    body = await request.json()
+async def logout(request: Request, response: Response, user: User = Depends(auth), body: dict = Depends(json_body)) -> dict:
     token = body.get('token')
 
     if type(token) != str:
