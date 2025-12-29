@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Request, Response, Depends
 from ...models.user import User
 from ...helpers.api_response import api_response as mkresp
-from .auth import auth
+from ...helpers.api_dependencies import auth
 
 router = APIRouter()
 

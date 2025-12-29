@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Request, Response, Depends
 from ...models.user import User, Session
 from ...helpers.api_response import api_response as mkresp
-
-async def auth(request: Request) -> 'User | None': return await User.get_by_session_auth(token) if type(token := (await request.json()).get('token')) == str else None
+from ...helpers.api_dependencies import auth
 
 router = APIRouter()
 
