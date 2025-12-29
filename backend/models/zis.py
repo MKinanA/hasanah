@@ -1,4 +1,5 @@
 from uuid import uuid4 as uuid
+from time import time
 from aiosqlite import IntegrityError
 from ..models.user import User
 from ..helpers.db_connect import db_connect, Cursor
@@ -205,8 +206,10 @@ class PaymentVersion:
 
     async def insert(self, payment: int, cursor: Cursor) -> None:
         if self.__id is not None: raise RuntimeError('Can\'t insert a payment version that already has an `id`.')
-        if self.__payment is not None: raise RuntimeError('Can\'t insert a payment version that already has an `payment`.')
-        if self.__version is not None: raise RuntimeError('Can\'t insert a payment version that already has an `version`.')
+        if self.__payment is not None: raise RuntimeError('Can\'t insert a payment version that already has a `payment`.')
+        if self.__version is not None: raise RuntimeError('Can\'t insert a payment version that already has a `version`.')
+        if self.__created_at is not None: raise RuntimeError('Can\'t insert a payment version that already has a `created_at`.')
+        self.__created_at = int(time())
         await self.validate_created_by_access(self.__created_by)
         await cursor.execute(*(lambda pair: (pair[0] + ' ORDER BY version DESC', pair[1]))(sql.select('zis_payment_version', where={'payment': self.__id})))
         last_version = await cursor.fetchone()
