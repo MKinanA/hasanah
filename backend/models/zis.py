@@ -66,10 +66,6 @@ class Payment:
 
     @classmethod
     async def new(cls, details: dict) -> 'Payment':
-        try:
-            version = PaymentVersion(payment=None, version=None, payer_name=details['payer_name'], payer_number=details['payer_number'] if 'payer_number' in details else None, payer_email=details['payer_email'] if 'payer_email' in details else None, payer_address=details['payer_address'], note=details['note'] if 'note' in details else None, created_at=None, created_by=details['created_by'], is_deleted=details['is_deleted'] if 'is_deleted' in details else False)
-            lines = (*(PaymentLine(payment_version=None, payer_name=line['payer_name'], category=line['category'], amount=line['amount'], note=line['note'] if 'note' in line else None) for line in details['lines']),)
-        except Exception as e: raise cls.IncompleteOrInvalidPaymentDetails(f'Payment details are incomplete or invalid, or another error was thrown while parsing them.\n{type(e).__name__}: {e}') from e
         async with db_connect() as conn:
             cursor = await conn.cursor()
             while True:
@@ -79,14 +75,28 @@ class Payment:
                     break
                 except IntegrityError as e:
                     if getattr(e, 'sqlite_errorname', None) != 'SQLITE_CONSTRAINT_UNIQUE': raise
-            payment = cursor.lastrowid
-            if not isinstance(payment, int): raise RuntimeError('Failed to retrieve new payment ID after insertion.')
-            await version.insert(payment, cursor)
-            if not isinstance(version.id, int): raise RuntimeError('Failed to retrieve new payment version ID after insertion.')
-            for line in lines: await line.insert(version.id, cursor)
+            id = cursor.lastrowid
+            if not isinstance(id, int): raise RuntimeError('Failed to retrieve new payment ID after insertion.')
+            payment = cls(new_uuid, id)
+            await payment.insert_new_version(details, cursor)
             await conn.commit()
-        return cls(new_uuid, payment)
+        return payment
 
+    async def update(self, details: dict) -> None:
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await self.insert_new_version(details, cursor)
+            await conn.commit()
+
+    async def insert_new_version(self, details: dict, cursor: Cursor) -> None:
+        try:
+            version = PaymentVersion(payment=None, version=None, payer_name=details['payer_name'], payer_number=details['payer_number'] if 'payer_number' in details else None, payer_email=details['payer_email'] if 'payer_email' in details else None, payer_address=details['payer_address'], note=details['note'] if 'note' in details else None, created_at=None, created_by=details['created_by'], is_deleted=details['is_deleted'] if 'is_deleted' in details else False)
+            lines = (*(PaymentLine(payment_version=None, payer_name=line['payer_name'], category=line['category'], amount=line['amount'], note=line['note'] if 'note' in line else None) for line in details['lines']),)
+        except Exception as e: raise self.IncompleteOrInvalidPaymentDetails(f'Payment details are incomplete or invalid, or another error was thrown while parsing them.\n{type(e).__name__}: {e}') from e
+        if not isinstance(self.__id, int): raise RuntimeError('Failed to retrieve current payment ID.')
+        await version.insert(self.__id, cursor)
+        if not isinstance(version.id, int): raise RuntimeError('Failed to retrieve new payment version ID after insertion.')
+        for line in lines: await line.insert(version.id, cursor)
 
 class PaymentVersion:
     class InexistentPayment(Exception): http_status_code = 404
@@ -205,6 +215,14 @@ class PaymentVersion:
         self.__id = cursor.lastrowid
         self.__payment = payment
         self.__version = latest_version
+
+    @property
+    async def lines(self) -> 'list[PaymentLine]':
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute(*sql.select('zis_payment_line', where={'payment_version': self.__id}))
+            rows = await cursor.fetchall()
+            return [PaymentLine(payment_version=row['payment_version'], payer_name=row['payer_name'], category=(await PaymentCategory.get_name_by_id(row['category'], cursor=cursor)) or '', amount=row['amount'], note=row['note'], id=row['id']) for row in rows]
 
 class PaymentLine:
     class InvalidPaymentVersion(Exception): http_status_code = 400
