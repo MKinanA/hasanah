@@ -1,7 +1,7 @@
 from uuid import uuid4 as uuid
 from time import time
 from aiosqlite import IntegrityError
-from ..models.user import User
+from .user import User
 from ..helpers.db_connect import db_connect, Cursor
 from ..helpers.log import log
 from ..helpers import sql_commands as sql

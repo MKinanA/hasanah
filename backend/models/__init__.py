@@ -1,1 +1,1 @@
-from . import user, zis
+from . import user, zis_payment
