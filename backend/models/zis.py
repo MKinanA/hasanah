@@ -211,7 +211,7 @@ class PaymentVersion:
         if self.__created_at is not None: raise RuntimeError('Can\'t insert a payment version that already has a `created_at`.')
         self.__created_at = int(time())
         await self.validate_created_by_access(self.__created_by)
-        await cursor.execute(*(lambda pair: (pair[0] + ' ORDER BY version DESC', pair[1]))(sql.select('zis_payment_version', where={'payment': self.__id})))
+        await cursor.execute(*(lambda pair: (pair[0] + ' ORDER BY version DESC', pair[1]))(sql.select('zis_payment_version', where={'payment': payment})))
         last_version = await cursor.fetchone()
         latest_version = (last_version['version'] if last_version else 0) + 1
         await cursor.execute(*sql.insert('zis_payment_version', values={'payment': payment, 'version': latest_version, 'payer_name': self.__payer_name, 'payer_number': self.__payer_number, 'payer_email': self.__payer_email, 'payer_address': self.__payer_address, 'note': self.__note, 'created_at': self.__created_at, 'created_by': self.__created_by.id, 'is_deleted': self.__is_deleted}))
