@@ -14,7 +14,7 @@ FRONTEND_DIRECTORY = get_package_path(__name__, __file__).parent / 'frontend' # 
 app = FastAPI()
 
 @app.exception_handler(Exception)
-async def exception_handler(request, exc: BaseException) -> JSONResponse: return JSONResponse(status_code=getattr(exc, 'http_status_code', 500), content=mkresp('error', type(exc).__name__, str(exc)))
+async def exception_handler(request, exc: BaseException) -> JSONResponse: return JSONResponse(status_code=getattr(exc, 'status_code', 500), content=mkresp('error', type(exc).__name__, str(exc)))
 
 app.include_router(api, prefix='/api')
 app.mount('/', CustomStaticFiles(directory=FRONTEND_DIRECTORY, html=True))

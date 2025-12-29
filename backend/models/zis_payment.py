@@ -9,8 +9,8 @@ from ..helpers.is_uuid import is_uuid
 from ..helpers.repr import repr
 
 class Payment:
-    class PaymentNotFound(Exception): http_status_code = 404
-    class IncompleteOrInvalidPaymentDetails(Exception): http_status_code = 400
+    class PaymentNotFound(Exception): status_code = 404
+    class IncompleteOrInvalidPaymentDetails(Exception): status_code = 400
 
     def __init__(self, uuid: str, id: int):
         self.__id = id
@@ -101,19 +101,19 @@ class Payment:
         for line in lines: await line.insert(version.id, cursor)
 
 class PaymentVersion:
-    class InexistentPayment(Exception): http_status_code = 404
-    class InvalidPayment(Exception): http_status_code = 400
-    class InvalidVersion(Exception): http_status_code = 400
-    class InvalidPayerName(Exception): http_status_code = 400
-    class InvalidPayerNumber(Exception): http_status_code = 400
-    class InvalidPayerEmail(Exception): http_status_code = 400
-    class NoPayerContact(Exception): http_status_code = 400
-    class InvalidPayerAddress(Exception): http_status_code = 400
-    class InvalidNote(Exception): http_status_code = 400
-    class InvalidCreatedAt(Exception): http_status_code = 400
-    class InvalidCreatedBy(Exception): http_status_code = 400
-    class UnauthorizedCreatedBy(Exception): http_status_code = 403
-    class InvalidIsDeleted(Exception): http_status_code = 400
+    class InexistentPayment(Exception): status_code = 404
+    class InvalidPayment(Exception): status_code = 400
+    class InvalidVersion(Exception): status_code = 400
+    class InvalidPayerName(Exception): status_code = 400
+    class InvalidPayerNumber(Exception): status_code = 400
+    class InvalidPayerEmail(Exception): status_code = 400
+    class NoPayerContact(Exception): status_code = 400
+    class InvalidPayerAddress(Exception): status_code = 400
+    class InvalidNote(Exception): status_code = 400
+    class InvalidCreatedAt(Exception): status_code = 400
+    class InvalidCreatedBy(Exception): status_code = 400
+    class UnauthorizedCreatedBy(Exception): status_code = 403
+    class InvalidIsDeleted(Exception): status_code = 400
 
     def __init__(self, payment: 'int | None', version: 'int | None', payer_name: str, payer_number: 'str | None', payer_email: 'str | None', payer_address: str, note: 'str | None', created_at: 'int | None', created_by: User, is_deleted: 'bool | int' = False, id: 'int | None' = None):
         self.validate_id(id)
@@ -244,13 +244,13 @@ class PaymentVersion:
     }
 
 class PaymentLine:
-    class InvalidPaymentVersion(Exception): http_status_code = 400
-    class InexistentPaymentVersion(Exception): http_status_code = 404
-    class InvalidPayerName(Exception): http_status_code = 400
-    class InvalidCategory(Exception): http_status_code = 400
-    class InexistentCategory(Exception): http_status_code = 404
-    class InvalidAmount(Exception): http_status_code = 400
-    class InvalidNote(Exception): http_status_code = 400
+    class InvalidPaymentVersion(Exception): status_code = 400
+    class InexistentPaymentVersion(Exception): status_code = 404
+    class InvalidPayerName(Exception): status_code = 400
+    class InvalidCategory(Exception): status_code = 400
+    class InexistentCategory(Exception): status_code = 404
+    class InvalidAmount(Exception): status_code = 400
+    class InvalidNote(Exception): status_code = 400
 
     def __init__(self, payment_version: 'int | None', payer_name: str, category: str, amount: 'float | int', note: 'str | None' = None, id: 'int | None' = None):
         self.validate_id(id)
@@ -320,7 +320,7 @@ class PaymentLine:
     }
 
 class PaymentCategory:
-    class InvalidCategory(Exception): http_status_code = 400
+    class InvalidCategory(Exception): status_code = 400
 
     @staticmethod
     async def get_all(cursor: 'Cursor | None' = None) -> 'dict[int, str]':

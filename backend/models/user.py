@@ -12,10 +12,10 @@ TOKEN_NBYTES = 64
 SESSION_LIFETIME = 60 * 60 * 24 * 7
 
 class User:
-    class InvalidUsername(Exception): http_status_code = 400
-    class InvalidName(Exception): http_status_code = 400
-    class InvalidPassword(Exception): http_status_code = 400
-    class InexistentUser(Exception): http_status_code = 404
+    class InvalidUsername(Exception): status_code = 400
+    class InvalidName(Exception): status_code = 400
+    class InvalidPassword(Exception): status_code = 400
+    class InexistentUser(Exception): status_code = 404
 
     def __init__(self, username: str, name: str, password: str, id: 'int | None' = None) -> None:
         self.validate_id(id)
@@ -139,7 +139,7 @@ class User:
     async def create_session(self, token_nbytes: int = TOKEN_NBYTES) -> str: return await Session.create(self, token_nbytes)
 
 class Access:
-    class InvalidAccess(Exception): http_status_code = 400
+    class InvalidAccess(Exception): status_code = 400
 
     @staticmethod
     async def get_all() -> 'dict[int, str]':
