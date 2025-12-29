@@ -2,15 +2,15 @@ from fastapi import APIRouter, Request, Response, Depends
 from ...models.user import User, Session
 from ...helpers.api_response import api_response as mkresp
 
-async def auth(request: Request) -> 'User | None': return await User.get_by_session_auth(token) if type(token := (await request.form()).get('token')) == str else None
+async def auth(request: Request) -> 'User | None': return await User.get_by_session_auth(token) if type(token := (await request.json()).get('token')) == str else None
 
 router = APIRouter()
 
 @router.post('/login')
 async def login(request: Request, response: Response) -> dict:
-    form = await request.form()
-    username = form.get('username')
-    password = form.get('password')
+    body = await request.json()
+    username = body.get('username')
+    password = body.get('password')
 
     if type(username) != str:
         response.status_code = 400
@@ -37,8 +37,8 @@ async def login(request: Request, response: Response) -> dict:
 
 @router.post('/logout')
 async def logout(request: Request, response: Response, user: User = Depends(auth)) -> dict:
-    form = await request.form()
-    token = form.get('token')
+    body = await request.json()
+    token = body.get('token')
 
     if type(token) != str:
         response.status_code = 400
