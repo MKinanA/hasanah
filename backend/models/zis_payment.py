@@ -63,7 +63,7 @@ class Payment:
         if row:
             created_by = await User.get(id=row['created_by'])
             if created_by is None: raise RuntimeError('`created_by` user not found.')
-            return PaymentVersion(payment=row['payment'], version=row['version'], payer_name=row['payer_name'], payer_number=row['payer_number'], payer_email=row['payer_email'], payer_address=row['payer_address'], note=row['note'], created_at=row['created_at'], created_by=created_by, is_deleted=row['is_deleted'], id=row['id'])
+            return PaymentVersion(payment=row['payment'], version=row['version'], payer_name=row['payer_name'], payer_number=row['payer_number'], payer_email=row['payer_email'], payer_address=row['payer_address'], note=row['note'], created_at=row['created_at'], created_by=created_by, is_deleted=bool(row['is_deleted']), id=row['id'])
 
     @classmethod
     async def new(cls, details: dict) -> 'Payment':
@@ -214,7 +214,7 @@ class PaymentVersion:
         await cursor.execute(*(lambda pair: (pair[0] + ' ORDER BY version DESC', pair[1]))(sql.select('zis_payment_version', where={'payment': payment})))
         last_version = await cursor.fetchone()
         latest_version = (last_version['version'] if last_version else 0) + 1
-        await cursor.execute(*sql.insert('zis_payment_version', values={'payment': payment, 'version': latest_version, 'payer_name': self.__payer_name, 'payer_number': self.__payer_number, 'payer_email': self.__payer_email, 'payer_address': self.__payer_address, 'note': self.__note, 'created_at': self.__created_at, 'created_by': self.__created_by.id, 'is_deleted': self.__is_deleted}))
+        await cursor.execute(*sql.insert('zis_payment_version', values={'payment': payment, 'version': latest_version, 'payer_name': self.__payer_name, 'payer_number': self.__payer_number, 'payer_email': self.__payer_email, 'payer_address': self.__payer_address, 'note': self.__note, 'created_at': self.__created_at, 'created_by': self.__created_by.id, 'is_deleted': int(self.__is_deleted)}))
         self.__id = cursor.lastrowid
         self.__payment = payment
         self.__version = latest_version
@@ -226,6 +226,21 @@ class PaymentVersion:
             await cursor.execute(*sql.select('zis_payment_line', where={'payment_version': self.__id}))
             rows = await cursor.fetchall()
             return [PaymentLine(payment_version=row['payment_version'], payer_name=row['payer_name'], category=(await PaymentCategory.get_name_by_id(row['category'], cursor=cursor)) or '', amount=row['amount'], note=row['note'], id=row['id']) for row in rows]
+
+    @property
+    async def to_dict(self) -> dict: return {
+        'payment': payment.uuid if (payment := await Payment.get(id=self.__payment)) else None,
+        'version': self.__version,
+        'payer_name': self.__payer_name,
+        'payer_number': self.__payer_number,
+        'payer_email': self.__payer_email,
+        'payer_address': self.__payer_address,
+        'note': self.__note,
+        'lines': [await line.to_dict for line in await self.lines],
+        'created_at': self.__created_at,
+        'created_by': self.__created_by.username,
+        'is_deleted': self.__is_deleted,
+    }
 
 class PaymentLine:
     class InvalidPaymentVersion(Exception): http_status_code = 400
@@ -294,6 +309,14 @@ class PaymentLine:
         await cursor.execute(*sql.insert('zis_payment_line', values={'payment_version': payment_version, 'payer_name': self.__payer_name, 'category': await PaymentCategory.get_id_by_name(self.__category, cursor=cursor), 'amount': self.__amount, 'note': self.__note}))
         self.__id = cursor.lastrowid
         self.__payment_version = payment_version
+
+    @property
+    async def to_dict(self) -> dict: return {
+        'payer_name': self.__payer_name,
+        'category': self.__category,
+        'amount': self.__amount,
+        'note': self.__note,
+    }
 
 class PaymentCategory:
     class InvalidCategory(Exception): http_status_code = 400
