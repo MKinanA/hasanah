@@ -6,6 +6,7 @@ from ..helpers.db_connect import db_connect, Cursor
 from ..helpers.log import log
 from ..helpers import sql_commands as sql
 from ..helpers.is_uuid import is_uuid
+from ..helpers.repr import repr
 
 class Payment:
     class PaymentNotFound(Exception): http_status_code = 404
@@ -20,7 +21,7 @@ class Payment:
     @property
     def uuid(self) -> str: return self.__uuid
 
-    # def __repr__(self) -> str: pass
+    def __repr__(self) -> str: return repr(self)
 
     @staticmethod
     def validate_id(value) -> None:
@@ -162,7 +163,7 @@ class PaymentVersion:
     @property
     def is_deleted(self) -> bool: return bool(self.__is_deleted)
 
-    # def __repr__(self) -> str: pass
+    def __repr__(self) -> str: return repr(self)
 
     @staticmethod
     def validate_id(value) -> None:
