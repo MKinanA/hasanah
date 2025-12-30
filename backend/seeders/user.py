@@ -7,7 +7,8 @@ from ..helpers.log import log
 async def seed() -> None:
     env(get_package_path(__name__, __file__)/'.env')
 
-    await Access.create('seluruhnya')
+    for name, value in vars(Access).items():
+        if name.isupper() and isinstance(value, str): await Access.create(value)
 
     admin = User(
         username=str(getenv('USERNAME_AKUN_ADMIN')),
@@ -15,7 +16,7 @@ async def seed() -> None:
         password=str(getenv('PASSWORD_AKUN_ADMIN')),
     )
     await admin.save()
-    await admin.grant_access('seluruhnya')
+    await admin.grant_access(Access.ADMIN)
 
     dummy_user = User(
         username='user',
