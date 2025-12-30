@@ -133,10 +133,12 @@ class User:
             await cursor.execute(*sql.delete('r_user_access', where={'user': self.__id, 'access': access_id}))
             await conn.commit()
 
-    async def has_access(self, access: str) -> bool: return access in (accesses := await self.accesses) or Access.ADMIN in accesses
+    async def has_access(self, *accesses: str) -> bool:
+        self_accesses = await self.accesses
+        return all(access in self_accesses for access in accesses) or Access.ADMIN in self_accesses
 
-    async def require_access(self, access: str) -> None:
-        if not await self.has_access(access): raise Access.AccessDenied('Anda tidak memiliki akses untuk ini.')
+    async def require_access(self, *accesses: str) -> None:
+        if not await self.has_access(*accesses): raise Access.AccessDenied('Anda tidak memiliki akses untuk ini.')
 
     @staticmethod
     async def get_by_session_auth(token: str) -> 'User | None': return await Session.authenticate(token)
