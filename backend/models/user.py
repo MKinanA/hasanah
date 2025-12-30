@@ -133,6 +133,11 @@ class User:
             await cursor.execute(*sql.delete('r_user_access', where={'user': self.__id, 'access': access_id}))
             await conn.commit()
 
+    async def has_access(self, access: str) -> bool: return access in (accesses := await self.accesses) or Access.ADMIN in accesses
+
+    async def require_access(self, access: str) -> None:
+        if not await self.has_access(access): raise Access.AccessDenied('Anda tidak memiliki akses untuk ini.')
+
     @staticmethod
     async def get_by_session_auth(token: str) -> 'User | None': return await Session.authenticate(token)
 
@@ -140,6 +145,11 @@ class User:
 
 class Access:
     class InvalidAccess(Exception): status_code = 400
+    class AccessDenied(Exception): status_code = 403
+
+    ADMIN = 'admin'
+    ZIS_PAYMENT_READ = 'zis_payment_read'
+    ZIS_PAYMENT_WRITE = 'zis_payment_write'
 
     @staticmethod
     async def get_all() -> 'dict[int, str]':
