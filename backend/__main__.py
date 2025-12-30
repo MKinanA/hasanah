@@ -8,6 +8,7 @@ from .apps.api import api
 from .apps.custom_static_files import CustomStaticFiles
 from .helpers.get_package_path import get_package_path
 from .helpers.api_response import api_response as mkresp
+from .run_schema_and_seed import run_schema_and_seed
 
 FRONTEND_DIRECTORY = get_package_path(__name__, __file__).parent / 'frontend' # `../frontend/`
 
@@ -23,6 +24,10 @@ print(log(__name__, f'{FRONTEND_DIRECTORY = }'))
 print(log(__name__, f'{__package__ = }'))
 
 if __name__ == "__main__":
+    if not (get_package_path(__name__, __file__)/'.db').exists():
+        print(log(__name__, 'Database file not found, creating...'))
+        async_run(run_schema_and_seed())
+
     print(log(__name__, 'Testing database connection...'))
     async def init_connect():
         async with db_connect(): pass
