@@ -93,8 +93,9 @@ class Payment:
             'ON pv.payment = lv.payment '
             'AND pv.version = lv.latest_version '
             f"{('WHERE ' + where + ' ') if where else ''}"
-            'ORDER BY ' + order_by,
-            (*(parameter for parameters in nested_parameters for parameter in parameters),)
+            'ORDER BY ' + order_by + ' '
+            'LIMIT ? OFFSET ?',
+            (*(parameter for parameters in nested_parameters for parameter in parameters), limit if (limit := int(limit)) >= 0 else 0, offset if (offset := int(offset)) >= 0 else 0)
         )
 
         return command
