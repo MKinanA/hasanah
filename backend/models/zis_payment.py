@@ -7,6 +7,7 @@ from ..helpers.log import log
 from ..helpers import sql_commands as sql
 from ..helpers.is_uuid import is_uuid
 from ..helpers.repr import repr
+from ..helpers.multisteps import multisteps_async
 
 class Payment:
     class PaymentNotFound(Exception): status_code = 404
@@ -49,6 +50,56 @@ class Payment:
             await cursor.execute(*sql.select('zis_payment', where=kwargs))
             rows = await cursor.fetchall()
             return [cls(row['uuid'], row['id']) for row in rows]
+
+    @classmethod
+    async def query(cls, filters: 'dict | None' = None, include_deleted: bool = False, only_deleted: bool = False, sort: str = 'last_updated', limit: int = 100, offset: int = 0):
+        order_by = {
+            'last_updated': 'pv.created_at DESC',
+            'last_created': 'fv.created_at DESC',
+            # 'first_updated': 'pv.created_at ASC',
+            'first_created': 'fv.created_at ASC',
+        }[sort]
+        filter_values_parser = {
+            'first_created_by': (lambda username: User.get(username=username), lambda user: user.id),
+            'last_updated_by': (lambda username: User.get(username=username), lambda user: user.id),
+            'created_in_timespan': lambda seconds: int(seconds),
+            'updated_in_timespan': lambda seconds: int(seconds),
+        }
+        filters_parser = {
+            'first_created_by': lambda value: f'fv.created_by = {value}',
+            'last_updated_by': lambda value: f'pv.created_by = {value}',
+            'created_in_timespan': lambda value: f'fv.created_at + {value} >= {int(time())}',
+            'updated_in_timespan': lambda value: f'pv.created_at + {value} >= {int(time())}',
+        }
+        parsed_filters = [filters_parser[key](await multisteps_async(lambda: value, *(parser if isinstance(parser := filter_values_parser[key], (tuple, list)) else (parser,)))) for key, value in (filters or {}).items()]
+        where = ' AND '.join(x for x in (
+            'pv.is_deleted = 0' if not include_deleted else 'pv.is_deleted = 1' if only_deleted else None,
+            *parsed_filters
+        ) if x is not None)
+        command = (
+            'SELECT p.* '
+            'FROM zis_payment p '
+            'JOIN zis_payment_version fv '
+            'ON fv.payment = p.id '
+            'AND fv.version = 1 '
+            'JOIN ( '
+                'SELECT payment, MAX(version) AS latest_version '
+                'FROM zis_payment_version '
+                'GROUP BY payment '
+            ') lv '
+            'ON lv.payment = p.id '
+            'JOIN zis_payment_version pv '
+            'ON pv.payment = lv.payment '
+            'AND pv.version = lv.latest_version '
+            'WHERE ' + where + ' '
+            'ORDER BY ' + order_by
+        )
+
+        return command
+
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            await cursor.execute(command, ())
 
     @property
     async def latest(self) -> 'PaymentVersion':
