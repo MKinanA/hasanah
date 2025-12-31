@@ -62,8 +62,8 @@ class Payment:
             'first_created': 'fv.created_at ASC',
         }[sort]
         filter_values_parser = {
-            'first_created_by': (lambda username: User.get(username=username), lambda user: user.id),
-            'last_updated_by': (lambda username: User.get(username=username), lambda user: user.id),
+            'first_created_by': (lambda username: User.get(username=username), lambda user: user.id if user is not None else 0),
+            'last_updated_by': (lambda username: User.get(username=username), lambda user: user.id if user is not None else 0),
             'created_in_timespan': lambda seconds: int(seconds),
             'updated_in_timespan': lambda seconds: int(seconds),
         }
