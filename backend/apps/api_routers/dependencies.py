@@ -14,5 +14,7 @@ async def auth(request: Request) -> User:
     return user
 
 async def json_body(request: Request) -> dict:
-    try: return await request.json()
+    try: body = await request.json()
     except JSONDecodeError as e: raise InvalidBodyFormat(f'Failed to parse request body as JSON.\n{type(e).__name__}: {str(e)}') from e
+    if not isinstance(body, dict): raise InvalidBodyFormat(f'Body must be convertible to a Python dict, not {type(body).__name__}.')
+    return body
