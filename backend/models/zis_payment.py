@@ -151,12 +151,13 @@ class Payment:
             await self.insert_new_version(details, cursor)
             await conn.commit()
 
-    async def delete(self) -> None:
+    async def delete(self, by: User) -> None:
         async with db_connect() as conn:
             cursor = await conn.cursor()
             if (latest_version := await self.select_version(None, cursor)) is None: raise RuntimeError('Payment has no versions, can\'t delete a payment with no versions.')
             elif latest_version.is_deleted: raise self.PaymentIsDeleted('Can\'t delete an already deleted record.')
             details = await latest_version.to_dict
+            details['created_by'] = by
             details['is_deleted'] = True
             await self.insert_new_version(details, cursor)
             await conn.commit()
