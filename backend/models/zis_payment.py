@@ -66,16 +66,17 @@ class Payment:
             'updated_in_timespan': lambda seconds: int(seconds),
         }
         filters_parser = {
-            'first_created_by': lambda value: f'fv.created_by = {value}',
-            'last_updated_by': lambda value: f'pv.created_by = {value}',
-            'created_in_timespan': lambda value: f'fv.created_at + {value} >= {int(time())}',
-            'updated_in_timespan': lambda value: f'pv.created_at + {value} >= {int(time())}',
+            'first_created_by': lambda value: (f'fv.created_by = ?', value),
+            'last_updated_by': lambda value: (f'pv.created_by = ?', value),
+            'created_in_timespan': lambda value: (f'fv.created_at + ? >= ?', (value, int(time()))),
+            'updated_in_timespan': lambda value: (f'pv.created_at + ? >= ?', (value, int(time()))),
         }
         parsed_filters = [filters_parser[key](await multisteps_async(lambda: value, *(parser if isinstance(parser := filter_values_parser[key], (tuple, list)) else (parser,)))) for key, value in (filters or {}).items()]
         where = ' AND '.join(x for x in (
             'pv.is_deleted = 0' if not include_deleted else 'pv.is_deleted = 1' if only_deleted else None,
-            *parsed_filters
+            *(parsed_filter[0] for parsed_filter in parsed_filters)
         ) if x is not None)
+        nested_parameters = (*(parsed_filter_parameters if isinstance(parsed_filter_parameters := parsed_filter[1], (tuple, list)) else (parsed_filter_parameters,) for parsed_filter in parsed_filters),)
         command = (
             'SELECT p.* '
             'FROM zis_payment p '
@@ -91,15 +92,16 @@ class Payment:
             'JOIN zis_payment_version pv '
             'ON pv.payment = lv.payment '
             'AND pv.version = lv.latest_version '
-            'WHERE ' + where + ' '
-            'ORDER BY ' + order_by
+            f"{('WHERE ' + where + ' ') if where else ''}"
+            'ORDER BY ' + order_by,
+            (*(parameter for parameters in nested_parameters for parameter in parameters),)
         )
 
         return command
 
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(command, ())
+            await cursor.execute(command)
 
     @property
     async def latest(self) -> 'PaymentVersion':
