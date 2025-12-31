@@ -12,6 +12,8 @@ from ..helpers.multisteps import multisteps_async
 class Payment:
     class PaymentNotFound(Exception): status_code = 404
     class IncompleteOrInvalidPaymentDetails(Exception): status_code = 400
+    class PaymentIsDeleted(Exception): status_code = 400
+    class PaymentIsNotDeleted(Exception): status_code = 400
 
     def __init__(self, uuid: str, id: int):
         self.__id = id
@@ -52,7 +54,7 @@ class Payment:
             return [cls(row['uuid'], row['id']) for row in rows]
 
     @classmethod
-    async def query(cls, filters: 'dict | None' = None, include_deleted: bool = False, only_deleted: bool = False, sort: str = 'last_updated', limit: int = 100, offset: int = 0):
+    async def query(cls, filters: 'dict | None' = None, include_deleted: bool = False, only_deleted: bool = False, sort: str = 'last_updated', limit: int = 100, offset: int = 0) -> 'list[Payment]':
         order_by = {
             'last_updated': 'pv.created_at DESC',
             'last_created': 'fv.created_at DESC',
@@ -98,11 +100,11 @@ class Payment:
             (*(parameter for parameters in nested_parameters for parameter in parameters), limit if (limit := int(limit)) >= 0 else 0, offset if (offset := int(offset)) >= 0 else 0)
         )
 
-        return command
-
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            await cursor.execute(command)
+            await cursor.execute(*command)
+            rows = await cursor.fetchall()
+            return [cls(row['uuid'], row['id']) for row in rows]
 
     @property
     async def latest(self) -> 'PaymentVersion':
@@ -112,9 +114,11 @@ class Payment:
     async def version(self, version: 'int | None' = None) -> 'PaymentVersion | None':
         async with db_connect() as conn:
             cursor = await conn.cursor()
-            if isinstance(version, int): await cursor.execute(*sql.select('zis_payment_version', where={'payment': self.__id, 'version': version}))
-            else: await cursor.execute(*(lambda pair: (pair[0] + ' ORDER BY version DESC', pair[1]))(sql.select('zis_payment_version', where={'payment': self.__id})))
-            row = await cursor.fetchone()
+            return await self.select_version(version, cursor)
+    async def select_version(self, version: 'int | None', cursor: Cursor) -> 'PaymentVersion | None':
+        if isinstance(version, int): await cursor.execute(*sql.select('zis_payment_version', where={'payment': self.__id, 'version': version}))
+        else: await cursor.execute(*(lambda pair: (pair[0] + ' ORDER BY version DESC', pair[1]))(sql.select('zis_payment_version', where={'payment': self.__id})))
+        row = await cursor.fetchone()
         if row:
             created_by = await User.get(id=row['created_by'])
             if created_by is None: raise RuntimeError('`created_by` user not found.')
@@ -139,8 +143,21 @@ class Payment:
         return payment
 
     async def update(self, details: dict) -> None:
+        if 'is_deleted' in details: del details['is_deleted']
         async with db_connect() as conn:
             cursor = await conn.cursor()
+            if (latest_version := await self.select_version(None, cursor)) is None: raise RuntimeError('Payment has no versions.')
+            elif latest_version.is_deleted: raise self.PaymentIsDeleted('Can\'t update a deleted record.')
+            await self.insert_new_version(details, cursor)
+            await conn.commit()
+
+    async def delete(self) -> None:
+        async with db_connect() as conn:
+            cursor = await conn.cursor()
+            if (latest_version := await self.select_version(None, cursor)) is None: raise RuntimeError('Payment has no versions, can\'t delete a payment with no versions.')
+            elif latest_version.is_deleted: raise self.PaymentIsDeleted('Can\'t delete an already deleted record.')
+            details = await latest_version.to_dict
+            details['is_deleted'] = True
             await self.insert_new_version(details, cursor)
             await conn.commit()
 
