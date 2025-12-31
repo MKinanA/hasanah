@@ -1,7 +1,7 @@
 from uuid import uuid4 as uuid
 from time import time
 from aiosqlite import IntegrityError
-from .user import User
+from .user import User, Access
 from ..helpers.db_connect import db_connect, Cursor
 from ..helpers.log import log
 from ..helpers import sql_commands as sql
@@ -272,7 +272,7 @@ class PaymentVersion:
         if not (isinstance(value, User)): raise cls.InvalidCreatedBy('`created_by` must be a User.')
     @classmethod
     async def validate_created_by_access(cls, created_by: User):
-        if not 'zis_payment_create' in (await created_by.accesses): raise cls.UnauthorizedCreatedBy('`created_by` user doesn\'t have the required access.')
+        if not (await created_by.has_access(Access.ZIS_PAYMENT_WRITE)): raise cls.UnauthorizedCreatedBy('`created_by` user doesn\'t have the required access.')
     @classmethod
     def validate_is_deleted(cls, value):
         if not (type(value) in (int, bool) and (type(value) == bool or value in (0, 1))): raise cls.InvalidIsDeleted('`is_deleted` must be a boolean (or 0 and 1 integer).')
