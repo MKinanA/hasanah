@@ -5,23 +5,24 @@ from ...models.zis_payment import Payment
 from ...helpers.api_response import api_response as mkresp
 from .dependencies import auth, json_body
 
+PAYMENT_QUERY_PARAMS = (*signature(Payment.query).parameters.keys(),)
+
 router = APIRouter()
 
 @router.post('/payments')
 async def payments(request: Request, response: Response, user: User = Depends(auth), body: dict = Depends(json_body)):
     await user.require_access(Access.ZIS_PAYMENT_READ)
-    parameters = parameters if isinstance(parameters := await request.json(), dict) else {}
-    payments = Payment.query(**{key: value for key, value in parameters.items() if key in (*signature(Payment.query).parameters.keys(),)})
-    return mkresp('success', 'Payments Fetched', 'Successfully fetched payments.', payments=[(await (await payment.latest).to_dict) for payment in await payments])
+    payments = await Payment.query(**{key: value for key, value in body.items() if key in PAYMENT_QUERY_PARAMS})
+    return mkresp('success', 'Payments Fetched', 'Successfully fetched payments.', payments=[(await (await payment.latest).to_dict) for payment in payments])
 
 @router.post('/payment')
 async def payment(request: Request, response: Response, user: User = Depends(auth), body: dict = Depends(json_body)):
     await user.require_access(Access.ZIS_PAYMENT_READ)
-    uuid = (parameters if isinstance(parameters := await request.json(), dict) else {}).get('uuid')
+    uuid = body.get('uuid')
     if not isinstance(uuid, str):
         response.status_code = 400
         return mkresp('error', 'Missing or Invalid UUID', 'Please provide a valid payment UUID.')
-    version = (parameters if isinstance(parameters, dict) else {}).get('version')
+    version = body.get('version')
     if not (version is None or isinstance(version, int)):
         try: version = int(version)
         except: pass
