@@ -54,7 +54,7 @@ class Payment:
             return [cls(row['uuid'], row['id']) for row in rows]
 
     @classmethod
-    async def query(cls, filters: 'dict | None' = None, include_deleted: bool = False, only_deleted: bool = False, sort: str = 'last_updated', limit: int = 100, offset: int = 0) -> 'list[Payment]':
+    async def query(cls, filters: 'dict | None' = None, include_deleted: bool = False, only_deleted: bool = False, sort: str = 'last_updated', limit: int = 100, offset: int = 0, **kwargs) -> 'list[Payment]':
         order_by = {
             'last_updated': 'pv.created_at DESC',
             'last_created': 'fv.created_at DESC',
