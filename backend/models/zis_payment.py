@@ -459,3 +459,72 @@ class PaymentCategory:
                 cursor = await conn.cursor()
                 await cursor.execute(*command)
                 await conn.commit()
+
+class PaymentUnit:
+    class InvalidUnit(Exception): status_code = 400
+
+    @staticmethod
+    async def get_all(cursor: 'Cursor | None' = None) -> 'dict[int, str]':
+        command = sql.select('zis_payment_unit', columns=('id', 'name'))
+        if isinstance(cursor, Cursor):
+            await cursor.execute(*command)
+            rows = await cursor.fetchall()
+        else:
+            async with db_connect() as conn:
+                cursor = await conn.cursor()
+                await cursor.execute(*command)
+                rows = await cursor.fetchall()
+        return {row['id']: row['name'] for row in rows}
+
+    @staticmethod
+    async def get_name_by_id(id: int, cursor: 'Cursor | None' = None) -> 'str | None':
+        command = sql.select('zis_payment_unit', columns='name', where={'id': id})
+        if isinstance(cursor, Cursor):
+            await cursor.execute(*command)
+            row = await cursor.fetchone()
+        else:
+            async with db_connect() as conn:
+                cursor = await conn.cursor()
+                await cursor.execute(*command)
+                row = await cursor.fetchone()
+        if row: return row['name']
+
+    @staticmethod
+    async def get_id_by_name(unit: str, cursor: 'Cursor | None' = None) -> 'int | None':
+        command = sql.select('zis_payment_unit', columns='id', where={'name': unit.lower()})
+        if isinstance(cursor, Cursor):
+            await cursor.execute(*command)
+            row = await cursor.fetchone()
+        else:
+            async with db_connect() as conn:
+                cursor = await conn.cursor()
+                await cursor.execute(*command)
+                row = await cursor.fetchone()
+        if row: return row['id']
+
+    @classmethod
+    async def create(cls, unit: str, cursor: 'Cursor | None' = None) -> None:
+        if not (type(unit) == str and 1 <= len(unit) <= 64 and unit.islower()): raise cls.InvalidUnit('Unit harus berupa string dengan panjang 1-64 karakter dan hanya berisi huruf kecil.')
+        select_command = sql.select('zis_payment_unit', columns='COUNT(*)', where={'name': unit.lower()})
+        insert_command = sql.insert('zis_payment_unit', values={'name': unit.lower()})
+        if isinstance(cursor, Cursor):
+            await cursor.execute(*select_command)
+            if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
+            await cursor.execute(*insert_command)
+        else:
+            async with db_connect() as conn:
+                cursor = await conn.cursor()
+                await cursor.execute(*select_command)
+                if (fetchone := await cursor.fetchone()) and fetchone[0] > 0: return
+                await cursor.execute(*insert_command)
+                await conn.commit()
+
+    @staticmethod
+    async def delete(unit: str, cursor: 'Cursor | None' = None) -> None:
+        command = sql.delete('zis_payment_unit', where={'name': (unit, unit.lower())})
+        if isinstance(cursor, Cursor): await cursor.execute(*command)
+        else:
+            async with db_connect() as conn:
+                cursor = await conn.cursor()
+                await cursor.execute(*command)
+                await conn.commit()

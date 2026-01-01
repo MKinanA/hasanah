@@ -59,6 +59,11 @@ CREATE TABLE zis_payment_category (
     name TEXT NOT NULL UNIQUE CHECK (name = lower(name))
 ) STRICT;
 
+CREATE TABLE zis_payment_unit (
+    id INTEGER PRIMARY KEY UNIQUE NOT NULL,
+    name TEXT NOT NULL UNIQUE CHECK (name = lower(name))
+) STRICT;
+
 CREATE TABLE zis_payment_line (
     id INTEGER PRIMARY KEY UNIQUE NOT NULL,
     payment_version INTEGER NOT NULL REFERENCES zis_payment_version(id) ON UPDATE CASCADE ON DELETE RESTRICT,
