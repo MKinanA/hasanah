@@ -167,7 +167,7 @@ class Payment:
     async def insert_new_version(self, details: dict, cursor: Cursor) -> None:
         try:
             version = PaymentVersion(payment=None, version=None, payer_name=details['payer_name'], payer_number=details['payer_number'] if 'payer_number' in details else None, payer_email=details['payer_email'] if 'payer_email' in details else None, payer_address=details['payer_address'], note=details['note'] if 'note' in details else None, created_at=None, created_by=details['created_by'], is_deleted=details['is_deleted'] if 'is_deleted' in details else False)
-            lines = (*(PaymentLine(payment_version=None, payer_name=line['payer_name'], category=line['category'], amount=line['amount'], note=line['note'] if 'note' in line else None) for line in details['lines']),)
+            lines = (*(PaymentLine(payment_version=None, payer_name=line['payer_name'], category=line['category'], amount=line['amount'], unit=line['unit'], note=line['note'] if 'note' in line else None) for line in details['lines']),)
         except Exception as e: raise self.IncompleteOrInvalidPaymentDetails(f'Payment details are incomplete or invalid, or another error was thrown while parsing them.\n{type(e).__name__}: {e}') from e
         if not isinstance(self.__id, int): raise RuntimeError('Failed to retrieve current payment ID.')
         await version.insert(self.__id, cursor)
@@ -300,7 +300,7 @@ class PaymentVersion:
             cursor = await conn.cursor()
             await cursor.execute(*sql.select('zis_payment_line', where={'payment_version': self.__id}))
             rows = await cursor.fetchall()
-            return [PaymentLine(payment_version=row['payment_version'], payer_name=row['payer_name'], category=(await PaymentCategory.get_name_by_id(row['category'], cursor=cursor)) or '', amount=row['amount'], note=row['note'], id=row['id']) for row in rows]
+            return [PaymentLine(payment_version=row['payment_version'], payer_name=row['payer_name'], category=(await PaymentCategory.get_name_by_id(row['category'], cursor=cursor)) or '', amount=row['amount'], unit=(await PaymentUnit.get_name_by_id(row['unit'], cursor=cursor)) or '', note=row['note'], id=row['id']) for row in rows]
 
     @property
     async def to_dict(self) -> dict: return {
@@ -323,21 +323,25 @@ class PaymentLine:
     class InvalidPayerName(Exception): status_code = 400
     class InvalidCategory(Exception): status_code = 400
     class InexistentCategory(Exception): status_code = 404
+    class InvalidUnit(Exception): status_code = 400
+    class InexistentUnit(Exception): status_code = 404
     class InvalidAmount(Exception): status_code = 400
     class InvalidNote(Exception): status_code = 400
 
-    def __init__(self, payment_version: 'int | None', payer_name: str, category: str, amount: 'float | int', note: 'str | None' = None, id: 'int | None' = None):
+    def __init__(self, payment_version: 'int | None', payer_name: str, category: str, amount: 'float | int', unit: str, note: 'str | None' = None, id: 'int | None' = None):
         self.validate_id(id)
         self.validate_payment_version(payment_version)
         self.validate_payer_name(payer_name)
         self.validate_category(category)
         self.validate_amount(amount)
+        self.validate_unit(unit)
         self.validate_note(note)
         self.__id = id
         self.__payment_version = payment_version
         self.__payer_name = payer_name
         self.__category = category
         self.__amount = float(amount)
+        self.__unit = unit
         self.__note = note
 
     @property
@@ -351,9 +355,11 @@ class PaymentLine:
     @property
     def amount(self) -> float: return self.__amount
     @property
+    def unit(self) -> str: return self.__unit
+    @property
     def note(self) -> 'str | None': return self.__note
 
-    def __repr__(self) -> str: return f'{type(self).__name__}(\n    id = {self.__id},\n    payment_version = {self.__payment_version},\n    payer_name = \'{self.__payer_name}\',\n    category = \'{self.__category}\',\n    amount = {self.__amount},\n    note = \'{self.__note or ""}\',\n)'
+    def __repr__(self) -> str: return f'{type(self).__name__}(\n    id = {self.__id},\n    payment_version = {self.__payment_version},\n    payer_name = \'{self.__payer_name}\',\n    category = \'{self.__category}\',\n    amount = {self.__amount},\n    unit = {self.__unit},\n    note = \'{self.__note or ""}\',\n)'
 
     @staticmethod
     def validate_id(value) -> None:
@@ -373,6 +379,12 @@ class PaymentLine:
     @classmethod
     def validate_amount(cls, value):
         if not (type(value) in (float, int) and value > 0): raise cls.InvalidAmount('Jumlah harus berupa angka positif.')
+    @classmethod
+    def validate_unit(cls, value):
+        if not (type(value) == str): raise cls.InvalidUnit('Unit harus berupa string.')
+    @classmethod
+    async def validate_unit_exists(cls, unit: str, cursor: 'Cursor'):
+        if await PaymentUnit.get_id_by_name(unit, cursor=cursor) is None: raise cls.InexistentUnit(f'unit \'{unit}\' tidak ada.')
     @classmethod
     def validate_note(cls, value):
         if not (type(value) in (str, type(None)) and ((len(value) > 0) if type(value) == str else True)): raise cls.InvalidNote('Catatan harus berupa string yang tidak kosong atau tidak sama sekali.')
