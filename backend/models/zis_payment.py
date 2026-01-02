@@ -60,6 +60,8 @@ class Payment:
             'last_created': 'fv.created_at DESC',
             # 'first_updated': 'pv.created_at ASC',
             'first_created': 'fv.created_at ASC',
+            'name_asc': 'pv.payer_name ASC',
+            'name_desc': 'pv.payer_name DESC',
         }[sort]
         filter_values_parser = {
             'first_created_by': (lambda username: User.get(username=username), lambda user: user.id if user is not None else 0),
