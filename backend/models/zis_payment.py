@@ -393,7 +393,8 @@ class PaymentLine:
         if self.__id is not None: raise RuntimeError('Can\'t insert a payment line that already has an `id`.')
         if self.__payment_version is not None: raise RuntimeError('Can\'t insert a payment line that already has an `payment_version`.')
         await self.validate_category_exists(self.__category, cursor=cursor)
-        await cursor.execute(*sql.insert('zis_payment_line', values={'payment_version': payment_version, 'payer_name': self.__payer_name, 'category': await PaymentCategory.get_id_by_name(self.__category, cursor=cursor), 'amount': self.__amount, 'note': self.__note}))
+        await self.validate_unit_exists(self.__unit, cursor=cursor)
+        await cursor.execute(*sql.insert('zis_payment_line', values={'payment_version': payment_version, 'payer_name': self.__payer_name, 'category': await PaymentCategory.get_id_by_name(self.__category, cursor=cursor), 'amount': self.__amount, 'unit': await PaymentUnit.get_id_by_name(self.__unit, cursor=cursor), 'note': self.__note}))
         self.__id = cursor.lastrowid
         self.__payment_version = payment_version
 
