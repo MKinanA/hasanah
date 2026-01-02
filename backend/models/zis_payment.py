@@ -372,7 +372,7 @@ class PaymentLine:
         if not (type(value) == str and len(value) > 0): raise cls.InvalidPayerName('Nama pembayar harus berupa string yang tidak kosong.')
     @classmethod
     def validate_category(cls, value):
-        if not (type(value) == str): raise cls.InvalidCategory('Kategory harus berupa string.')
+        if not (type(value) == str): raise cls.InvalidCategory('Kategori harus berupa string.')
     @classmethod
     async def validate_category_exists(cls, category: str, cursor: 'Cursor'):
         if await PaymentCategory.get_id_by_name(category, cursor=cursor) is None: raise cls.InexistentCategory(f'Kategori \'{category}\' tidak ada.')
