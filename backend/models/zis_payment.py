@@ -402,6 +402,7 @@ class PaymentLine:
         'payer_name': self.__payer_name,
         'category': self.__category,
         'amount': self.__amount,
+        'unit': self.__unit,
         'note': self.__note,
     }
 
