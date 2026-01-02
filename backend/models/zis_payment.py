@@ -372,7 +372,7 @@ class PaymentLine:
         if not (type(value) == str and len(value) > 0): raise cls.InvalidPayerName('Nama pembayar harus berupa string yang tidak kosong.')
     @classmethod
     def validate_category(cls, value):
-        if not (type(value) == str): raise cls.InvalidCategory('Kategori harus berupa string.')
+        if not (type(value) == str and value.islower()): raise cls.InvalidCategory('Kategori harus berupa string lowercase.')
     @classmethod
     async def validate_category_exists(cls, category: str, cursor: 'Cursor'):
         if await PaymentCategory.get_id_by_name(category, cursor=cursor) is None: raise cls.InexistentCategory(f'Kategori \'{category}\' tidak ada.')
@@ -381,7 +381,7 @@ class PaymentLine:
         if not (type(value) in (float, int) and value > 0): raise cls.InvalidAmount('Jumlah harus berupa angka positif.')
     @classmethod
     def validate_unit(cls, value):
-        if not (type(value) == str): raise cls.InvalidUnit('Unit harus berupa string.')
+        if not (type(value) == str and value.islower()): raise cls.InvalidUnit('Unit harus berupa string lowercase.')
     @classmethod
     async def validate_unit_exists(cls, unit: str, cursor: 'Cursor'):
         if await PaymentUnit.get_id_by_name(unit, cursor=cursor) is None: raise cls.InexistentUnit(f'unit \'{unit}\' tidak ada.')
