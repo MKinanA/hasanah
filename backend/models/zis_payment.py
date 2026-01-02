@@ -359,7 +359,7 @@ class PaymentLine:
     @property
     def note(self) -> 'str | None': return self.__note
 
-    def __repr__(self) -> str: return f'{type(self).__name__}(\n    id = {self.__id},\n    payment_version = {self.__payment_version},\n    payer_name = \'{self.__payer_name}\',\n    category = \'{self.__category}\',\n    amount = {self.__amount},\n    unit = {self.__unit},\n    note = \'{self.__note or ""}\',\n)'
+    def __repr__(self) -> str: return f'{type(self).__name__}(\n    id = {self.__id},\n    payment_version = {self.__payment_version},\n    payer_name = \'{self.__payer_name}\',\n    category = \'{self.__category}\',\n    amount = {self.__amount},\n    unit = \'{self.__unit}\',\n    note = \'{self.__note or ""}\',\n)'
 
     @staticmethod
     def validate_id(value) -> None:
