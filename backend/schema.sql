@@ -8,6 +8,13 @@ CREATE TABLE kv_store (
     value TEXT NOT NULL
 ) STRICT;
 
+CREATE TABLE file (
+    id INTEGER PRIMARY KEY UNIQUE NOT NULL,
+    uuid TEXT UNIQUE NOT NULL,
+    name TEXT NOT NULL,
+    data BLOB NOT NULL
+) STRICT;
+
 CREATE TABLE user (
     id INTEGER PRIMARY KEY UNIQUE NOT NULL,
     username TEXT NOT NULL UNIQUE CHECK (username = lower(username) AND length(username) BETWEEN 1 AND 64),
