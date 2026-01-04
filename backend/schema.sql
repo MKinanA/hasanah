@@ -12,6 +12,7 @@ CREATE TABLE file (
     id INTEGER PRIMARY KEY UNIQUE NOT NULL,
     uuid TEXT UNIQUE NOT NULL,
     name TEXT NOT NULL,
+    mimetype TEXT NOT NULL,
     data BLOB NOT NULL
 ) STRICT;
 
