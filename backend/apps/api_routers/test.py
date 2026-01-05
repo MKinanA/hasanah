@@ -16,3 +16,9 @@ async def auth(request: Request, response: Response, user: User = Depends(auth))
 
 @router.post('/request-body')
 async def request_body(request: Request, response: Response, body: dict = Depends(json_body)) -> dict: return mkresp('success', 'Request Received', 'Request body has been parsed as JSON.', json=body, raw=(await request.body()).decode())
+
+@router.post('/request-cookies')
+async def request_cookies(request: Request, response: Response) -> dict: return mkresp('success', 'Request Received', 'Request cookies has been read.', cookies=request.cookies)
+
+@router.post('/request-headers')
+async def request_headers(request: Request, response: Response) -> dict: return mkresp('success', 'Request Received', 'Request headers has been read.', headers=dict(request.headers))
