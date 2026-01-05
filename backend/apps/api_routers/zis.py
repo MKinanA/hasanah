@@ -3,7 +3,7 @@ from fastapi import APIRouter, Request, Response, Depends
 from ...models.user import User, Access
 from ...models.zis_payment import Payment, PaymentVersion
 from ...helpers.api_response import api_response as mkresp
-from .dependencies import auth, json_body
+from ..dependencies import auth, json_body
 
 PAYMENT_QUERY_PARAMS = (*signature(Payment.query).parameters.keys(),)
 

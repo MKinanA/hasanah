@@ -1,6 +1,6 @@
 from fastapi import Request
 from json import JSONDecodeError
-from ...models.user import User
+from ..models.user import User
 
 class NoAuthToken(Exception): status_code = 401
 class UserSessionNotFound(Exception): status_code = 401

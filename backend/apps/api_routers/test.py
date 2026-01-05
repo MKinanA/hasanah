@@ -2,7 +2,7 @@ from fastapi import APIRouter, Request, Response, Depends
 from json import dumps as to_json
 from ...models.user import User
 from ...helpers.api_response import api_response as mkresp
-from .dependencies import auth, json_body
+from ..dependencies import auth, json_body
 
 router = APIRouter()
 

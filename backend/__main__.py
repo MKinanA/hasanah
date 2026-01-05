@@ -5,12 +5,11 @@ from .helpers.log import log
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from .apps.api import api
-from .apps.custom_static_files import CustomStaticFiles
+from fastapi.staticfiles import StaticFiles
 from .helpers.get_package_path import get_package_path
 from .helpers.api_response import api_response as mkresp
 from .run_schema_and_seed import run_schema_and_seed
-
-FRONTEND_DIRECTORY = get_package_path(__name__, __file__).parent / 'frontend' # `../frontend/`
+from .apps.pages import pages, FRONTEND_DIRECTORY
 
 app = FastAPI()
 
@@ -18,7 +17,7 @@ app = FastAPI()
 async def exception_handler(request, exc: BaseException) -> JSONResponse: return JSONResponse(status_code=getattr(exc, 'status_code', 500), content=mkresp('error', type(exc).__name__, str(exc)))
 
 app.include_router(api, prefix='/api')
-app.mount('/', CustomStaticFiles(directory=FRONTEND_DIRECTORY, html=True))
+app.mount('/static', StaticFiles(directory=FRONTEND_DIRECTORY / 'static'))
 
 print(log(__name__, f'{FRONTEND_DIRECTORY = }'))
 print(log(__name__, f'{__package__ = }'))
