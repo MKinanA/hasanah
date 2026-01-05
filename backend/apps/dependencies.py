@@ -13,10 +13,12 @@ async def auth(request: Request) -> User:
     cookie_token = request.cookies.get('token')
     json_token = (await request.json()).get('token')
     if len(set(token for token in (header_token, cookie_token, json_token) if type(token) == str)) > 1: raise DifferentAuthTokens('The provided tokens in cookies and json body are different.')
-    user = (await User.get_by_session_auth(header_token)) if type(header_token) == str else (await User.get_by_session_auth(cookie_token)) if type(cookie_token) == str else (await User.get_by_session_auth(json_token)) if type(json_token) == str else None
+    token = header_token if type(header_token) == str else cookie_token if type(cookie_token) == str else json_token if type(json_token) == str else None
+    user = (await User.get_by_session_auth(token)) if type(token) == str else None
     if user is None:
-        if str not in (type(header_token), type(cookie_token), type(json_token)): raise NoAuthToken('Please provide a valid session token for this request, it could be via an `authentication` header with type `Bearer`, a `token` cookie, or a `token` field in the JSON body.')
+        if type(token) != str: raise NoAuthToken('Please provide a valid session token for this request, it could be via an `authentication` header with type `Bearer`, a `token` cookie, or a `token` field in the JSON body.')
         raise UserSessionNotFound('Can\'t find your session, try logging in again.')
+    if not hasattr(user, 'token'): setattr(user, 'token', token)
     return user
 
 async def json_body(request: Request) -> dict:

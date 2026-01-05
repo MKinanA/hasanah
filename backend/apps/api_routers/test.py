@@ -12,7 +12,7 @@ async def auth(request: Request, response: Response, user: User = Depends(auth))
         response.status_code = 401
         return mkresp('error', 'Unauthenticated', 'No token provided or token is invalid.')
 
-    return mkresp('success', 'Authenticated', 'Token is valid.', username=user.username)
+    return mkresp('success', 'Authenticated', 'Token is valid.', username=user.username, token=getattr(user, 'token', None))
 
 @router.post('/request-body')
 async def request_body(request: Request, response: Response, body: dict = Depends(json_body)) -> dict: return mkresp('success', 'Request Received', 'Request body has been parsed as JSON.', json=body, raw=(await request.body()).decode())

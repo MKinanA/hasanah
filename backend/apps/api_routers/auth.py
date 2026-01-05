@@ -34,15 +34,10 @@ async def login(request: Request, response: Response, body: dict = Depends(json_
     return mkresp('success', 'Sesi Dimulai', 'Login berhasil, sesi baru telah dibuat.', token=token)
 
 @router.post('/logout')
-async def logout(request: Request, response: Response, user: User = Depends(auth), body: dict = Depends(json_body)) -> dict:
-    token = body.get('token')
+async def logout(request: Request, response: Response, user: User = Depends(auth)) -> dict:
+    token = getattr(user, 'token', None)
 
-    if type(token) != str:
-        response.status_code = 400
-        return mkresp('error', 'Permintaan Buruk', 'Token sesi tidak valid.')
-    if user is None:
-        response.status_code = 401
-        return mkresp('error', 'Tidak Terotorisasi', 'Sesi tidak ditemukan, token mungkin sudah kedaluwarsa.')
+    if type(token) != str: raise RuntimeError('Failed to retrieve user session token from auth.')
 
     await Session.delete(token)
     return mkresp('success', 'Sesi Diakhiri', 'Logout berhasil, sesi telah dihapus.')
