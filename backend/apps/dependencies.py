@@ -11,7 +11,7 @@ async def auth(request: Request) -> User:
     header_token = request.headers.get('authorization')
     header_token = (split_header_token[1] if len(split_header_token) >= 2 else split_header_token[0] if len(split_header_token) >= 1 else None) if type(header_token) == str and (split_header_token[0].lower() == 'bearer' if len(split_header_token := header_token.split()) >= 2 else True) else None
     cookie_token = request.cookies.get('token')
-    json_token = (await request.json()).get('token')
+    json_token = (await json_body(request)).get('token')
     if len(set(token for token in (header_token, cookie_token, json_token) if type(token) == str)) > 1: raise DifferentAuthTokens('The provided tokens in cookies and json body are different.')
     token = header_token if type(header_token) == str else cookie_token if type(cookie_token) == str else json_token if type(json_token) == str else None
     user = (await User.get_by_session_auth(token)) if type(token) == str else None
@@ -22,7 +22,7 @@ async def auth(request: Request) -> User:
     return user
 
 async def json_body(request: Request) -> dict:
-    try: body = await request.json()
+    try: body = ((await request.json()) if len((await request.body()).decode().split()) > 0 else {})
     except JSONDecodeError as e: raise InvalidBodyFormat(f'Failed to parse request body as JSON.\n{type(e).__name__}: {str(e)}') from e
     if not isinstance(body, dict): raise InvalidBodyFormat(f'Body must be convertible to a Python dict, not {type(body).__name__}.')
     return body
