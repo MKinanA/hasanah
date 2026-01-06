@@ -16,6 +16,7 @@ app = FastAPI()
 @app.exception_handler(Exception)
 async def exception_handler(request, exc: BaseException) -> JSONResponse: return JSONResponse(status_code=getattr(exc, 'status_code', 500), content=mkresp('error', type(exc).__name__, str(exc)))
 
+app.include_router(pages)
 app.include_router(api, prefix='/api')
 app.mount('/static', StaticFiles(directory=FRONTEND_DIRECTORY / 'static'))
 
