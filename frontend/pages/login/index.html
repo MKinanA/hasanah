@@ -1,12 +1,12 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+{% extends 'templates/base.html' %}
+
+{% block title %}Login{% endblock %}
+
+{% block head %}
     <link rel="stylesheet" href="/static/css/auth/login.css">
-</head>
-<body>
+{% endblock %}
+
+{% block body %}
     <form action="">
         <h1>Selamat Datang</h1>
         <p>Silahkan login terlebih dahulu.</p>
@@ -21,5 +21,4 @@
         <button>Login</button>
         <p>Belum punya akun? <a href="/register">Daftar</a></p>
     </form>
-</body>
-</html>
+{% endblock %}

@@ -1,12 +1,12 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daftar</title>
+{% extends 'templates/base.html' %}
+
+{% block title %}Daftar{% endblock %}
+
+{% block head %}
     <link rel="stylesheet" href="/static/css/auth/register.css">
-</head>
-<body>
+{% endblock %}
+
+{% block body %}
     <form action="">
         <h1>Selamat Datang</h1>
         <p>Silahkan daftar terlebih dahulu.</p>
@@ -21,5 +21,4 @@
         <button>Daftar</button>
         <p>Sudah punya akun? <a href="/login">Login</a></p>
     </form>
-</body>
-</html>
+{% endblock %}
