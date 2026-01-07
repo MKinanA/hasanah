@@ -1,0 +1,61 @@
+@import 'base.css';
+
+body {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: var(--y-padding) max(var(--x-padding), var(--y-padding));
+}
+
+body > form {
+    width: 100%;
+    max-width: max-content;
+    padding: var(--y-padding);
+    border-radius: calc(32 * var(--scaling-factor));
+    /* border: calc(2 * var(--scaling-factor)) solid rgba(var(--fg-color-2)); */
+    background: rgb(var(--bg-color-2));
+    /* box-shadow: 0 0 calc(2 * var(--scaling-factor)) rgba(var(--fg-color-2)); */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: calc(16 * var(--scaling-factor));
+}
+
+body > form > * {
+    text-align: center;
+}
+
+body > form > label {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    gap: calc(4 * var(--scaling-factor));
+}
+
+body > form > label > p {
+    text-align: start;
+}
+
+body > form > label > input {
+    width: 100%;
+    border-radius: calc(8 * var(--scaling-factor));
+    /* box-shadow: 0 0 calc(2 * var(--scaling-factor)) rgb(var(--bg-color)); */
+    padding: calc(4 * var(--scaling-factor)) calc(8 * var(--scaling-factor));
+    background: rgba(var(--input-color));
+    font-size: calc(16 * var(--scaling-factor));
+    line-height: 150%;
+}
+
+body > form > button {
+    font-size: calc(16 * var(--scaling-factor));
+    font-weight: 700;
+    color: rgb(var(--bg-color-2));
+    width: 100%;
+    border-radius: calc(8 * var(--scaling-factor));
+    padding: calc(8 * var(--scaling-factor));
+    background: rgb(var(--primary-color));
+}

@@ -1,0 +1,80 @@
+:root {
+    --scaling-factor-vw-1: 0;
+    --scaling-factor-scale-1: 1;
+    --scaling-factor-vw-2: 2560;
+    --scaling-factor-scale-2: 1.25;
+    --scaling-factor: calc(((var(--scaling-factor-scale-2) - var(--scaling-factor-scale-1)) / (var(--scaling-factor-vw-2) - var(--scaling-factor-vw-1))) * 100vw + ((var(--scaling-factor-scale-1) - ((var(--scaling-factor-scale-2) - var(--scaling-factor-scale-1)) / (var(--scaling-factor-vw-2) - var(--scaling-factor-vw-1))) * var(--scaling-factor-vw-1)) * 1px));
+    --dark: 31, 31, 31;
+    --light: 239, 239, 239;
+    --lighter-dark: 63, 63, 63;
+    --darker-light: 207, 207, 207;
+    --darkest: 15, 15, 15;
+    --lightest: 255, 255, 255;
+    --fg-color: var(--dark);
+    --fg-color-2: var(--lighter-dark);
+    --bg-color: var(--darker-light);
+    --bg-color-2: var(--light);
+    --input: var(--lightest);
+    --input-color: var(--input), 100%;
+    --shadow-opacity: 75%;
+    --primary-color: 0, 127, 0;
+    --y-padding: calc(24 * var(--scaling-factor));
+    --x-padding: calc(2vw + calc(2 * var(--scaling-factor)));
+}
+
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    line-height: 100%;
+    transition: all 0.25s ease-out;
+    scroll-behavior: smooth;
+    color: rgb(var(--fg-color));
+    fill: currentColor;
+    object-fit: cover;
+    border: none;
+    outline: calc(2 * var(--scaling-factor)) solid rgba(var(--fg-color), 0%);
+    outline-offset: calc(-2 * var(--scaling-factor));
+    user-select: none;
+    -webkit-user-drag: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+:root, html, body {
+    background: rgb(var(--bg-color));
+    height: 100dvh;
+    width: 100dvw;
+    overflow: hidden;
+}
+
+input:focus {
+    outline-offset: calc(0 * var(--scaling-factor));
+    outline-width: calc(2 * var(--scaling-factor));
+    outline-color: rgb(var(--fg-color-2));
+}
+
+a[href] {
+    color: color-mix(in srgb, rgb(var(--fg-color)), rgb(0, 0, 255));
+    font-weight: 600;
+}
+
+a[href]:focus {
+    background: color-mix(in srgb, rgb(var(--bg-color)), rgb(0, 0, 255) 25%);
+}
+
+:is(button, a):active, :not(input, a):focus {
+    filter: brightness(80%);
+}
+
+[hidden] {
+    display: none !important;
+}
+
+h1 {font-size: calc(24 * var(--scaling-factor)); font-weight: 800;}
+h2 {font-size: calc(22 * var(--scaling-factor)); font-weight: 800;}
+h3 {font-size: calc(20 * var(--scaling-factor)); font-weight: 700;}
+h4 {font-size: calc(18 * var(--scaling-factor)); font-weight: 700;}
+h5 {font-size: calc(16 * var(--scaling-factor)); font-weight: 900;}
+h6 {font-size: calc(14 * var(--scaling-factor)); font-weight: 900;}
+p {font-size: calc(16 * var(--scaling-factor));}
