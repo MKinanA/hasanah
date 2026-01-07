@@ -42,7 +42,7 @@ body > form > label > input {
     width: 100%;
     border-radius: calc(8 * var(--scaling-factor));
     padding: calc(4 * var(--scaling-factor)) calc(8 * var(--scaling-factor));
-    background: rgba(var(--input-color));
+    background: rgba(var(--fg-color), 12.5%);
     font-size: calc(16 * var(--scaling-factor));
     line-height: 150%;
 }
@@ -50,7 +50,7 @@ body > form > label > input {
 body > form > button {
     font-size: calc(16 * var(--scaling-factor));
     font-weight: 700;
-    color: rgb(var(--bg-color-2));
+    color: rgb(var(--light));
     width: 100%;
     border-radius: calc(8 * var(--scaling-factor));
     padding: calc(8 * var(--scaling-factor));
