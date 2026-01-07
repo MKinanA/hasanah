@@ -13,9 +13,7 @@ body > form {
     max-width: max-content;
     padding: var(--y-padding);
     border-radius: calc(32 * var(--scaling-factor));
-    /* border: calc(2 * var(--scaling-factor)) solid rgba(var(--fg-color-2)); */
     background: rgb(var(--bg-color-2));
-    /* box-shadow: 0 0 calc(2 * var(--scaling-factor)) rgba(var(--fg-color-2)); */
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -43,7 +41,6 @@ body > form > label > p {
 body > form > label > input {
     width: 100%;
     border-radius: calc(8 * var(--scaling-factor));
-    /* box-shadow: 0 0 calc(2 * var(--scaling-factor)) rgb(var(--bg-color)); */
     padding: calc(4 * var(--scaling-factor)) calc(8 * var(--scaling-factor));
     background: rgba(var(--input-color));
     font-size: calc(16 * var(--scaling-factor));
