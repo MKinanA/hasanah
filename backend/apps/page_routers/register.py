@@ -8,5 +8,5 @@ router = APIRouter()
 @router.get('/')
 async def register(request: Request):
     try: await auth(request)
-    except: return render('register.html')
+    except: return render('pages/register/')
     return RedirectResponse(url='/home', status_code=302)
