@@ -1,5 +1,5 @@
 from fastapi.responses import Response, HTMLResponse
-from jinja2 import Environment, FileSystemLoader, select_autoescape
+from jinja2 import Environment, FileSystemLoader, TemplateNotFound, select_autoescape
 from ..helpers.get_package_path import get_package_path
 
 FRONTEND_DIRECTORY = get_package_path(__name__, __file__).parent / 'frontend'
@@ -12,7 +12,21 @@ env = Environment(
 )
 
 def render(name: str, context: 'dict | None' = None, response: 'Response | None' = None) -> 'str | Response':
-    content = env.get_template((name + 'index.html') if name.endswith('/') else name).render(context or {})
+    possible_names = (*(possible_name for possible_name in (
+        name,
+        name[:-1] if len(name) > 1 and name[-1] in ('/', '\\') else None,
+        name + ('' if len(name) > 1 and name[-1] in ('/', '\\') else '\\' if len(name.split('\\')) > 1 else '/') + 'index.html',
+        (name[:-1] if len(name) > 1 and name[-1] in ('/', '\\') else name) + ('' if name.endswith('.') else '.') + 'html',
+    ) if possible_name is not None),)
+    content = None
+    error = None
+    for possible_name in possible_names:
+        try: content = env.get_template(possible_name).render(context or {})
+        except TemplateNotFound as e:
+            if error is None: error = e
+            continue
+        break
+    if content is None: raise error if error is not None else RuntimeError('Failed to record error while attempting to get template file.')
     if isinstance(response, Response):
         response.media_type = 'text/html'
         return content
