@@ -1,4 +1,4 @@
-from fastapi.responses import HTMLResponse
+from fastapi.responses import Response, HTMLResponse
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from ..helpers.get_package_path import get_package_path
 
@@ -11,4 +11,9 @@ env = Environment(
     ),
 )
 
-def render(name: str, context: 'dict | None' = None) -> HTMLResponse: return HTMLResponse(env.get_template((name + 'index.html') if name.endswith('/') else name).render(context or {}))
+def render(name: str, context: 'dict | None' = None, response: 'Response | None' = None) -> 'str | Response':
+    content = env.get_template((name + 'index.html') if name.endswith('/') else name).render(context or {})
+    if isinstance(response, Response):
+        response.media_type = 'text/html'
+        return content
+    else: return HTMLResponse()
