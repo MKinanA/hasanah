@@ -17,6 +17,7 @@ body {
     flex-direction: row;
     justify-content: start;
     align-items: start;
+    overflow-y: auto;
 }
 
 body > header {
@@ -46,11 +47,16 @@ body > div > :is(main, footer) {
     display: flex;
 }
 
+body > div > :is(main, footer) * {
+    line-height: 125%;
+}
+
 body > div > main {
     flex-direction: column;
     justify-content: start;
     align-items: start;
     gap: calc(24 * var(--scaling-factor));
+    flex-grow: 1;
 }
 
 body > div > footer {
@@ -62,4 +68,5 @@ body > div > footer {
 
 body > div > footer * {
     font-size: calc(16 * var(--scaling-factor));
+    text-align: center;
 }
