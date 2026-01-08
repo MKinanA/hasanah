@@ -26,7 +26,7 @@ export function storeToken(token) {
     });
 };
 
-export const setVisibilityToggles = (selector) => document.querySelectorAll(selector).forEach(toggle => {
+export const setVisibilityToggles = selector => document.querySelectorAll(selector).forEach(toggle => {
     toggle.addEventListener('click', (toggle => e => {
         e.preventDefault();
         if (toggle.querySelector('svg.eye-crossed').hasAttribute('hidden')) {
@@ -41,3 +41,5 @@ export const setVisibilityToggles = (selector) => document.querySelectorAll(sele
     })(toggle));
     requestAnimationFrame(() => toggle.click());
 });
+
+export const turnOffVisibilityToggles = selector => document.querySelectorAll(selector).forEach(toggle => (toggle.querySelector('svg.eye').hasAttribute('hidden') && !toggle.querySelector('svg.eye-crossed').hasAttribute('hidden')) ? toggle.click() : undefined);

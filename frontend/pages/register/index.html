@@ -4,6 +4,7 @@
 
 {% block head %}
     <link rel="stylesheet" href="/static/css/auth/register.css">
+    <script type="module" src="/static/js/register.js"></script>
 {% endblock %}
 
 {% block body %}
@@ -16,7 +17,13 @@
                 <input type="text" name="username" placeholder="username">
             </label>
             <label>
-                <p>Password</p>
+                <div>
+                    <p>Password</p>
+                    <div class="visibility-toggle">
+                        {% include 'components/svg/eye.html' %}
+                        {% include 'components/svg/eye-crossed.html' %}
+                    </div>
+                </div>
                 <input type="password" name="password" placeholder="password">
             </label>
             <button>Daftar</button>

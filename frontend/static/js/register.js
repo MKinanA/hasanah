@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.querySelector('body > form > fieldset > label > input[name="password"]').value;
             const checks = [...checkUsername(username), ...checkPassword(password)];
             if (checks.length <= 0) {
-                const resp = await fetch('/api/auth/login', {method: 'POST', body: JSON.stringify({
+                const resp = await fetch('/api/auth/register', {method: 'POST', body: JSON.stringify({
                     username: username,
                     password: password,
                 })});
