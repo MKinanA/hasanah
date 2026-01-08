@@ -17,7 +17,7 @@
     --shadow-opacity: 75%;
     --primary-color: 0, 127, 0;
     --y-padding: calc(24 * var(--scaling-factor));
-    --x-padding: calc(2vw + calc(2 * var(--scaling-factor)));
+    --x-padding: calc(4vw + calc(4 * var(--scaling-factor)));
 }
 
 *, *::before, *::after {
@@ -70,12 +70,12 @@ a[href]:focus {
     display: none !important;
 }
 
-h1 {font-size: calc(24 * var(--scaling-factor)); font-weight: 800;}
-h2 {font-size: calc(22 * var(--scaling-factor)); font-weight: 800;}
+h1 {font-size: calc(24 * var(--scaling-factor)); font-weight: 700;}
+h2 {font-size: calc(22 * var(--scaling-factor)); font-weight: 700;}
 h3 {font-size: calc(20 * var(--scaling-factor)); font-weight: 700;}
 h4 {font-size: calc(18 * var(--scaling-factor)); font-weight: 700;}
-h5 {font-size: calc(16 * var(--scaling-factor)); font-weight: 900;}
-h6 {font-size: calc(14 * var(--scaling-factor)); font-weight: 900;}
+h5 {font-size: calc(16 * var(--scaling-factor)); font-weight: 700;}
+h6 {font-size: calc(14 * var(--scaling-factor)); font-weight: 700;}
 p {font-size: calc(16 * var(--scaling-factor));}
 
 @media (prefers-color-scheme: dark) {

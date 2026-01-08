@@ -1,0 +1,18 @@
+{% extends 'templates/base.html' %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/css/pages/base.css">
+{% endblock %}
+
+{% block body %}
+    <header></header>
+    <div>
+        <main>
+            {% block main %}
+            {% endblock %}
+        </main>
+        <footer>
+            <p>&copy; Masjid Al-Hasanah Taman Meruya Ilir</p>
+        </footer>
+    </div>
+{% endblock %}

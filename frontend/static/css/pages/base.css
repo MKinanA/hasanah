@@ -1,0 +1,65 @@
+@import '../base.css';
+
+:root {
+    --header-base-width: calc(calc(64 * var(--scaling-factor)) + var(--x-padding));
+}
+
+h1 {font-size: calc(26 * var(--scaling-factor)); font-weight: 700;}
+h2 {font-size: calc(24 * var(--scaling-factor)); font-weight: 700;}
+h3 {font-size: calc(22 * var(--scaling-factor)); font-weight: 700;}
+h4 {font-size: calc(20 * var(--scaling-factor)); font-weight: 700;}
+h5 {font-size: calc(18 * var(--scaling-factor)); font-weight: 700;}
+h6 {font-size: calc(16 * var(--scaling-factor)); font-weight: 700;}
+p {font-size: calc(18 * var(--scaling-factor));}
+
+body {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: start;
+}
+
+body > header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: var(--header-base-width);
+    height: 100%;
+    padding: var(--y-padding) calc(16 * var(--scaling-factor)) var(--y-padding) var(--x-padding);
+    background: rgb(var(--bg-color-2));
+}
+
+body > div {
+    width: 100%;
+    height: 100%;
+    padding-left: var(--header-base-width);
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+}
+
+body > div > :is(main, footer) {
+    width: 100%;
+    padding: var(--y-padding) var(--x-padding) var(--y-padding) calc(24 * var(--scaling-factor));
+    display: flex;
+}
+
+body > div > main {
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    gap: calc(24 * var(--scaling-factor));
+}
+
+body > div > footer {
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: calc(24 * var(--scaling-factor));
+}
+
+body > div > footer * {
+    font-size: calc(16 * var(--scaling-factor));
+}
