@@ -5,7 +5,7 @@ from ..render import render
 
 router = APIRouter()
 
-@router.get('/')
+@router.get('')
 async def home(request: Request):
     try: user = auth(request)
     except (NoAuthToken, UserSessionNotFound): return RedirectResponse(url='/login', status_code=302)
