@@ -1,1 +1,1 @@
-from . import login, register, zis
+from . import login, register, home, zis
