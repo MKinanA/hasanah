@@ -16,4 +16,4 @@ def render(name: str, context: 'dict | None' = None, response: 'Response | None'
     if isinstance(response, Response):
         response.media_type = 'text/html'
         return content
-    else: return HTMLResponse()
+    else: return HTMLResponse(content)
