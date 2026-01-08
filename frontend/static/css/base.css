@@ -41,10 +41,17 @@
 }
 
 :root, html, body {
-    background: rgb(var(--bg-color));
     height: 100dvh;
     width: 100dvw;
     overflow: hidden;
+}
+
+:root, html {
+    background: rgb(var(--bg-color-2));
+}
+
+body {
+    background: rgb(var(--bg-color));
 }
 
 input:focus {
