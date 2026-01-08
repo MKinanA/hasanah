@@ -25,7 +25,15 @@ body > form > * {
     text-align: center;
 }
 
-body > form > label {
+body > form > fieldset {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: calc(16 * var(--scaling-factor));
+}
+
+body > form > fieldset > label {
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -34,11 +42,35 @@ body > form > label {
     gap: calc(4 * var(--scaling-factor));
 }
 
-body > form > label > p {
+body > form > fieldset > label > div {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: end;
+    gap: calc(4 * var(--scaling-factor));
+}
+
+body > form > fieldset > label > p, body > form > fieldset > label > div > p {
     text-align: start;
 }
 
-body > form > label > input {
+body > form > fieldset > label > div > .visibility-toggle {
+    height: calc(16 * var(--scaling-factor));
+    width: calc(16 * var(--scaling-factor));
+    cursor: pointer;
+}
+
+body > form > fieldset > label > div > .visibility-toggle > svg {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+body > form > fieldset > label > input {
     width: 100%;
     border-radius: calc(8 * var(--scaling-factor));
     padding: calc(4 * var(--scaling-factor)) calc(8 * var(--scaling-factor));
@@ -47,7 +79,7 @@ body > form > label > input {
     line-height: 150%;
 }
 
-body > form > button {
+body > form > fieldset > button {
     font-size: calc(16 * var(--scaling-factor));
     font-weight: 700;
     color: rgb(var(--light));
@@ -55,4 +87,34 @@ body > form > button {
     border-radius: calc(8 * var(--scaling-factor));
     padding: calc(8 * var(--scaling-factor));
     background: rgb(var(--primary-color));
+    cursor: pointer;
+}
+
+@keyframes spin {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
+body > form > fieldset:disabled {
+    opacity: 75%;
+}
+
+body > form > fieldset:disabled > button:after {
+    content: '';
+    display: block;
+    position: absolute;
+    right: calc(8 * var(--scaling-factor));
+    top: 50%;
+    transform: translateY(-50%);
+    transform-origin: top;
+    width: calc(16 * var(--scaling-factor));
+    height: calc(16 * var(--scaling-factor));
+    border: calc(4 * var(--scaling-factor)) solid rgb(var(--light));
+    border-bottom-color: transparent;
+    border-radius: 100%;
+    animation: spin 1s linear infinite;
 }

@@ -4,21 +4,30 @@
 
 {% block head %}
     <link rel="stylesheet" href="/static/css/auth/login.css">
+    <script type="module" src="/static/js/login.js"></script>
 {% endblock %}
 
 {% block body %}
     <form action="">
         <h1>Selamat Datang</h1>
         <p>Silahkan login terlebih dahulu.</p>
-        <label>
-            <p>Username</p>
-            <input type="text" name="username" placeholder="username">
-        </label>
-        <label>
-            <p>Password</p>
-            <input type="password" name="password" placeholder="password">
-        </label>
-        <button>Login</button>
+        <fieldset>
+            <label>
+                <p>Username</p>
+                <input type="text" name="username" placeholder="username" autocomplete="username">
+            </label>
+            <label>
+                <div>
+                    <p>Password</p>
+                    <div class="visibility-toggle">
+                        {% include 'components/svg/eye.html' %}
+                        {% include 'components/svg/eye-crossed.html' %}
+                    </div>
+                </div>
+                <input type="password" name="password" placeholder="password" autocomplete="current-password">
+            </label>
+            <button>Login</button>
+        </fieldset>
         <p>Belum punya akun? <a href="/register">Daftar</a></p>
     </form>
 {% endblock %}
