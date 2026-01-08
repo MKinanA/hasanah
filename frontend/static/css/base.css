@@ -1,8 +1,8 @@
 :root {
     --scaling-factor-vw-1: 0;
-    --scaling-factor-scale-1: 1;
+    --scaling-factor-scale-1: 0.75;
     --scaling-factor-vw-2: 2560;
-    --scaling-factor-scale-2: 1.25;
+    --scaling-factor-scale-2: 1.5;
     --scaling-factor: calc(((var(--scaling-factor-scale-2) - var(--scaling-factor-scale-1)) / (var(--scaling-factor-vw-2) - var(--scaling-factor-vw-1))) * 100vw + ((var(--scaling-factor-scale-1) - ((var(--scaling-factor-scale-2) - var(--scaling-factor-scale-1)) / (var(--scaling-factor-vw-2) - var(--scaling-factor-vw-1))) * var(--scaling-factor-vw-1)) * 1px));
     --dark: 31, 31, 31;
     --light: 239, 239, 239;
