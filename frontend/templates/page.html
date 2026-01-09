@@ -1,18 +1,16 @@
 {% extends 'templates/base.html' %}
 
-{% block head %}
-    <link rel="stylesheet" href="/static/css/pages/base.css">
-{% endblock %}
-
 {% block body %}
-    <header></header>
+    <header>
+        {% include 'components/header.html' %}
+    </header>
     <div>
         <main>
             {% block main %}
             {% endblock %}
         </main>
         <footer>
-            <p>Masjid Al-Hasanah Taman Meruya Ilir</p>
+            {% include 'components/footer.html' %}
         </footer>
     </div>
 {% endblock %}

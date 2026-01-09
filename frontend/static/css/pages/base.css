@@ -1,7 +1,9 @@
 @import '../base.css';
 
 :root {
-    --header-base-width: calc(calc(64 * var(--scaling-factor)) + var(--x-padding));
+    --header-base-content-width: calc(32 * var(--scaling-factor));
+    --header-content-padding: calc(8 * var(--scaling-factor));
+    --header-base-width: calc(var(--header-base-content-width) + calc(var(--header-content-padding) * 2) + var(--x-padding));
 }
 
 h1 {font-size: calc(26 * var(--scaling-factor)); font-weight: 700;}
@@ -20,15 +22,148 @@ body {
     overflow-y: auto;
 }
 
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    height: 100vh;
+    width: 100vw;
+    z-index: 1;
+    background: rgba(var(--darkest), 50%);
+}
+
 body > header {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 1;
+    z-index: 2;
     width: var(--header-base-width);
     height: 100%;
     padding: var(--y-padding) calc(16 * var(--scaling-factor)) var(--y-padding) var(--x-padding);
     background: rgb(var(--bg-color-2));
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    gap: calc(8 * var(--scaling-factor));
+    overflow-x: hidden;
+}
+
+body > header:not(:hover) {
+    overflow-y: hidden;
+}
+
+body:has(> header:not(:hover))::before {
+    pointer-events: none;
+    background: transparent
+}
+
+body > header:hover {
+    width: max-content;
+    box-shadow: 0 0 calc(calc(64 * var(--scaling-factor))) rgb(var(--darkest));
+}
+
+:is(body > header, body > header > nav > div, body > header > nav > div > div) > a {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    gap: calc(var(--header-content-padding) * 2);
+    border-radius: calc(8 * var(--scaling-factor));
+    padding: var(--header-content-padding);
+    padding-right: calc(var(--header-content-padding) * 2);
+    border-radius: var(--header-content-padding);
+    cursor: pointer;
+}
+
+:is(body > header, body > header > nav > div, body > header > nav > div > div) > a > * {
+    line-height: 100%;
+}
+
+:is(body > header, body > header > nav, body > header > nav > div, body > header > nav > div > div) > * {
+    width: 100%;
+    min-width: max-content;
+}
+
+body > header:not(:hover) > * {
+    margin-left: calc(var(--header-content-padding) * -1);
+}
+
+:is(body > header, body > header > nav > div, body > header > nav > div > div) > a:active {
+    background: rgba(var(--bg-color), 75%);
+}
+
+@media (hover: hover) and (pointer: fine) {:is(body > header, body > header > nav > div, body > header > nav > div > div) > a:hover {
+    background: rgba(var(--bg-color), 75%);
+}}
+
+:is(body > header, body > header > nav > div, body > header > nav > div > div) > a > :first-child:is(div, img) {
+    width: var(--header-base-content-width);
+}
+
+body > header > a > :first-child:is(div, img) {
+    height: var(--header-base-content-width);
+}
+
+body > header > nav > div > a > :first-child:is(div, img) {
+    height: calc(var(--header-base-content-width) * 3 / 4);
+}
+
+body > header > nav > div > div > a > :first-child:is(div, img) {
+    height: calc(var(--header-base-content-width) * 1 / 2);
+}
+
+:is(body > header > nav, body > header > nav > div) > div {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+}
+
+body > header > nav > div > div {
+    overflow: hidden;
+    justify-content: end;
+}
+
+body > header > nav > div:hover > div {
+    height: max-content;
+}
+
+body > header > nav > div:not(:hover) > div{
+    height: 0;
+}
+
+:is(body > header, body > header > nav > div, body > header > nav > div > div) > a > div > * {
+    height: 100%;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    overflow: visible;
+}
+
+body > header > a > * {
+    font-size: calc(24 * var(--scaling-factor));
+}
+
+body > header > nav > div > a > * {
+    font-size: calc(20 * var(--scaling-factor));
+    font-weight: 600;
+}
+
+body > header > nav > div > div > a > * {
+    font-size: calc(16 * var(--scaling-factor));
+    font-weight: 500;
+}
+
+body > header > nav {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: center;
+    gap: calc(4 * var(--scaling-factor));
 }
 
 body > div {
@@ -57,6 +192,21 @@ body > div > main {
     align-items: start;
     gap: calc(24 * var(--scaling-factor));
     flex-grow: 1;
+}
+
+body > div > main div {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+}
+
+body > div > main > div {
+    gap: calc(16 * var(--scaling-factor));
+}
+
+body > div > main > div > div {
+    gap: calc(12 * var(--scaling-factor));
 }
 
 body > div > footer {
