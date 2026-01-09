@@ -3,8 +3,8 @@
 :root {
     --header-base-content-width: calc(24 * var(--scaling-factor));
     --header-content-padding: calc(8 * var(--scaling-factor));
-    --header-base-width: calc(var(--header-base-content-width) + calc(var(--header-content-padding) * 4));
-    --main-padding: calc(24 * var(--scaling-factor));
+    --header-base-width: calc(var(--header-base-content-width) + calc(min(var(--x-padding), calc(var(--header-content-padding) * 2)) * 2));
+    --main-padding: min(var(--x-padding), calc(24 * var(--scaling-factor)));
 }
 
 h1 {font-size: calc(26 * var(--scaling-factor)); font-weight: 700;}
@@ -41,7 +41,7 @@ body > header {
     z-index: 2;
     width: var(--header-base-width);
     height: 100%;
-    padding: var(--header-content-padding) calc(var(--header-content-padding) * 2);
+    padding: min(calc(var(--x-padding) * 2), var(--header-content-padding)) min(var(--x-padding), calc(var(--header-content-padding) * 2));
     background: rgb(var(--bg-color-2));
     display: flex;
     flex-direction: column;
