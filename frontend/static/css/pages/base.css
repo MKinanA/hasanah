@@ -64,7 +64,7 @@ body > header:hover {
     box-shadow: 0 0 calc(calc(64 * var(--scaling-factor))) rgb(var(--darkest));
 }
 
-:is(body > header, body > header > nav > div, body > header > nav > div > div) > a {
+:is(body > header, body > header > nav > div, body > header > nav > div > div) > :is(header > div, a) {
     display: flex;
     flex-direction: row;
     justify-content: start;
@@ -74,10 +74,13 @@ body > header:hover {
     padding: var(--header-content-padding);
     padding-right: calc(var(--header-content-padding) * 2);
     border-radius: var(--header-content-padding);
+}
+
+:is(body > header, body > header > nav > div, body > header > nav > div > div) > a {
     cursor: pointer;
 }
 
-:is(body > header, body > header > nav > div, body > header > nav > div > div) > a > * {
+:is(body > header, body > header > nav > div, body > header > nav > div > div) > :is(header > div, a) > * {
     line-height: 100%;
 }
 
@@ -98,15 +101,15 @@ body > header:not(:hover) > * {
     background: rgba(var(--bg-color), 75%);
 }}
 
-:is(body > header, body > header > nav > div, body > header > nav > div > div) > a > :first-child:is(div, img) {
+:is(body > header, body > header > nav > div, body > header > nav > div > div) > :is(header > div, a) > :first-child:is(div, img) {
     width: var(--header-base-content-width);
 }
 
-:is(body > header, body > header > nav > div) > a > :first-child:is(div, img) {
+:is(body > header, body > header > nav > div) > :is(header > div, a) > :first-child:is(div, img) {
     height: var(--header-base-content-width);
 }
 
-body > header > nav > div > div > a > :first-child:is(div, img) {
+body > header > nav > div > div > :is(header > div, a) > :first-child:is(div, img) {
     height: calc(var(--header-base-content-width) * 3 / 4);
 }
 
@@ -130,7 +133,7 @@ body > header > nav > div:not(:hover) > div{
     height: 0;
 }
 
-:is(body > header, body > header > nav > div, body > header > nav > div > div) > a > div > * {
+:is(body > header, body > header > nav > div, body > header > nav > div > div) > :is(header > div, a) > div > * {
     height: 100%;
     position: absolute;
     top: 50%;
@@ -139,16 +142,16 @@ body > header > nav > div:not(:hover) > div{
     overflow: visible;
 }
 
-:is(body > header, body > header > nav > div) > a > * {
-    font-size: calc(24 * var(--scaling-factor));
+:is(body > header, body > header > nav > div) > :is(header > div, a) > * {
+    font-size: calc(20 * var(--scaling-factor));
     font-weight: 700;
 }
 
-body > header > nav > div > a > * {
+body > header > nav > div > :is(header > div, a) > * {
     font-weight: 600;
 }
 
-body > header > nav > div > div > a > * {
+body > header > nav > div > div > :is(header > div, a) > * {
     font-size: calc(16 * var(--scaling-factor));
     font-weight: 500;
 }
