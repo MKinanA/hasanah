@@ -1,9 +1,10 @@
 @import '../base.css';
 
 :root {
-    --header-base-content-width: calc(32 * var(--scaling-factor));
+    --header-base-content-width: calc(24 * var(--scaling-factor));
     --header-content-padding: calc(8 * var(--scaling-factor));
-    --header-base-width: calc(var(--header-base-content-width) + calc(var(--header-content-padding) * 2) + var(--x-padding));
+    --header-base-width: calc(var(--header-base-content-width) + calc(var(--header-content-padding) * 4));
+    --main-padding: calc(24 * var(--scaling-factor));
 }
 
 h1 {font-size: calc(26 * var(--scaling-factor)); font-weight: 700;}
@@ -40,7 +41,7 @@ body > header {
     z-index: 2;
     width: var(--header-base-width);
     height: 100%;
-    padding: var(--y-padding) calc(16 * var(--scaling-factor)) var(--y-padding) var(--x-padding);
+    padding: var(--header-content-padding) calc(var(--header-content-padding) * 2);
     background: rgb(var(--bg-color-2));
     display: flex;
     flex-direction: column;
@@ -166,9 +167,10 @@ body > header > nav {
 }
 
 body > div {
-    width: 100%;
+    width: calc(100% - var(--header-base-width));
     height: 100%;
-    padding-left: var(--header-base-width);
+    margin-left: var(--header-base-width);
+    padding-left: max(calc(0 * var(--scaling-factor)), calc(var(--x-padding) - calc(var(--header-base-width) + var(--main-padding))));
     display: flex;
     flex-direction: column;
     justify-content: start;
@@ -177,7 +179,7 @@ body > div {
 
 body > div > :is(main, footer) {
     width: 100%;
-    padding: var(--y-padding) var(--x-padding) var(--y-padding) calc(24 * var(--scaling-factor));
+    padding: var(--y-padding) var(--x-padding) var(--y-padding) var(--main-padding);
     display: flex;
 }
 
