@@ -5,9 +5,9 @@
     --scaling-factor-scale-2: 1.5;
     --scaling-factor: calc(((var(--scaling-factor-scale-2) - var(--scaling-factor-scale-1)) / (var(--scaling-factor-vw-2) - var(--scaling-factor-vw-1))) * 100vw + ((var(--scaling-factor-scale-1) - ((var(--scaling-factor-scale-2) - var(--scaling-factor-scale-1)) / (var(--scaling-factor-vw-2) - var(--scaling-factor-vw-1))) * var(--scaling-factor-vw-1)) * 1px));
     --dark: 31, 31, 31;
-    --light: 239, 239, 239;
-    --lighter-dark: 63, 63, 63;
-    --darker-light: 207, 207, 207;
+    --light: 235, 235, 235;
+    --lighter-dark: 47, 47, 47;
+    --darker-light: 215, 215, 215;
     --darkest: 15, 15, 15;
     --lightest: 255, 255, 255;
     --fg-color: var(--dark);
@@ -38,6 +38,7 @@
     user-select: none;
     -webkit-user-drag: none;
     -webkit-tap-highlight-color: transparent;
+    interpolate-size: allow-keywords;
 }
 
 :root, html, body {
