@@ -102,16 +102,12 @@ body > header:not(:hover) > * {
     width: var(--header-base-content-width);
 }
 
-body > header > a > :first-child:is(div, img) {
+:is(body > header, body > header > nav > div) > a > :first-child:is(div, img) {
     height: var(--header-base-content-width);
 }
 
-body > header > nav > div > a > :first-child:is(div, img) {
-    height: calc(var(--header-base-content-width) * 3 / 4);
-}
-
 body > header > nav > div > div > a > :first-child:is(div, img) {
-    height: calc(var(--header-base-content-width) * 1 / 2);
+    height: calc(var(--header-base-content-width) * 3 / 4);
 }
 
 :is(body > header > nav, body > header > nav > div) > div {
@@ -143,12 +139,12 @@ body > header > nav > div:not(:hover) > div{
     overflow: visible;
 }
 
-body > header > a > * {
+:is(body > header, body > header > nav > div) > a > * {
     font-size: calc(24 * var(--scaling-factor));
+    font-weight: 700;
 }
 
 body > header > nav > div > a > * {
-    font-size: calc(20 * var(--scaling-factor));
     font-weight: 600;
 }
 
@@ -163,7 +159,7 @@ body > header > nav {
     flex-direction: column;
     justify-content: start;
     align-items: center;
-    gap: calc(4 * var(--scaling-factor));
+    gap: calc(8 * var(--scaling-factor));
 }
 
 body > div {
