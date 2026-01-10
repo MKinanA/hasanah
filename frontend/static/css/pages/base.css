@@ -47,7 +47,7 @@ body > header {
     flex-direction: column;
     justify-content: start;
     align-items: start;
-    gap: calc(8 * var(--scaling-factor));
+    gap: var(--header-content-padding);
     overflow-x: hidden;
 }
 
@@ -112,6 +112,7 @@ body > header:not(:hover) > * {
 
 body > header > nav > div > div > :is(header > div, a) > :first-child:is(div, img) {
     height: calc(var(--header-base-content-width) * 3 / 4);
+    margin-left: calc(var(--header-base-content-width) / 2);
 }
 
 :is(body > header > nav, body > header > nav > div) > div {
@@ -163,7 +164,7 @@ body > header > nav {
     flex-direction: column;
     justify-content: start;
     align-items: center;
-    gap: calc(8 * var(--scaling-factor));
+    gap: var(--header-content-padding);
 }
 
 body > div {
