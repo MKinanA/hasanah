@@ -101,6 +101,7 @@ body > form > fieldset > button {
 
 body > form > fieldset:disabled {
     opacity: 75%;
+    pointer-events: none;
 }
 
 body > form > fieldset:disabled > button:after {
