@@ -79,6 +79,11 @@ body > header:hover {
 
 :is(body > header, body > header > nav > div, body > header > nav > div > div) > a {
     cursor: pointer;
+    text-decoration: none;
+}
+
+:is(body > header, body > header > nav > div, body > header > nav > div > div) > a:focus {
+    background: unset;
 }
 
 :is(body > header, body > header > nav > div, body > header > nav > div > div) > :is(header > div, a) > * {

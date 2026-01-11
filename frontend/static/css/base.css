@@ -61,17 +61,17 @@ input:focus {
     outline-color: rgb(var(--fg-color-2));
 }
 
-a[href] {
+:is(h1, h2, h3, h4, h5, h6, p, span) > a[href] {
     color: color-mix(in srgb, rgb(var(--fg-color)), rgb(0, 0, 255));
     font-weight: 600;
 }
 
-a[href]:focus {
+:is(h1, h2, h3, h4, h5, h6, p, span) > a[href]:focus {
     background: color-mix(in srgb, rgb(var(--bg-color)), rgb(0, 0, 255) 25%);
 }
 
-:is(button, a):active, :not(input, a):focus {
-    filter: brightness(80%);
+:is(button, a[href]):active, :not(input, a):focus {
+    filter: brightness(75%);
 }
 
 [hidden] {
