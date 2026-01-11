@@ -18,7 +18,7 @@ def nav_menu_template(href, svg, text) -> dict: return {'href': href, 'svg': svg
 async def process_context(context: dict) -> dict:
     if 'user' in context and isinstance(user := context['user'], User): context['nav_menus'] = noneless((
         {
-            **nav_menu_template(None, 'sack', 'Zis'),
+            **nav_menu_template(None, 'sack', 'ZIS'),
             'submenus': noneless((
                 nav_menu_template(None, 'in', 'Payments'),
             ))
