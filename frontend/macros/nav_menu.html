@@ -1,0 +1,10 @@
+{% macro nav_menu(href=none, svg=none, text=none, text_type='p', wrapper='a') %}
+    <{{ wrapper }}{% if href is not none %} href="{{ href }}"{% endif %}>
+        {% if svg is not none %}
+            <div>
+                {% include 'components/svg/' ~ svg ~ '.html' %}
+            </div>
+        {% endif %}
+        {% if text is not none %}<{{ text_type }}>{{ text }}</{{ text_type }}>{% endif %}
+    </{{ wrapper }}>
+{% endmacro %}
