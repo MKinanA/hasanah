@@ -1,0 +1,1 @@
+def noneless(stuff: 'list | tuple') -> 'list | tuple': return type(stuff)(x for x in stuff if x is not None)
