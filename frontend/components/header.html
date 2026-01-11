@@ -8,7 +8,7 @@
     {% if nav_menus is defined %}{% for menu in nav_menus %}
     <div>
         {{ nav_menu(href=menu['href'], svg=menu['svg'], text=menu['text'], text_type='h2') }}
-        {% if 'submenus' in menus and len(menu['submenus']) > 0 %}
+        {% if 'submenus' in menu and menu['submenus'] | length > 0 %}
         <div>
             {% for submenu in menu['submenus'] %}
             {{ nav_menu(href=submenu['href'], svg=submenu['svg'], text=submenu['text'], text_type='h3') }}
