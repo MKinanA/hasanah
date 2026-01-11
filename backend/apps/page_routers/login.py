@@ -8,5 +8,5 @@ router = APIRouter()
 @router.get('')
 async def login(request: Request):
     try: await auth(request)
-    except (NoAuthToken, UserSessionNotFound): return render('pages/login')
+    except (NoAuthToken, UserSessionNotFound): return await render('pages/login')
     return RedirectResponse(url='/home', status_code=302)

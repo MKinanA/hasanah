@@ -9,7 +9,7 @@ router = APIRouter()
 @router.get('')
 async def logout(request: Request):
     try: user = await auth(request)
-    except (NoAuthToken, UserSessionNotFound): return render('pages/login')
+    except (NoAuthToken, UserSessionNotFound): return await render('pages/login')
     token = getattr(user, 'token', None)
     if type(token) != str: raise RuntimeError('Failed to retrieve user session token from auth.')
     await Session.delete(token)
