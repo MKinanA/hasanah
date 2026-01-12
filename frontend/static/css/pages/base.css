@@ -167,6 +167,19 @@ body > header > nav > div > div > :is(header > div, a) > * {
     font-weight: 500;
 }
 
+body > header > nav > div:empty {
+    margin: calc(var(--header-content-padding) * -0.5) 0;
+    flex-grow: 1;
+}
+
+body > header > nav > div:empty + :last-child:not(:empty) {
+    flex-direction: column-reverse;
+}
+
+body > header > nav > div:empty + :last-child:not(:empty) > div {
+    justify-content: start;
+}
+
 body > header > nav {
     flex-grow: 1;
     display: flex;
