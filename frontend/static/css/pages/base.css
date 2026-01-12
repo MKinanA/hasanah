@@ -77,6 +77,10 @@ body > header:hover {
     border-radius: var(--header-content-padding);
 }
 
+body > header > div:first-child:is(:has(> div), :has(> img)) {
+    opacity: 50%;
+}
+
 :is(body > header, body > header > nav > div, body > header > nav > div > div) > a {
     cursor: pointer;
     text-decoration: none;
