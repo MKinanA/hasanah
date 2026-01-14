@@ -1,9 +1,11 @@
 {% extends 'templates/base.html' %}
 
 {% block body %}
+    {% if use_header | default(true) %}
     <header>
         {% include 'components/header.html' %}
     </header>
+    {% endif %}
     <div>
         <main>
             {% block main %}
