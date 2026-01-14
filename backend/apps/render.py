@@ -20,7 +20,7 @@ async def process_context(context: dict) -> dict:
         {
             **nav_menu_template(None, 'sack', 'ZIS'),
             'submenus': noneless((
-                nav_menu_template(None, 'in', 'Payments'),
+                nav_menu_template('/zis/payments', 'in', 'Payments'),
             ))
         } if (await user.has_access(Access.ZIS_PAYMENT_READ)) else None,
     ))

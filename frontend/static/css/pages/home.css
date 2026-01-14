@@ -1,1 +1,11 @@
 @import 'base.css';
+
+body > div > main {
+    justify-content: center;
+    align-items: center;
+}
+
+body > div > main > h1 {
+    text-align: center;
+    font-size: calc(28 * var(--scaling-factor));
+}

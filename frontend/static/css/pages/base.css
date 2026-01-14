@@ -78,7 +78,7 @@ body > header:hover {
 }
 
 body > header > div:first-child:is(:has(> div), :has(> img)) {
-    opacity: 50%;
+    opacity: 75%;
 }
 
 :is(body > header, body > header > nav > div, body > header > nav > div > div) > a {
@@ -243,4 +243,5 @@ body > div > footer {
 body > div > footer * {
     font-size: calc(16 * var(--scaling-factor));
     text-align: center;
+    opacity: 75%;
 }
