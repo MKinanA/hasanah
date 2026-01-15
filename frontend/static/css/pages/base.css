@@ -7,6 +7,10 @@
     --main-padding: min(var(--x-padding), calc(24 * var(--scaling-factor)));
 }
 
+:root:not(:has(body header)) {
+    --header-base-width: calc(0 * var(--scaling-factor));
+}
+
 h1 {font-size: calc(26 * var(--scaling-factor)); font-weight: 700;}
 h2 {font-size: calc(24 * var(--scaling-factor)); font-weight: 700;}
 h3 {font-size: calc(22 * var(--scaling-factor)); font-weight: 700;}
@@ -32,6 +36,10 @@ body::before {
     width: 100vw;
     z-index: 1;
     background: rgba(var(--darkest), 50%);
+}
+
+:root:not(:has(body header)) > body::before {
+    display: none;
 }
 
 body > header {
@@ -216,6 +224,10 @@ body > div > main {
     align-items: start;
     gap: calc(24 * var(--scaling-factor));
     flex-grow: 1;
+}
+
+body > div > main > * {
+    width: 100%;
 }
 
 body > div > main div {

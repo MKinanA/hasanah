@@ -303,19 +303,26 @@ class PaymentVersion:
             return [PaymentLine(payment_version=row['payment_version'], payer_name=row['payer_name'], category=(await PaymentCategory.get_name_by_id(row['category'], cursor=cursor)) or '', amount=row['amount'], unit=(await PaymentUnit.get_name_by_id(row['unit'], cursor=cursor)) or '', note=row['note'], id=row['id']) for row in rows]
 
     @property
-    async def to_dict(self) -> dict: return {
-        'payment': payment.uuid if (payment := await Payment.get(id=self.__payment)) else None,
-        'version': self.__version,
-        'payer_name': self.__payer_name,
-        'payer_number': self.__payer_number,
-        'payer_email': self.__payer_email,
-        'payer_address': self.__payer_address,
-        'note': self.__note,
-        'lines': [await line.to_dict for line in await self.lines],
-        'created_at': self.__created_at,
-        'created_by': self.__created_by.username,
-        'is_deleted': self.__is_deleted,
-    }
+    async def to_dict(self) -> dict:
+        payment = await Payment.get(id=self.__payment)
+        if payment is None: raise RuntimeError('Failed to retrieve payment.')
+        first_version = await payment.version(1)
+        if first_version is None: raise RuntimeError('Failed to retrieve first version of this payment.')
+        return {
+            'payment': payment.uuid,
+            'version': self.__version,
+            'payer_name': self.__payer_name,
+            'payer_number': self.__payer_number,
+            'payer_email': self.__payer_email,
+            'payer_address': self.__payer_address,
+            'note': self.__note,
+            'lines': [await line.to_dict for line in await self.lines],
+            'created_at': first_version.created_at,
+            'created_by': first_version.created_by.username,
+            'updated_at': self.__created_at,
+            'updated_by': self.__created_by.username,
+            'is_deleted': self.__is_deleted,
+        }
 
 class PaymentLine:
     class InvalidPaymentVersion(Exception): status_code = 400

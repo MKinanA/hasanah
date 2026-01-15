@@ -1,0 +1,48 @@
+@import '../base.css';
+
+:root {
+    --table-row-border-radius: calc(8 * var(--scaling-factor));
+}
+
+body > div > main > table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+
+body > div > main > table * {
+    text-align: start;
+}
+
+body > div > main > table > :is(thead, tbody) > :is(thead > tr, tbody > tr:nth-child(2n)) {
+    background: rgb(var(--bg-color-2));
+}
+
+body > div > main > table > :is(thead, tbody) > tr > :is(th, td) {
+    padding: calc(8 * var(--scaling-factor)) calc(4 * var(--scaling-factor));
+}
+
+body > div > main > table > :is(thead, tbody) > tr > :is(th, td):is(:first-child) {
+    border-radius: var(--table-row-border-radius) 0 0 var(--table-row-border-radius);
+    padding-left: calc(8 * var(--scaling-factor));
+}
+
+body > div > main > table > :is(thead, tbody) > tr > :is(th, td):is(:last-child) {
+    border-radius: 0 var(--table-row-border-radius) var(--table-row-border-radius) 0;
+    padding-right: calc(8 * var(--scaling-factor));
+}
+
+body > div > main > table > thead * {
+    font-weight: 600;
+}
+
+body > div > main > table > tbody > tr {
+    cursor: pointer;
+} 
+
+body > div > main > table > tbody > tr:is(:nth-child(n)):hover {
+    background: rgba(var(--bg-color-2), 50%);
+}
+
+body > div > main > table > tbody > tr:active {
+    filter: brightness(75%);
+}

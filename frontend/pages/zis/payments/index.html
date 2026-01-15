@@ -1,0 +1,55 @@
+{% extends 'templates/page.html' %}
+
+{% block title %}Pembayaran - ZIS{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/css/pages/payments/index.css">
+    <script type="module" src="/static/js/payments/index.js"></script>
+{% endblock %}
+
+{% block main %}
+    <h2>Pembayaran</h2>
+    <table>
+        <thead>
+            <tr>
+                <th><p>Nama</p></th>
+                <th><p>Dibuat pada</p></th>
+                <th><p>Dibuat oleh</p></th>
+                <th><p>Diperbarui pada</p></th>
+                <th><p>Diperbarui oleh</p></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for payment in payments %}
+            <tr data-payment="{{ payment.payment }}">
+                <td><p>{{ payment.payer_name }}</p></td>
+                <td><p>{{ payment.created_at }}</p></td>
+                <td><p>{{ payment.created_by }}</p></td>
+                <td><p>{{ payment.updated_at }}</p></td>
+                <td><p>{{ payment.updated_by }}</p></td>
+            </tr>
+            <tr data-payment="{{ payment.payment }}">
+                <td><p>{{ payment.payer_name }}</p></td>
+                <td><p>{{ payment.created_at }}</p></td>
+                <td><p>{{ payment.created_by }}</p></td>
+                <td><p>{{ payment.updated_at }}</p></td>
+                <td><p>{{ payment.updated_by }}</p></td>
+            </tr>
+            <tr data-payment="{{ payment.payment }}">
+                <td><p>{{ payment.payer_name }}</p></td>
+                <td><p>{{ payment.created_at }}</p></td>
+                <td><p>{{ payment.created_by }}</p></td>
+                <td><p>{{ payment.updated_at }}</p></td>
+                <td><p>{{ payment.updated_by }}</p></td>
+            </tr>
+            <tr data-payment="{{ payment.payment }}">
+                <td><p>{{ payment.payer_name }}</p></td>
+                <td><p>{{ payment.created_at }}</p></td>
+                <td><p>{{ payment.created_by }}</p></td>
+                <td><p>{{ payment.updated_at }}</p></td>
+                <td><p>{{ payment.updated_by }}</p></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

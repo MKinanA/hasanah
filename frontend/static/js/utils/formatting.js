@@ -1,0 +1,1 @@
+export const leadingZeros = (num, len) => num.toString().length >= len ? num.toString() : '0'.repeat(len - num.toString().length) + num.toString();

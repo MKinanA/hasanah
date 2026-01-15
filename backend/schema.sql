@@ -77,6 +77,7 @@ CREATE TABLE zis_payment_line (
     payment_version INTEGER NOT NULL REFERENCES zis_payment_version(id) ON UPDATE CASCADE ON DELETE RESTRICT,
     payer_name TEXT NOT NULL,
     category INTEGER NOT NULL REFERENCES zis_payment_category(id) ON UPDATE CASCADE ON DELETE RESTRICT,
-    amount INTEGER NOT NULL CHECK (amount >= 0),
+    amount REAL NOT NULL CHECK (amount >= 0),
+    unit INTEGER NOT NULL REFERENCES zis_payment_unit(id) ON UPDATE CASCADE ON DELETE RESTRICT,
     note TEXT
 ) STRICT;
