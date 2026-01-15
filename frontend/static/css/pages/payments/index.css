@@ -29,7 +29,7 @@ body > div > main > div#table > table > :is(thead, tbody) > :is(thead > tr, tbod
 }
 
 body > div > main > div#table > table > :is(thead, tbody) > tr > :is(th, td) {
-    padding: calc(8 * var(--scaling-factor)) calc(4 * var(--scaling-factor));
+    padding: calc(8 * var(--scaling-factor)) calc(16 * var(--scaling-factor));
 }
 
 body > div > main > div#table > table > :is(thead, tbody) > tr > :is(th, td):is(:first-child) {
