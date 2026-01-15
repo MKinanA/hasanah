@@ -4,45 +4,56 @@
     --table-row-border-radius: calc(8 * var(--scaling-factor));
 }
 
-body > div > main > table {
-    border-collapse: separate;
-    border-spacing: 0;
+body > div > main > div#table {
+    margin-left: calc(var(--main-padding) * -1);
+    padding-left: var(--main-padding);
+    margin-right: calc(var(--x-padding) * -1);
+    padding-right: var(--x-padding);
+    width: calc(100% + var(--main-padding) + var(--x-padding));
+    overflow-x: auto;
 }
 
-body > div > main > table * {
+body > div > main > div#table > table {
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 100%;
+    width: max-content;
+}
+
+body > div > main > div#table > table * {
     text-align: start;
 }
 
-body > div > main > table > :is(thead, tbody) > :is(thead > tr, tbody > tr:nth-child(2n)) {
+body > div > main > div#table > table > :is(thead, tbody) > :is(thead > tr, tbody > tr:nth-child(2n)) {
     background: rgb(var(--bg-color-2));
 }
 
-body > div > main > table > :is(thead, tbody) > tr > :is(th, td) {
+body > div > main > div#table > table > :is(thead, tbody) > tr > :is(th, td) {
     padding: calc(8 * var(--scaling-factor)) calc(4 * var(--scaling-factor));
 }
 
-body > div > main > table > :is(thead, tbody) > tr > :is(th, td):is(:first-child) {
+body > div > main > div#table > table > :is(thead, tbody) > tr > :is(th, td):is(:first-child) {
     border-radius: var(--table-row-border-radius) 0 0 var(--table-row-border-radius);
     padding-left: calc(8 * var(--scaling-factor));
 }
 
-body > div > main > table > :is(thead, tbody) > tr > :is(th, td):is(:last-child) {
+body > div > main > div#table > table > :is(thead, tbody) > tr > :is(th, td):is(:last-child) {
     border-radius: 0 var(--table-row-border-radius) var(--table-row-border-radius) 0;
     padding-right: calc(8 * var(--scaling-factor));
 }
 
-body > div > main > table > thead * {
+body > div > main > div#table > table > thead * {
     font-weight: 600;
 }
 
-body > div > main > table > tbody > tr {
+body > div > main > div#table > table > tbody > tr {
     cursor: pointer;
 } 
 
-body > div > main > table > tbody > tr:is(:nth-child(n)):hover {
+body > div > main > div#table > table > tbody > tr:is(:nth-child(n)):hover {
     background: rgba(var(--bg-color-2), 50%);
 }
 
-body > div > main > table > tbody > tr:active {
+body > div > main > div#table > table > tbody > tr:active {
     filter: brightness(75%);
 }
