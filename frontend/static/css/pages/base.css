@@ -59,6 +59,10 @@ body > header {
     overflow-x: hidden;
 }
 
+body > header:not(:hover) * {
+    color: rgb(var(--fg-color-2))
+}
+
 body > header:not(:hover) {
     overflow-y: hidden;
 }
