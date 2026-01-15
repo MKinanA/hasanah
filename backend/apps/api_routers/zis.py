@@ -12,8 +12,7 @@ router = APIRouter()
 @router.post('/payments')
 async def payments(request: Request, response: Response, user: User = Depends(auth), body: dict = Depends(json_body)) -> dict:
     await user.require_access(Access.ZIS_PAYMENT_READ)
-    payments = await Payment.query(**{key: value for key, value in body.items() if key in PAYMENT_QUERY_PARAMS})
-    return mkresp('success', 'Payments Fetched', 'Successfully fetched payments.', payments=[(await (await payment.latest).to_dict) for payment in payments])
+    return mkresp('success', 'Payments Fetched', 'Successfully fetched payments.', payments=[(await (await payment.latest).to_dict) for payment in await Payment.query(**{key: value for key, value in body.items() if key in PAYMENT_QUERY_PARAMS})])
 
 @router.post('/payment')
 async def payment(request: Request, response: Response, user: User = Depends(auth), body: dict = Depends(json_body)) -> dict:

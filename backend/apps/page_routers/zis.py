@@ -17,6 +17,4 @@ async def index(request: Request):
         await user.require_access(Access.ZIS_PAYMENT_READ)
     except (NoAuthToken, UserSessionNotFound): return RedirectResponse(url='/login', status_code=302)
     except Access.AccessDenied: return RedirectResponse(url='/home', status_code=302)
-    payments: 'list[dict]' = []
-    for payment in await Payment.query(): payments.append(await (await payment.latest).to_dict)
-    return await render('pages/zis/payments', {'user': user, 'payments': payments})
+    return await render('pages/zis/payments', {'user': user, 'payments': [(await (await payment.latest).to_dict) for payment in await Payment.query()]})
