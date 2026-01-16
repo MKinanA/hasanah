@@ -1,0 +1,19 @@
+@import 'base.css';
+
+body > div > main {
+    justify-content: center;
+    align-items: center;
+}
+
+body > div > main > * {
+    width: 100%;
+    text-align: center;
+}
+
+body > div > main > h1 {
+    font-size: calc(64 * var(--scaling-factor));
+}
+
+body > div > main > h2 {
+    font-size: calc(32 * var(--scaling-factor));
+}

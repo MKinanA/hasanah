@@ -1,0 +1,14 @@
+{% extends 'templates/page.html' %}
+
+{% block title %}Pembayaran - ZIS{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/css/pages/error.css">
+    <script type="module" src="/static/js/error.js"></script>
+{% endblock %}
+
+{% block main %}
+    <h1>{{ code | default(500) }}</h1>
+    <h2>{{ error | default('Error') }}</h2>
+    <p>Anda akan dikembalikan dalam <span>{{ duration | default(10) }}</span>...</p>
+{% endblock %}
