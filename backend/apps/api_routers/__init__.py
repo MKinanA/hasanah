@@ -1,1 +1,1 @@
-from . import auth, test, zis
+from . import auth, test, zis, user
