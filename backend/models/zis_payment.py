@@ -68,12 +68,14 @@ class Payment:
             'last_updated_by': (lambda username: User.get(username=username), lambda user: user.id if user is not None else 0),
             'created_in_timespan': lambda seconds: int(seconds),
             'updated_in_timespan': lambda seconds: int(seconds),
+            'created_between': lambda span: (*(int(time) for time in str(span).split('-')),),
         }
         filters_parser = {
             'first_created_by': lambda value: (f'fv.created_by = ?', value),
             'last_updated_by': lambda value: (f'pv.created_by = ?', value),
             'created_in_timespan': lambda value: (f'fv.created_at + ? >= ?', (value, int(time()))),
             'updated_in_timespan': lambda value: (f'pv.created_at + ? >= ?', (value, int(time()))),
+            'created_between': lambda value: (f'fv.created_at BETWEEN ? AND ?', (value[0], value[1])),
         }
         parsed_filters = [filters_parser[key](await multisteps_async(lambda: value, *(parser if isinstance(parser := filter_values_parser[key], (tuple, list)) else (parser,)))) for key, value in (filters or {}).items()]
         where = ' AND '.join(x for x in (
