@@ -57,3 +57,14 @@ body > div > main > div#table > table > tbody > tr:is(:nth-child(n)):hover {
 body > div > main > div#table > table > tbody > tr:active {
     filter: brightness(75%);
 }
+
+body > div > main > div#table > table > tbody > tr > td {
+    position: static;
+}
+
+body > div > main > div#table > table > tbody > tr > td:first-child > a[href]:empty {
+    position: absolute;
+    display: block;
+    inset: 0;
+    z-index: 1;
+}

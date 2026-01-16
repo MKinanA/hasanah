@@ -34,7 +34,7 @@ body::before {
     bottom: 0;
     height: 100vh;
     width: 100vw;
-    z-index: 1;
+    z-index: 15;
     background: rgba(var(--darkest), 50%);
 }
 
@@ -46,7 +46,7 @@ body > header {
     position: fixed;
     top: 0;
     left: 0;
-    z-index: 2;
+    z-index: 16;
     width: var(--header-base-width);
     height: 100%;
     padding: min(calc(var(--x-padding) * 2), var(--header-content-padding)) min(var(--x-padding), calc(var(--header-content-padding) * 2));

@@ -22,8 +22,8 @@
             </thead>
             <tbody>
                 {% for payment in payments %}
-                <tr data-payment="{{ payment.payment }}">
-                    <td><p>{{ payment.payer_name }}</p></td>
+                <tr>
+                    <td><a href="payments/{{ payment.payment }}"></a><p>{{ payment.payer_name }}</p></td>
                     <td><p>{{ payment.created_at }}</p></td>
                     <td><p>{{ payment.created_by }}</p></td>
                     <td><p>{{ payment.updated_at }}</p></td>
