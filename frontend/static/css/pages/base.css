@@ -59,20 +59,20 @@ body > header {
     overflow-x: hidden;
 }
 
-body > header:not(:hover) * {
+body > header:not(:is(:hover, :has(:focus))) * {
     color: rgb(var(--fg-color-2))
 }
 
-body > header:not(:hover) {
+body > header:not(:is(:hover, :has(:focus))) {
     overflow-y: hidden;
 }
 
-body:has(> header:not(:hover))::before {
+body:has(> header:not(:is(:hover, :has(:focus))))::before {
     pointer-events: none;
     background: transparent
 }
 
-body > header:hover {
+body > header:is(:hover, :has(:focus)) {
     width: max-content;
     box-shadow: 0 0 calc(calc(64 * var(--scaling-factor))) rgb(var(--darkest));
 }
@@ -111,11 +111,11 @@ body > header > div:first-child:is(:has(> div), :has(> img)) {
     min-width: max-content;
 }
 
-body > header:not(:hover) > * {
+body > header:not(:is(:hover, :has(:focus))) > * {
     margin-left: calc(var(--header-content-padding) * -1);
 }
 
-:is(body > header, body > header > nav > div, body > header > nav > div > div) > a:active {
+:is(body > header, body > header > nav > div, body > header > nav > div > div) > a:is(:active, :focus) {
     background: rgba(var(--bg-color), 75%);
 }
 
@@ -146,14 +146,11 @@ body > header > nav > div > div > :is(header > div, a) > :first-child:is(div, im
 body > header > nav > div > div {
     overflow: hidden;
     justify-content: end;
-}
-
-body > header > nav > div:hover > div {
-    height: max-content;
-}
-
-body > header > nav > div:not(:hover) > div{
     height: 0;
+}
+
+body > header > nav > div:is(:hover, :has(:focus)) > div {
+    height: max-content;
 }
 
 :is(body > header, body > header > nav > div, body > header > nav > div > div) > :is(header > div, a) > div > * {
