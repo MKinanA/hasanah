@@ -1,0 +1,126 @@
+{% extends 'templates/page.html' %}
+
+{% block title %}Pembayaran - ZIS{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/css/pages/payments/show.css">
+    <script type="module" src="/static/js/payments/show.js"></script>
+{% endblock %}
+
+{% block main %}
+    <h2>Pembayaran</h2>
+    <div id="main">
+        <div class="wrap-table">
+            <div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><p>Nama</p></td>
+                            <td><p>&colon;</p></td>
+                            <td><p>{{ payment.payer_name }}</p></td>
+                        </tr>
+                        <tr>
+                            <td><p>Nomor</p></td>
+                            <td><p>&colon;</p></td>
+                            <td><p>{{ payment.payer_number }}</p></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><p>Email</p></td>
+                            <td><p>&colon;</p></td>
+                            <td><p>{{ payment.payer_email }}</p></td>
+                        </tr>
+                        <tr>
+                            <td><p>Alamat</p></td>
+                            <td><p>&colon;</p></td>
+                            <td><p>{{ payment.payer_address }}</p></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="table">
+            <table>
+                <thead>
+                    <tr>
+                        <th><p>Nama</p></th>
+                        <th><p>Kategori</p></th>
+                        <th><p>Jumlah</p></th>
+                        <th><p>Satuan</p></th>
+                        <th><p>Catatan</p></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for line in payment.lines %}
+                    <tr>
+                        <td><p>{{ line.payer_name }}</p></td>
+                        <td><p>{{ line.category }}</p></td>
+                        <td><p>{{ line.amount }}</p></td>
+                        <td><p>{{ line.unit }}</p></td>
+                        <td><p>{{ line.note }}</p></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <p>Catatan</p>
+            <p>{{ payment.note or '-' }}</p>
+        </div>
+    </div>
+    <div>
+        <div>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><p>UUID</p></td>
+                        <td><p>&colon;</p></td>
+                        <td><p>{{ payment.payment }}</p></td>
+                    </tr>
+                    <tr>
+                        <td><p>Versi</p></td>
+                        <td><p>&colon;</p></td>
+                        <td><p>{{ payment.version }}</p></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><p>Dibuat pada</p></td>
+                        <td><p>&colon;</p></td>
+                        <td><p class="timestamp">{{ payment.created_at }}</p></td>
+                    </tr>
+                    <tr>
+                        <td><p>Dibuat oleh</p></td>
+                        <td><p>&colon;</p></td>
+                        <td><p class="username">{{ payment.created_by }}</p></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div>
+            <table>
+                <tbody>
+                    <tr>
+                        <td><p>Diperbarui pada</p></td>
+                        <td><p>&colon;</p></td>
+                        <td><p class="timestamp">{{ payment.updated_at }}</p></td>
+                    </tr>
+                    <tr>
+                        <td><p>Diperbarui oleh</p></td>
+                        <td><p>&colon;</p></td>
+                        <td><p class="username">{{ payment.updated_by }}</p></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}

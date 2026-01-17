@@ -48,7 +48,7 @@ body > div > main > div#table > table > thead * {
 
 body > div > main > div#table > table > tbody > tr {
     cursor: pointer;
-} 
+}
 
 body > div > main > div#table > table > tbody > tr:is(:nth-child(n)):is(:hover, :has(:focus)) {
     background: rgba(var(--bg-color-2), 50%);
