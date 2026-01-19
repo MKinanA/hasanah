@@ -85,7 +85,7 @@
                     <tr>
                         <td><p>Versi</p></td>
                         <td><p>&colon;</p></td>
-                        <td><p>{{ payment.version }}</p></td>
+                        <td><a href="{{ payment.payment }}/versions"><p>{{ payment.version }}</p></a></td>
                     </tr>
                 </tbody>
             </table>
@@ -101,7 +101,7 @@
                     <tr>
                         <td><p>Dibuat oleh</p></td>
                         <td><p>&colon;</p></td>
-                        <td><p class="username">{{ payment.created_by }}</p></td>
+                        <td><a href="/users/{{ payment.created_by }}"><p class="username">{{ payment.created_by }}</p></a></td>
                     </tr>
                 </tbody>
             </table>
@@ -117,7 +117,7 @@
                     <tr>
                         <td><p>Diperbarui oleh</p></td>
                         <td><p>&colon;</p></td>
-                        <td><p class="username">{{ payment.updated_by }}</p></td>
+                        <td><a href="/users/{{ payment.updated_by }}"><p class="username">{{ payment.updated_by }}</p></a></td>
                     </tr>
                 </tbody>
             </table>

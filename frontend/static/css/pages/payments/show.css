@@ -94,6 +94,10 @@ body > div > main > div#main > div#table > table > tbody > tr > td:is(:nth-child
     text-transform: uppercase;
 }
 
+body > div > main > div#main > div#table > table > tbody * {
+    user-select: text;
+}
+
 body > div > main > div#main > div:not(#table, .wrap-table) {
     gap: calc(8 * var(--scaling-factor));
 }
@@ -146,4 +150,19 @@ body > div > main > div#main + div > div > table > tbody > tr > td:nth-child(2) 
 
 body > div > main > div#main + div > div > table > tbody > tr > td:not(:first-child, :nth-child(2)) * {
     user-select: text;
+}
+
+body > div > main a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    outline: calc(2 * var(--scaling-factor)) solid transparent;
+    outline-offset: 0;
+    pointer-events: none;
+    border-radius: calc(2 * var(--scaling-factor));
+}
+
+body > div > main a:focus-visible::after {
+    outline-offset: calc(2 * var(--scaling-factor));
+    outline-color: currentColor;
 }
