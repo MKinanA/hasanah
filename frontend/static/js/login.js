@@ -15,7 +15,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     password: password,
                 })});
                 const body = await resp.json();
-                if ((Math.round(resp.status / 100) === 2) && (body.type === 'success')) {
+                if ((Math.floor(resp.status / 100) === 2) && (body.type === 'success')) {
                     storeToken(body.token);
                     location.replace('/home');
                 } else alert(body.message ?? body.detail ?? 'Username atau password salah.');

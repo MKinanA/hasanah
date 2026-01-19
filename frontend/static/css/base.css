@@ -86,6 +86,15 @@ h5 {font-size: calc(16 * var(--scaling-factor)); font-weight: 700;}
 h6 {font-size: calc(14 * var(--scaling-factor)); font-weight: 700;}
 p {font-size: calc(16 * var(--scaling-factor));}
 
+@keyframes spin {
+  from {
+    rotate: 0deg;
+  }
+  to {
+    rotate: 360deg;
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     --fg-color: var(--light);

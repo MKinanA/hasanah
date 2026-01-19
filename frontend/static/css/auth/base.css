@@ -90,21 +90,12 @@ body > form > fieldset > button {
     cursor: pointer;
 }
 
-@keyframes spin {
-  from {
-    rotate: 0deg;
-  }
-  to {
-    rotate: 360deg;
-  }
-}
-
 body > form > fieldset:disabled {
     opacity: 75%;
     pointer-events: none;
 }
 
-body > form > fieldset:disabled > button:after {
+body > form > fieldset:disabled > button::after {
     content: '';
     display: block;
     position: absolute;
