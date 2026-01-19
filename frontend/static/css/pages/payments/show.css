@@ -166,3 +166,52 @@ body > div > main a:focus-visible::after {
     outline-offset: calc(2 * var(--scaling-factor));
     outline-color: currentColor;
 }
+
+body > div > main > div#main + div + div:not(:has(> :not(a))) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--main-padding);
+    margin-top: var(--main-padding);
+}
+
+body > div > main > div#main + div + div:not(:has(> :not(a))) * {
+    text-decoration: none;
+    font-weight: 600;
+    text-align: center;
+}
+
+body > div > main > div#main + div + div:not(:has(> :not(a))) > * {
+    display: flex;
+    padding: calc(8 * var(--scaling-factor)) calc(16 * var(--scaling-factor));
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: calc(256 * var(--scaling-factor));
+    background: rgb(var(--bg-color-2));
+    border-radius: calc(12 * var(--scaling-factor));
+}
+
+body > div > main > div#main + div + div:not(:has(> :not(a))) > #delete-button {
+    background: color-mix(in oklab, rgb(var(--bg-color)) 25%, red);
+}
+
+body > div > main > div#main + div + div:not(:has(> :not(a))) > #delete-button * {
+    color: color-mix(in oklab, rgb(var(--fg-color)) 25%, rgb(var(--light)));
+}
+
+body > div > main > div#main + div + div:not(:has(> :not(a))) > #delete-button.loading::after {
+    content: '';
+    display: block;
+    position: absolute;
+    right: calc(12 * var(--scaling-factor));
+    left: initial;
+    top: 50%;
+    transform: translateY(-50%);
+    transform-origin: top;
+    width: calc(16 * var(--scaling-factor));
+    height: calc(16 * var(--scaling-factor));
+    border: calc(4 * var(--scaling-factor)) solid rgb(var(--light));
+    border-bottom-color: transparent;
+    border-radius: 100%;
+    animation: spin 1s linear infinite;
+}

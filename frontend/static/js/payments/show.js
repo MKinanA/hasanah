@@ -19,4 +19,19 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     parseAllTimestamps();
     parseAllUsernameToName();
+    document.querySelector('#delete-button').addEventListener('click', async e => {
+        e.preventDefault();
+        document.querySelector('#delete-button').classList.add('loading');
+        if (!confirm('Hapus pembayaran ini?')) {
+            document.querySelector('#delete-button').classList.remove('loading');
+            return;
+        };
+        const resp = await fetch(document.querySelector('#delete-button').getAttribute('href'), {method: 'POST', body: JSON.stringify({})});
+        const body = await resp.json();
+        if ((Math.floor(resp.status / 100) === 2) && (body.type === 'success')) location.replace('.');
+        else {
+            alert(body.message ?? body.detail ?? 'Error');
+            document.querySelector('#delete-button').classList.remove('loading');
+        };
+    });
 });
