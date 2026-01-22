@@ -1,3 +1,5 @@
+from copy import deepcopy
+from json import dumps
 from fastapi.responses import Response, HTMLResponse
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound, select_autoescape
 from ..models.user import User, Access
@@ -15,19 +17,20 @@ env = Environment(
 
 def nav_menu_template(href, svg, text) -> dict: return {'href': href, 'svg': svg, 'text': text}
 
-async def process_context(context: dict) -> dict:
+async def process_context(context: dict, expose: 'list | tuple | str | None' = None) -> dict:
     if 'user' in context and isinstance(user := context['user'], User): context['nav_menus'] = noneless((
         {
             **nav_menu_template(None, 'sack', 'ZIS'),
             'submenus': noneless((
                 nav_menu_template('/zis/payments', 'in', 'Payments'),
-            ))
+            )),
         } if (await user.has_access(Access.ZIS_PAYMENT_READ)) else None,
     ))
+    if not 'data' in context: context['data'] = dumps(deepcopy({key: context[key] for key in (expose if isinstance(expose, (list, tuple)) else (expose,)) if key in context} if isinstance(expose, (list, tuple, str)) else {}))
     return context
 
-async def render(name: str, context: 'dict | None' = None, response: 'Response | None' = None) -> 'str | Response':
-    context = await process_context(context or {})
+async def render(name: str, context: 'dict | None' = None, expose: 'list | tuple | str | None' = None, response: 'Response | None' = None) -> 'str | Response':
+    context = await process_context(context or {}, expose)
     possible_names = (*(possible_name for possible_name in (
         name,
         name[:-1] if len(name) > 1 and name[-1] in ('/', '\\') else None,
