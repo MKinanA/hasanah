@@ -3,8 +3,8 @@
 {% block title %}Pembayaran - ZIS{% endblock %}
 
 {% block head %}
-    <link rel="stylesheet" href="/static/css/pages/payments/show.css">
-    <script type="module" src="/static/js/payments/show.js"></script>
+    <link rel="stylesheet" href="/static/css/pages/payments/edit.css">
+    <script type="module" src="/static/js/payments/edit.js"></script>
 {% endblock %}
 
 {% block main %}
@@ -125,6 +125,6 @@
     </div>
     <div>
         <a href="{{ payment.payment }}/edit" id="edit-button"><p>Edit</p></a>
-        <a href="/api/zis/payment/delete" id="delete-button"><p>Hapus</p></a>
+        <a href="{{ payment.payment }}/delete" id="delete-button"><p>Hapus</p></a>
     </div>
 {% endblock %}

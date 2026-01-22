@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>{% block title %}[UNTITLED]{% endblock %} - Hasanah</title>
+    <script type="application/json" id="data">{{ data | default('{}') | safe }}</script>
     <script type="module" src="/static/js/base.js"></script>
     {% block head %}{% endblock %}
 </head>

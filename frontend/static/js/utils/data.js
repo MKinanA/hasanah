@@ -1,0 +1,1 @@
+export const getData = () => JSON.parse(document.querySelector('script#data[type="application/json"]').textContent);

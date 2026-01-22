@@ -1,4 +1,6 @@
 import { leadingZeros } from '../utils/formatting.js';
+import { parseAllTimestamps } from '../utils/datetime.js';
+import { parseAllUsernameToName } from '../utils/username.js';
 
 const names = {};
 
@@ -13,5 +15,22 @@ document.addEventListener('DOMContentLoaded', () => {
             username: username,
         })}).then(resp => resp.json().then(body => ({status: resp.status, ...body}))).then(body => (Math.floor(body.status / 100) === 2) && (body.type === 'success') ? body.name : username);
         cell.textContent = await names[username];
+    });
+    parseAllTimestamps();
+    parseAllUsernameToName();
+    document.querySelector('#delete-button').addEventListener('click', async e => {
+        e.preventDefault();
+        document.querySelector('#delete-button').classList.add('loading');
+        if (!confirm('Hapus pembayaran ini?')) {
+            document.querySelector('#delete-button').classList.remove('loading');
+            return;
+        };
+        const resp = await fetch(document.querySelector('#delete-button').getAttribute('href'), {method: 'POST', body: JSON.stringify({})});
+        const body = await resp.json();
+        if ((Math.floor(resp.status / 100) === 2) && (body.type === 'success')) location.replace('.');
+        else {
+            alert(body.message ?? body.detail ?? 'Error');
+            document.querySelector('#delete-button').classList.remove('loading');
+        };
     });
 });

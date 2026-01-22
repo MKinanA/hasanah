@@ -1,11 +1,13 @@
-import {} from '../utils/auth.js';
 import { leadingZeros } from '../utils/formatting.js';
 import { parseAllTimestamps } from '../utils/datetime.js';
 import { parseAllUsernameToName } from '../utils/username.js';
+import { getData } from '../utils/data.js';
 
 const names = {};
 
 document.addEventListener('DOMContentLoaded', () => {
+    const data = getData();
+
     document.querySelectorAll('body > div > main > div#table > table > tbody > tr > td:is(:nth-child(2), :nth-child(4)) > p').forEach(cell => {
         const date = new Date(parseInt(cell.textContent) * 1000);
         cell.textContent = `${leadingZeros(date.getDate(), 2)}/${leadingZeros(date.getMonth() + 1, 2)}/${leadingZeros(date.getFullYear(), 2)} ${leadingZeros(date.getHours(), 2)}:${leadingZeros(date.getMinutes(), 2)}:${leadingZeros(date.getSeconds(), 2)}`
@@ -26,7 +28,9 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#delete-button').classList.remove('loading');
             return;
         };
-        const resp = await fetch(document.querySelector('#delete-button').getAttribute('href'), {method: 'POST', body: JSON.stringify({})});
+        const resp = await fetch(document.querySelector('#delete-button').getAttribute('href'), {method: 'POST', body: JSON.stringify({
+            uuid: data.payment.payment,
+        })});
         const body = await resp.json();
         if ((Math.floor(resp.status / 100) === 2) && (body.type === 'success')) location.replace('.');
         else {
