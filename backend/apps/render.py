@@ -29,7 +29,7 @@ async def process_context(context: dict, expose: 'list | tuple | str | None' = N
     if not 'data' in context: context['data'] = dumps(deepcopy({key: context[key] for key in (expose if isinstance(expose, (list, tuple)) else (expose,)) if key in context} if isinstance(expose, (list, tuple, str)) else {}))
     return context
 
-async def render(name: str, context: 'dict | None' = None, expose: 'list | tuple | str | None' = None, response: 'Response | None' = None) -> 'str | Response':
+async def render(name: str, context: 'dict | None' = None, expose: 'list | tuple | str | None' = None, status_code: 'int | None' = None) -> 'str | Response':
     context = await process_context(context or {}, expose)
     possible_names = (*(possible_name for possible_name in (
         name,
@@ -46,7 +46,6 @@ async def render(name: str, context: 'dict | None' = None, expose: 'list | tuple
             continue
         break
     if content is None: raise error if error is not None else RuntimeError('Failed to record error while attempting to get template file.')
-    if isinstance(response, Response):
-        response.media_type = 'text/html'
-        return content
-    else: return HTMLResponse(content)
+    response = HTMLResponse(content)
+    if isinstance(status_code, int): response.status_code = status_code
+    return response
