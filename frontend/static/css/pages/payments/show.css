@@ -8,6 +8,7 @@
 }
 
 body > div > main > div#main {
+    width: 100%;
     gap: calc(24 * var(--scaling-factor));
     padding: var(--section-padding);
     background: rgb(var(--bg-color-2));
@@ -100,6 +101,7 @@ body > div > main > div#main > div#table > table > tbody * {
 
 body > div > main > div#main > div:not(#table, .wrap-table) {
     gap: calc(8 * var(--scaling-factor));
+    width: 100%;
 }
 
 body > div > main > div#main > div:not(#table, .wrap-table) > :first-child {
@@ -152,6 +154,15 @@ body > div > main > div#main + div > div > table > tbody > tr > td:not(:first-ch
     user-select: text;
 }
 
+body > div > main > div#main + div > div > table > tbody > tr > td:not(:first-child, :nth-child(2)) > a:has(> p) {
+    display: inline-block;
+    width: min-content;
+}
+
+body > div > main > div#main + div > div > table > tbody > tr > td:not(:first-child, :nth-child(2)) > a > p {
+    width: max-content;
+}
+
 body > div > main a::after {
     content: '';
     position: absolute;
@@ -168,10 +179,10 @@ body > div > main a:focus-visible::after {
 }
 
 body > div > main > div#main + div + div:not(:has(> :not(a))) {
+    width: 100%;
     flex-direction: row;
     flex-wrap: wrap;
     gap: var(--main-padding);
-    margin-top: var(--main-padding);
 }
 
 body > div > main > div#main + div + div:not(:has(> :not(a))) * {
@@ -185,8 +196,9 @@ body > div > main > div#main + div + div:not(:has(> :not(a))) > * {
     padding: calc(8 * var(--scaling-factor)) calc(16 * var(--scaling-factor));
     justify-content: center;
     align-items: center;
-    width: 100%;
-    max-width: calc(256 * var(--scaling-factor));
+    flex-grow: 1;
+    min-width: min(100%, calc(256 * var(--scaling-factor)));
+    max-width: 100%;
     background: rgb(var(--bg-color-2));
     border-radius: calc(12 * var(--scaling-factor));
 }

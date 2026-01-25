@@ -22,7 +22,7 @@
                         <tr>
                             <td><p>Nomor</p></td>
                             <td><p>&colon;</p></td>
-                            <td><p>{{ payment.payer_number }}</p></td>
+                            <td><p>{{ payment.payer_number or '-' }}</p></td>
                         </tr>
                     </tbody>
                 </table>
@@ -33,7 +33,7 @@
                         <tr>
                             <td><p>Email</p></td>
                             <td><p>&colon;</p></td>
-                            <td><p>{{ payment.payer_email }}</p></td>
+                            <td><p>{{ payment.payer_email or '-' }}</p></td>
                         </tr>
                         <tr>
                             <td><p>Alamat</p></td>
@@ -60,9 +60,9 @@
                     <tr>
                         <td><p>{{ line.payer_name }}</p></td>
                         <td><p>{{ line.category }}</p></td>
-                        <td><p>{{ line.amount }}</p></td>
+                        <td><p>{{ (line.amount | int) if (line.amount | int) == line.amount else line.amount }}</p></td>
                         <td><p>{{ line.unit }}</p></td>
-                        <td><p>{{ line.note }}</p></td>
+                        <td><p>{{ line.note or '-' }}</p></td>
                     </tr>
                     {% endfor %}
                 </tbody>
