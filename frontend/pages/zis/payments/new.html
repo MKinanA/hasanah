@@ -1,0 +1,122 @@
+{% extends 'templates/page.html' %}
+
+{% block title %}Pembayaran - ZIS{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/css/pages/payments/new.css">
+    <script type="module" src="/static/js/payments/new.js"></script>
+{% endblock %}
+
+{% block main %}
+    <h2>Edit Pembayaran</h2>
+    <form action="">
+        <div id="main">
+            <div class="wrap-table">
+                <div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><p>Nama</p></td>
+                                <td><p>&colon;</p></td>
+                                <td><input type="text" name="payer_name" required></td>
+                            </tr>
+                            <tr>
+                                <td><p>Nomor</p></td>
+                                <td><p>&colon;</p></td>
+                                <td><input type="tel" name="payer_number"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><p>Email</p></td>
+                                <td><p>&colon;</p></td>
+                                <td><input type="email" name="payer_email"></td>
+                            </tr>
+                            <tr>
+                                <td><p>Alamat</p></td>
+                                <td><p>&colon;</p></td>
+                                <!-- <td><input type="text" name="payer_address"></td> -->
+                                <td><textarea name="payer_address" required></textarea></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><p>Nama</p></th>
+                            <th><p>Kategori</p></th>
+                            <th><p>Jumlah</p></th>
+                            <th><p>Satuan</p></th>
+                            <th><p>Catatan</p></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="line">
+                            <td><input type="text" name="line_payer_name" required></td>
+                            <td><select name="line_category" required>
+                                <option value="" disabled selected>Pilih kategori</option>
+                                {% for category in categories %}
+                                <option value="{{ category.value }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select></td>
+                            <td><input type="number" step="any" min="0" name="line_amount" required></td>
+                            <td><select name="line_unit" required>
+                                <option value="" disabled selected>Pilih satuan</option>
+                                {% for unit in units %}
+                                <option value="{{ unit.value }}">{{ unit.name }}</option>
+                                {% endfor %}
+                            </select></td>
+                            <td><input type="text" name="line_note"></td>
+                            <td><div>
+                                <div onclick="moveLineUp(this)">{% include 'components/svg/up.html' %}</div>
+                                <div onclick="moveLineDown(this)">{% include 'components/svg/down.html' %}</div>
+                                <div onclick="removeLine(this, event)">{% include 'components/svg/cross.html' %}</div>
+                                <div onclick="addLine(this, event)">{% include 'components/svg/plus.html' %}</div>
+                            </div></td>
+                        </tr>
+                        <tr class="line" id="line-template">
+                            <td><input type="text" name="line_payer_name" required disabled></td>
+                            <td><select name="line_category" required disabled>
+                                <option value="" disabled selected>Pilih kategori</option>
+                                {% for category in categories %}
+                                <option value="{{ category.value }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select></td>
+                            <td><input type="number" step="any" min="0" name="line_amount" required disabled></td>
+                            <td><select name="line_unit" required disabled>
+                                <option value="" disabled selected>Pilih satuan</option>
+                                {% for unit in units %}
+                                <option value="{{ unit.value }}">{{ unit.name }}</option>
+                                {% endfor %}
+                            </select></td>
+                            <td><input type="text" name="line_note" disabled></td>
+                            <td><div>
+                                <div onclick="moveLineUp(this)">{% include 'components/svg/up.html' %}</div>
+                                <div onclick="moveLineDown(this)">{% include 'components/svg/down.html' %}</div>
+                                <div onclick="removeLine(this, event)">{% include 'components/svg/cross.html' %}</div>
+                                <div onclick="addLine(this, event)">{% include 'components/svg/plus.html' %}</div>
+                            </div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <p>Catatan</p>
+                <textarea name="note"></textarea>
+            </div>
+        </div>
+        <div></div>
+        <div>
+            <button type="submit" id="save-button"><p>Simpan</p></button>
+            <button type="button" id="cancel-button"><p>Batal</p></button>
+        </div>
+    </form>
+{% endblock %}
