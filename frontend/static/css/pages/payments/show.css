@@ -178,20 +178,20 @@ body > div > main a:focus-visible::after {
     outline-color: currentColor;
 }
 
-body > div > main > div#main + div + div:not(:has(> :not(a))) {
+body > div > main > div#main + div + div:not(:has(> :not(a, button))) {
     width: 100%;
     flex-direction: row;
     flex-wrap: wrap;
     gap: var(--main-padding);
 }
 
-body > div > main > div#main + div + div:not(:has(> :not(a))) * {
+body > div > main > div#main + div + div:not(:has(> :not(a, button))) * {
     text-decoration: none;
     font-weight: 600;
     text-align: center;
 }
 
-body > div > main > div#main + div + div:not(:has(> :not(a))) > * {
+body > div > main > div#main + div + div:not(:has(> :not(a, button))) > * {
     display: flex;
     padding: calc(8 * var(--scaling-factor)) calc(16 * var(--scaling-factor));
     justify-content: center;
@@ -201,17 +201,18 @@ body > div > main > div#main + div + div:not(:has(> :not(a))) > * {
     max-width: 100%;
     background: rgb(var(--bg-color-2));
     border-radius: calc(12 * var(--scaling-factor));
+    cursor: pointer;
 }
 
-body > div > main > div#main + div + div:not(:has(> :not(a))) > #delete-button {
+body > div > main > div#main + div + div:not(:has(> :not(a, button))) > #delete-button {
     background: color-mix(in oklab, rgb(var(--bg-color)) 25%, red);
 }
 
-body > div > main > div#main + div + div:not(:has(> :not(a))) > #delete-button * {
+body > div > main > div#main + div + div:not(:has(> :not(a, button))) > #delete-button * {
     color: color-mix(in oklab, rgb(var(--fg-color)) 25%, rgb(var(--light)));
 }
 
-body > div > main > div#main + div + div:not(:has(> :not(a))) > #delete-button.loading::after {
+body > div > main > div#main + div + div:not(:has(> :not(a, button))) > #delete-button.loading::after {
     content: '';
     display: block;
     position: absolute;
