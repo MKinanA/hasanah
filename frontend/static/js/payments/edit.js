@@ -1,36 +1,77 @@
-import { leadingZeros } from '../utils/formatting.js';
 import { parseAllTimestamps } from '../utils/datetime.js';
 import { parseAllUsernameToName } from '../utils/username.js';
-
-const names = {};
+import { validate } from '../utils/zis-payment.js';
+import { getData } from '../utils/data.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('body > div > main > div#table > table > tbody > tr > td:is(:nth-child(2), :nth-child(4)) > p').forEach(cell => {
-        const date = new Date(parseInt(cell.textContent) * 1000);
-        cell.textContent = `${leadingZeros(date.getDate(), 2)}/${leadingZeros(date.getMonth() + 1, 2)}/${leadingZeros(date.getFullYear(), 2)} ${leadingZeros(date.getHours(), 2)}:${leadingZeros(date.getMinutes(), 2)}:${leadingZeros(date.getSeconds(), 2)}`
-    });
-    document.querySelectorAll('body > div > main > div#table > table > tbody > tr > td:is(:nth-child(3), :nth-child(5)) > p').forEach(async cell => {
-        const username = cell.textContent;
-        if (names[username] === undefined) names[username] = fetch('/api/user', {method: 'POST', body: JSON.stringify({
-            username: username,
-        })}).then(resp => resp.json().then(body => ({status: resp.status, ...body}))).then(body => (Math.floor(body.status / 100) === 2) && (body.type === 'success') ? body.name : username);
-        cell.textContent = await names[username];
-    });
+    const data = getData();
     parseAllTimestamps();
     parseAllUsernameToName();
-    document.querySelector('#delete-button').addEventListener('click', async e => {
+
+    document.querySelector('#cancel-button').addEventListener('click', () => location.href = '.');
+
+    document.querySelector('body > div > main > form').addEventListener('submit', async e => {
         e.preventDefault();
-        document.querySelector('#delete-button').classList.add('loading');
-        if (!confirm('Hapus pembayaran ini?')) {
-            document.querySelector('#delete-button').classList.remove('loading');
-            return;
+
+        const details = {
+            payer_name: document.querySelector('form :is(input, textarea, select)[name="payer_name"]:not(.line *)').value.trim(),
+            payer_number: document.querySelector('form :is(input, textarea, select)[name="payer_number"]:not(.line *)').value.trim(),
+            payer_email: document.querySelector('form :is(input, textarea, select)[name="payer_email"]:not(.line *)').value.trim(),
+            payer_address: document.querySelector('form :is(input, textarea, select)[name="payer_address"]:not(.line *)').value.trim(),
+            note: document.querySelector('form :is(input, textarea, select)[name="note"]:not(.line *)').value.trim(),
+            lines: [...document.querySelectorAll('form .line:has(:is(input, select, textarea):not([disabled])):not(#line-template)')].map(line => {
+                const data = {
+                    payer_name: line.querySelector(':is(input, textarea, select)[name="line_payer_name"]').value.trim(),
+                    category: line.querySelector(':is(input, textarea, select)[name="line_category"]').value.trim(),
+                    amount: Number(line.querySelector(':is(input, textarea, select)[name="line_amount"]').value),
+                    unit: line.querySelector(':is(input, textarea, select)[name="line_unit"]').value.trim(),
+                    note: line.querySelector(':is(input, textarea, select)[name="line_note"]').value.trim(),
+                }
+                if (data.note === '') delete data.note;
+                return data;
+            }),
         };
-        const resp = await fetch(document.querySelector('#delete-button').getAttribute('href'), {method: 'POST', body: JSON.stringify({})});
-        const body = await resp.json();
-        if ((Math.floor(resp.status / 100) === 2) && (body.type === 'success')) location.replace('.');
-        else {
-            alert(body.message ?? body.detail ?? 'Error');
-            document.querySelector('#delete-button').classList.remove('loading');
-        };
+        if (details.payer_number === '') delete details.payer_number;
+        if (details.payer_email === '') delete details.payer_email;
+        if (details.note === '') delete details.note;
+
+        const checks = validate(details);
+
+        document.querySelectorAll('form :is(input, textarea, select, button):not(#line-template *)').forEach(field => field.setAttribute('disabled', ''));
+        if (checks.length <= 0) {
+            if (confirm('Simpan?')) {
+                const resp = await fetch('/api/zis/payment/update', {method: 'POST', body: JSON.stringify({
+                    uuid: data.payment.payment,
+                    payment: details,
+                })});
+                const body = await resp.json();
+                if ((Math.floor(resp.status / 100) === 2) && (body.type === 'success')) {
+                    location.href = '.';
+                    return;
+                } else alert(body.message ?? body.detail ?? 'Terjadi error.');
+            };
+        } else alert(checks.map(check => `\n• ${check}`).join('\n'));
+        document.querySelectorAll('form :is(input, textarea, select, button):not(#line-template *)').forEach(field => field.removeAttribute('disabled'));
     });
 });
+
+window.addLine = (button, event) => {
+    const newLine = document.querySelector('#line-template:last-child').cloneNode(true);
+    newLine.id = '';
+    newLine.querySelectorAll(':is(input, select, textarea)').forEach(field => field.removeAttribute('disabled'));
+    button.closest('.line').insertAdjacentElement(event.shiftKey ? 'beforebegin' : 'afterend', newLine);
+};
+
+window.removeLine = (button, event) => ((document.querySelectorAll('.line:not(#line-template)').length > 1) && (event.shiftKey || confirm('Hapus baris ini?'))) ? button.closest('.line').remove() : undefined;
+
+window.moveLineUp = button => {
+    const line = button.closest('.line');
+    const previous = line.previousElementSibling;
+    if (previous !== null) previous.insertAdjacentElement('beforebegin', line);
+};
+
+window.moveLineDown = button => {
+    const line = button.closest('.line');
+    const next = line.nextElementSibling;
+    if (next !== null && next.id !== 'line-template') next.insertAdjacentElement('afterend', line);
+};

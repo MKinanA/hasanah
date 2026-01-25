@@ -8,21 +8,126 @@
 {% endblock %}
 
 {% block main %}
-    <h2>Pembayaran</h2>
-    <div id="main">
-        <div class="wrap-table">
+    <h2>Edit Pembayaran</h2>
+    <form action="">
+        <div id="main">
+            <div class="wrap-table">
+                <div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><p>Nama</p></td>
+                                <td><p>&colon;</p></td>
+                                <td><input type="text" name="payer_name" value="{{ payment.payer_name }}" required></td>
+                            </tr>
+                            <tr>
+                                <td><p>Nomor</p></td>
+                                <td><p>&colon;</p></td>
+                                <td><input type="tel" name="payer_number" value="{{ payment.payer_number or '' }}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td><p>Email</p></td>
+                                <td><p>&colon;</p></td>
+                                <td><input type="email" name="payer_email" value="{{ payment.payer_email or '' }}"></td>
+                            </tr>
+                            <tr>
+                                <td><p>Alamat</p></td>
+                                <td><p>&colon;</p></td>
+                                <!-- <td><input type="text" name="payer_address" value="{{ payment.payer_address }}"></td> -->
+                                <td><textarea name="payer_address" required>{{ payment.payer_address }}</textarea></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="table">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><p>Nama</p></th>
+                            <th><p>Kategori</p></th>
+                            <th><p>Jumlah</p></th>
+                            <th><p>Satuan</p></th>
+                            <th><p>Catatan</p></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for line in payment.lines %}
+                        <tr class="line">
+                            <td><input type="text" name="line_payer_name" value="{{ line.payer_name }}" required></td>
+                            <td><select name="line_category" required>
+                                <option value="" disabled>Pilih kategori</option>
+                                {% for category in categories %}
+                                <option value="{{ category.value }}" {% if line.category == category.value %}selected{% endif %}>{{ category.name }}</option>
+                                {% endfor %}
+                            </select></td>
+                            <td><input type="number" step="any" min="0" name="line_amount" value="{{ (line.amount | int) if (line.amount | int) == line.amount else line.amount }}" required></td>
+                            <td><select name="line_unit" required>
+                                <option value="" disabled>Pilih satuan</option>
+                                {% for unit in units %}
+                                <option value="{{ unit.value }}" {% if line.unit == unit.value %}selected{% endif %}>{{ unit.name }}</option>
+                                {% endfor %}
+                            </select></td>
+                            <td><input type="text" name="line_note" value="{{ line.note or '' }}"></td>
+                            <td><div>
+                                <div onclick="moveLineUp(this)">{% include 'components/svg/up.html' %}</div>
+                                <div onclick="moveLineDown(this)">{% include 'components/svg/down.html' %}</div>
+                                <div onclick="removeLine(this, event)">{% include 'components/svg/cross.html' %}</div>
+                                <div onclick="addLine(this, event)">{% include 'components/svg/plus.html' %}</div>
+                            </div></td>
+                        </tr>
+                        {% endfor %}
+                        <tr class="line" id="line-template">
+                            <td><input type="text" name="line_payer_name" required disabled></td>
+                            <td><select name="line_category" required disabled>
+                                <option value="" disabled selected>Pilih kategori</option>
+                                {% for category in categories %}
+                                <option value="{{ category.value }}">{{ category.name }}</option>
+                                {% endfor %}
+                            </select></td>
+                            <td><input type="number" step="any" min="0" name="line_amount" required disabled></td>
+                            <td><select name="line_unit" required disabled>
+                                <option value="" disabled selected>Pilih satuan</option>
+                                {% for unit in units %}
+                                <option value="{{ unit.value }}">{{ unit.name }}</option>
+                                {% endfor %}
+                            </select></td>
+                            <td><input type="text" name="line_note" disabled></td>
+                            <td><div>
+                                <div onclick="moveLineUp(this)">{% include 'components/svg/up.html' %}</div>
+                                <div onclick="moveLineDown(this)">{% include 'components/svg/down.html' %}</div>
+                                <div onclick="removeLine(this, event)">{% include 'components/svg/cross.html' %}</div>
+                                <div onclick="addLine(this, event)">{% include 'components/svg/plus.html' %}</div>
+                            </div></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <p>Catatan</p>
+                <textarea name="note">{{ payment.note or '' }}</textarea>
+            </div>
+        </div>
+        <div>
             <div>
                 <table>
                     <tbody>
                         <tr>
-                            <td><p>Nama</p></td>
+                            <td><p>UUID</p></td>
                             <td><p>&colon;</p></td>
-                            <td><p>{{ payment.payer_name }}</p></td>
+                            <td><p>{{ payment.payment }}</p></td>
                         </tr>
                         <tr>
-                            <td><p>Nomor</p></td>
+                            <td><p>Versi</p></td>
                             <td><p>&colon;</p></td>
-                            <td><p>{{ payment.payer_number }}</p></td>
+                            <td><a href="{{ payment.payment }}/versions"><p>{{ payment.version }}</p></a></td>
                         </tr>
                     </tbody>
                 </table>
@@ -31,100 +136,38 @@
                 <table>
                     <tbody>
                         <tr>
-                            <td><p>Email</p></td>
+                            <td><p>Dibuat pada</p></td>
                             <td><p>&colon;</p></td>
-                            <td><p>{{ payment.payer_email }}</p></td>
+                            <td><p class="timestamp">{{ payment.created_at }}</p></td>
                         </tr>
                         <tr>
-                            <td><p>Alamat</p></td>
+                            <td><p>Dibuat oleh</p></td>
                             <td><p>&colon;</p></td>
-                            <td><p>{{ payment.payer_address }}</p></td>
+                            <td><a href="/users/{{ payment.created_by }}"><p class="username">{{ payment.created_by }}</p></a></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div>
+                <table>
+                    <tbody>
+                        <tr>
+                            <td><p>Diedit pada</p></td>
+                            <td><p>&colon;</p></td>
+                            <td><p class="timestamp">{{ payment.updated_at }}</p></td>
+                        </tr>
+                        <tr>
+                            <td><p>Diedit oleh</p></td>
+                            <td><p>&colon;</p></td>
+                            <td><a href="/users/{{ payment.updated_by }}"><p class="username">{{ payment.updated_by }}</p></a></td>
                         </tr>
                     </tbody>
                 </table>
             </div>
         </div>
-        <div id="table">
-            <table>
-                <thead>
-                    <tr>
-                        <th><p>Nama</p></th>
-                        <th><p>Kategori</p></th>
-                        <th><p>Jumlah</p></th>
-                        <th><p>Satuan</p></th>
-                        <th><p>Catatan</p></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for line in payment.lines %}
-                    <tr>
-                        <td><p>{{ line.payer_name }}</p></td>
-                        <td><p>{{ line.category }}</p></td>
-                        <td><p>{{ line.amount }}</p></td>
-                        <td><p>{{ line.unit }}</p></td>
-                        <td><p>{{ line.note }}</p></td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
         <div>
-            <p>Catatan</p>
-            <p>{{ payment.note or '-' }}</p>
+            <button type="submit" id="save-button"><p>Simpan</p></button>
+            <button type="button" id="cancel-button"><p>Batal</p></button>
         </div>
-    </div>
-    <div>
-        <div>
-            <table>
-                <tbody>
-                    <tr>
-                        <td><p>UUID</p></td>
-                        <td><p>&colon;</p></td>
-                        <td><p>{{ payment.payment }}</p></td>
-                    </tr>
-                    <tr>
-                        <td><p>Versi</p></td>
-                        <td><p>&colon;</p></td>
-                        <td><a href="{{ payment.payment }}/versions"><p>{{ payment.version }}</p></a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div>
-            <table>
-                <tbody>
-                    <tr>
-                        <td><p>Dibuat pada</p></td>
-                        <td><p>&colon;</p></td>
-                        <td><p class="timestamp">{{ payment.created_at }}</p></td>
-                    </tr>
-                    <tr>
-                        <td><p>Dibuat oleh</p></td>
-                        <td><p>&colon;</p></td>
-                        <td><a href="/users/{{ payment.created_by }}"><p class="username">{{ payment.created_by }}</p></a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-        <div>
-            <table>
-                <tbody>
-                    <tr>
-                        <td><p>Diedit pada</p></td>
-                        <td><p>&colon;</p></td>
-                        <td><p class="timestamp">{{ payment.updated_at }}</p></td>
-                    </tr>
-                    <tr>
-                        <td><p>Diedit oleh</p></td>
-                        <td><p>&colon;</p></td>
-                        <td><a href="/users/{{ payment.updated_by }}"><p class="username">{{ payment.updated_by }}</p></a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-    <div>
-        <a href="{{ payment.payment }}/edit" id="edit-button"><p>Edit</p></a>
-        <a href="{{ payment.payment }}/delete" id="delete-button"><p>Hapus</p></a>
-    </div>
+    </form>
 {% endblock %}
