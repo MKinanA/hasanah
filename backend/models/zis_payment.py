@@ -54,7 +54,7 @@ class Payment:
             return [cls(row['uuid'], row['id']) for row in rows]
 
     @classmethod
-    async def query(cls, filters: 'dict | None' = None, include_deleted: bool = False, only_deleted: bool = False, sort: str = 'last_updated', limit: int = 100, offset: int = 0) -> 'list[Payment]':
+    async def query(cls, filters: 'dict | None' = None, include_deleted: bool = False, only_deleted: bool = False, sort: str = 'last_updated', limit: int = -1, offset: int = 0) -> 'list[Payment]':
         order_by = {
             'last_updated': 'pv.created_at DESC',
             'last_created': 'fv.created_at DESC',
@@ -101,7 +101,7 @@ class Payment:
             f"{('WHERE ' + where + ' ') if where else ''}"
             'ORDER BY ' + order_by + ' '
             'LIMIT ? OFFSET ?',
-            (*(parameter for parameters in nested_parameters for parameter in parameters), limit if (limit := int(limit)) >= 0 else 0, offset if (offset := int(offset)) >= 0 else 0)
+            (*(parameter for parameters in nested_parameters for parameter in parameters), limit, offset)
         )
 
         async with db_connect() as conn:
