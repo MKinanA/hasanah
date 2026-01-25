@@ -55,22 +55,22 @@ body {
     background: rgb(var(--bg-color));
 }
 
-input:focus {
+:is(input, select, textarea):focus {
     outline-offset: calc(0 * var(--scaling-factor));
     outline-width: calc(2 * var(--scaling-factor));
     outline-color: rgb(var(--fg-color-2));
 }
 
 :is(h1, h2, h3, h4, h5, h6, p, span) > a[href] {
-    color: color-mix(in srgb, rgb(var(--fg-color)), rgb(0, 0, 255));
+    color: color-mix(in oklab, rgb(var(--fg-color)), rgb(0, 0, 255));
     font-weight: 600;
 }
 
 :is(h1, h2, h3, h4, h5, h6, p, span) > a[href]:focus {
-    background: color-mix(in srgb, rgb(var(--bg-color)), rgb(0, 0, 255) 25%);
+    background: color-mix(in oklab, rgb(var(--bg-color)), rgb(0, 0, 255) 25%);
 }
 
-:is(button, a[href]):active, :not(input, a):focus {
+:is(button, a[href]):active, :not(input, select, textarea, a):focus-visible {
     filter: brightness(75%);
 }
 
