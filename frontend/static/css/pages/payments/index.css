@@ -68,3 +68,15 @@ body > div > main > div#table > table > tbody > tr > td:first-child > a[href]:em
     inset: 0;
     z-index: 1;
 }
+
+body > div > main > a#new-button {
+    display: block;
+    width: calc(40 * var(--scaling-factor));
+    height: calc(40 * var(--scaling-factor));
+    background: rgb(var(--bg-color-2));
+    border-radius: calc(10 * var(--scaling-factor));
+    box-shadow: 0 0 calc(calc(8 * var(--scaling-factor))) calc(calc(4 * var(--scaling-factor))) rgb(var(--bg-color));
+    position: fixed;
+    top: var(--y-padding);
+    right: var(--x-padding);
+}
