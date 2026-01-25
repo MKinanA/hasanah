@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 })});
                 const body = await resp.json();
                 if ((Math.floor(resp.status / 100) === 2) && (body.type === 'success')) {
-                    location.href = `./${body.uuid}`;
+                    location.href = `${body.uuid}`;
                     return;
                 } else alert(body.message ?? body.detail ?? 'Terjadi error.');
             };
