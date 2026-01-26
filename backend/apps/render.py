@@ -22,7 +22,7 @@ async def process_context(context: dict, expose: 'list | tuple | str | None' = N
         {
             **nav_menu_template(None, 'sack', 'ZIS'),
             'submenus': noneless((
-                nav_menu_template('/zis/payments', 'in', 'Payments'),
+                nav_menu_template('/zis/payments', 'in', 'Pembayaran'),
             )),
         } if (await user.has_access(Access.ZIS_PAYMENT_READ)) else None,
     ))
