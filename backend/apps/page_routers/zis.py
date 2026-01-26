@@ -1,6 +1,9 @@
+from io import BytesIO
+from time import time
 from fastapi import APIRouter, Request, Response
-from fastapi.responses import RedirectResponse
-from ...models.user import Access
+from fastapi.responses import RedirectResponse, StreamingResponse
+from openpyxl import Workbook
+from ...models.user import User, Access
 from ...models.zis_payment import Payment, PaymentCategory, PaymentUnit
 from ..dependencies import auth, NoAuthToken, UserSessionNotFound
 from ..render import render
@@ -18,6 +21,86 @@ async def payments_index(request: Request):
     except (NoAuthToken, UserSessionNotFound): return RedirectResponse(url='/login', status_code=302)
     except Access.AccessDenied: return RedirectResponse(url='/home', status_code=302)
     return await render('pages/zis/payments', {'user': user, 'payments': [(await (await payment.latest).to_dict) for payment in await Payment.query()]}, expose='payments')
+
+@router.get('/payments/export-xlsx')
+async def payments_xlsx(request: Request):
+    try:
+        user = await auth(request)
+        await user.require_access(Access.ZIS_PAYMENT_READ)
+    except (NoAuthToken, UserSessionNotFound): return RedirectResponse(url='/login', status_code=302)
+    except Access.AccessDenied: return RedirectResponse(url='/home', status_code=302)
+    wb = Workbook()
+    ws = wb.active
+    if ws is None: raise RuntimeError('Failed to get active sheet of workbook object (using openpyxl).')
+    ws.title = 'Pembayaran Zakat'
+    ws.append((
+        'Nomor',
+        'Nama pembayar',
+        'No. Telp.',
+        'Email',
+        'Alamat',
+        'Nama',
+        'Kategori',
+        'Jumlah',
+        'Satuan',
+        'Catatan',
+        'Catatan pembayar',
+        'Dibuat pada',
+        'Dibuat oleh',
+        'Terakhir diedit pada',
+        'Terakhir diedit oleh',
+        'UUID pembayaran',
+    ))
+    counter = 0
+    users = {}
+    for payment in await Payment.query():
+        counter += 1
+        payment = await (await payment.latest).to_dict
+        created_by = users[username] if (username := payment['created_by']) in users else (await User.get(username=username))
+        if username not in users: users[username] = created_by
+        updated_by = users[username] if (username := payment['updated_by']) in users else (await User.get(username=username))
+        if username not in users: users[username] = updated_by
+        ws.append((*(f'\'x' if isinstance(x, str) and x.startswith('=') else x for x in (
+            counter,
+            payment['payer_name'],
+            payment['payer_number'],
+            payment['payer_email'],
+            payment['payer_address'],
+            payment['lines'][0]['payer_name'],
+            payment['lines'][0]['category'],
+            payment['lines'][0]['amount'],
+            payment['lines'][0]['unit'],
+            payment['lines'][0]['note'],
+            payment['note'],
+            payment['created_at'],
+            f'{created_by.name} ({created_by.username})' if created_by is not None else '[Gagal mendapatkan informasi user]',
+            payment['updated_at'],
+            f'{updated_by.name} ({updated_by.username})' if updated_by is not None else '[Gagal mendapatkan informasi user]',
+            payment['payment'],
+        )),))
+        for line in payment['lines'][1:]:
+            ws.append((*(f'\'x' if isinstance(x, str) and x.startswith('=') else x for x in (
+                *(None,) * 5,
+                line['payer_name'],
+                line['category'],
+                line['amount'],
+                line['unit'],
+                line['note'],
+            )),))
+        for col in (*range(1, 6), *range(11, 17)):
+            if len(payment['lines']) > 1: ws.merge_cells(
+                start_row=ws.max_row - len(payment['lines']) + 1,
+                start_column=col,
+                end_row=ws.max_row,
+                end_column=col,
+            )
+    wb.save(buffer := BytesIO())
+    buffer.seek(0)
+    return StreamingResponse(
+        buffer,
+        media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={'Content-Disposition': f'attachment; filename=Export_Pembayaran_ZIS_{int(time())}.xlsx'}
+    )
 
 @router.get('/payments/new')
 async def payment_new(request: Request, response: Response):
