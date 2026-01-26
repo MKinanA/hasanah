@@ -205,11 +205,11 @@ body > div > main > div#main + div + div:not(:has(> :not(a, button))) > * {
 }
 
 body > div > main > div#main + div + div:not(:has(> :not(a, button))) > #delete-button {
-    background: color-mix(in oklab, rgb(var(--bg-color)) 25%, red);
+    background: red;
 }
 
 body > div > main > div#main + div + div:not(:has(> :not(a, button))) > #delete-button * {
-    color: color-mix(in oklab, rgb(var(--fg-color)) 25%, rgb(var(--light)));
+    color: rgb(var(--light));
 }
 
 body > div > main > div#main + div + div:not(:has(> :not(a, button))) > #delete-button.loading::after {

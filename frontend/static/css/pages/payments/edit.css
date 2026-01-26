@@ -306,11 +306,11 @@ body > div > main > form > div#main + div + div:not(:has(> :not(button))) > * {
 }
 
 body > div > main > form > div#main + div + div:not(:has(> :not(button))) > #save-button {
-    background: color-mix(in oklab, rgb(var(--bg-color)) 25%, green);
+    background: green;
 }
 
 body > div > main > form > div#main + div + div:not(:has(> :not(button))) > #save-button * {
-    color: color-mix(in oklab, rgb(var(--fg-color)) 25%, rgb(var(--light)));
+    color: rgb(var(--light));
 }
 
 body > div > main > form > div#main + div + div:not(:has(> :not(button))) > #save-button:disabled::after {
@@ -331,9 +331,9 @@ body > div > main > form > div#main + div + div:not(:has(> :not(button))) > #sav
 }
 
 body > div > main > form > div#main + div + div:not(:has(> :not(button))) > #cancel-button {
-    background: color-mix(in oklab, rgb(var(--bg-color)) 25%, red);
+    background: red;
 }
 
 body > div > main > form > div#main + div + div:not(:has(> :not(button))) > #cancel-button * {
-    color: color-mix(in oklab, rgb(var(--fg-color)) 25%, rgb(var(--light)));
+    color: rgb(var(--light));
 }
