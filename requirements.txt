@@ -8,3 +8,4 @@ lxml
 aiosqlite
 aiofiles
 jinja2
+openpyxl
