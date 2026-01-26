@@ -1,5 +1,6 @@
 from io import BytesIO
 from time import time
+from datetime import datetime
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import RedirectResponse, StreamingResponse
 from openpyxl import Workbook
@@ -72,21 +73,24 @@ async def payments_xlsx(request: Request):
             payment['lines'][0]['unit'],
             payment['lines'][0]['note'],
             payment['note'],
-            payment['created_at'],
+            datetime.fromtimestamp(payment['created_at']),
             f'{created_by.name} ({created_by.username})' if created_by is not None else '[Gagal mendapatkan informasi user]',
-            payment['updated_at'],
+            datetime.fromtimestamp(payment['updated_at']),
             f'{updated_by.name} ({updated_by.username})' if updated_by is not None else '[Gagal mendapatkan informasi user]',
             payment['payment'],
         )),))
-        for line in payment['lines'][1:]:
-            ws.append((*(f'\'x' if isinstance(x, str) and x.startswith('=') else x for x in (
-                *(None,) * 5,
-                line['payer_name'],
-                line['category'],
-                line['amount'],
-                line['unit'],
-                line['note'],
-            )),))
+        for col in (12, 14): ws.cell(
+            row=ws.max_row,
+            column=col,
+        ).number_format = 'dd/mm/yyyy hh:mm:ss'
+        for line in payment['lines'][1:]: ws.append((*(f'\'x' if isinstance(x, str) and x.startswith('=') else x for x in (
+            *(None,) * 5,
+            line['payer_name'],
+            line['category'],
+            line['amount'],
+            line['unit'],
+            line['note'],
+        )),))
         for col in (*range(1, 6), *range(11, 17)):
             if len(payment['lines']) > 1: ws.merge_cells(
                 start_row=ws.max_row - len(payment['lines']) + 1,
