@@ -68,9 +68,9 @@ async def payments_xlsx(request: Request):
             payment['payer_email'],
             payment['payer_address'],
             payment['lines'][0]['payer_name'],
-            payment['lines'][0]['category'],
+            payment['lines'][0]['category'].capitalize(),
             payment['lines'][0]['amount'],
-            payment['lines'][0]['unit'],
+            payment['lines'][0]['unit'].capitalize(),
             payment['lines'][0]['note'],
             payment['note'],
             datetime.fromtimestamp(payment['created_at']),
@@ -86,9 +86,9 @@ async def payments_xlsx(request: Request):
         for line in payment['lines'][1:]: ws.append((*(f'\'x' if isinstance(x, str) and x.startswith('=') else x for x in (
             *(None,) * 5,
             line['payer_name'],
-            line['category'],
+            line['category'].capitalize(),
             line['amount'],
-            line['unit'],
+            line['unit'].capitalize(),
             line['note'],
         )),))
         for col in (*range(1, 6), *range(11, 17)):
