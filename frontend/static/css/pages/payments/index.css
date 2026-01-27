@@ -69,14 +69,32 @@ body > div > main > div#table > table > tbody > tr > td:first-child > a[href]:em
     z-index: 1;
 }
 
-body > div > main > a#new-button {
+body > div > main > div:last-child:not(:has(> :not(a))) {
+    flex-direction: row;
+    justify-content: end;
+    gap: calc(24 * var(--scaling-factor));
+    width: 100%;
+    position: sticky;
+    bottom: var(--y-padding);
+    z-index: 1;
+    pointer-events: none;
+}
+
+body > div > main > div:last-child:not(:has(> :not(a))) > a {
     display: block;
+    z-index: 2;
+    pointer-events: all;
     width: calc(40 * var(--scaling-factor));
     height: calc(40 * var(--scaling-factor));
     background: rgb(var(--bg-color-2));
     border-radius: calc(10 * var(--scaling-factor));
-    box-shadow: 0 0 calc(calc(8 * var(--scaling-factor))) calc(calc(4 * var(--scaling-factor))) rgb(var(--bg-color));
-    position: fixed;
-    top: var(--y-padding);
-    right: var(--x-padding);
+    box-shadow: 0 0 calc(calc(12 * var(--scaling-factor))) calc(calc(12 * var(--scaling-factor))) rgb(var(--bg-color));
+}
+
+body > div > main > div:last-child:not(:has(> :not(a))) > a:active {
+    box-shadow: none;
+}
+
+body > div > main > div:last-child:not(:has(> :not(a))) > a > svg:not(.plus) {
+    margin: calc(8 * var(--scaling-factor));
 }
