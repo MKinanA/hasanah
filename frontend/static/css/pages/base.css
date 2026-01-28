@@ -35,7 +35,8 @@ body::before {
     height: 100vh;
     width: 100vw;
     z-index: 15;
-    background: rgba(var(--darkest), 50%);
+    pointer-events: none;
+    background: transparent;
 }
 
 :root:not(:has(body header)) > body::before {
@@ -67,9 +68,9 @@ body > header:not(:is(:hover, :has(:focus))) {
     overflow-y: hidden;
 }
 
-body:has(> header:not(:is(:hover, :has(:focus))))::before {
-    pointer-events: none;
-    background: transparent
+body:has(> header:is(:hover, :focus-within))::before {
+    pointer-events: all;
+    background: rgba(var(--darkest), 50%);
 }
 
 body > header:is(:hover, :has(:focus)) {
