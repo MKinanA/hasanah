@@ -1,6 +1,6 @@
 from copy import deepcopy
 from json import dumps
-from fastapi.responses import Response, HTMLResponse
+from fastapi.responses import HTMLResponse
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound, select_autoescape
 from ..models.user import User, Access
 from ..helpers.get_package_path import get_package_path
@@ -29,7 +29,7 @@ async def process_context(context: dict, expose: 'list | tuple | str | None' = N
     if not 'data' in context: context['data'] = dumps(deepcopy({key: context[key] for key in (expose if isinstance(expose, (list, tuple)) else (expose,)) if key in context} if isinstance(expose, (list, tuple, str)) else {}))
     return context
 
-async def render(name: str, context: 'dict | None' = None, expose: 'list | tuple | str | None' = None, status_code: 'int | None' = None) -> 'str | Response':
+async def render(name: str, context: 'dict | None' = None, expose: 'list | tuple | str | None' = None, status_code: 'int | None' = None) -> HTMLResponse:
     context = await process_context(context or {}, expose)
     possible_names = (*(possible_name for possible_name in (
         name,

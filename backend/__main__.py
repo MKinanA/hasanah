@@ -3,7 +3,7 @@ from uvicorn import run as uvicorn_run
 from .helpers.db_connect import db_connect
 from .helpers.log import log
 from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
 from .apps.api import api
 from fastapi.staticfiles import StaticFiles
 from jinja2 import TemplateNotFound
@@ -11,11 +11,19 @@ from .helpers.get_package_path import get_package_path
 from .helpers.api_response import api_response as mkresp
 from .run_schema_and_seed import run_schema_and_seed
 from .apps.pages import pages, FRONTEND_DIRECTORY
+from .apps.render import render
+from .apps.dependencies import auth
 
 app = FastAPI()
 
 @app.exception_handler(Exception)
 async def exception_handler(request: Request, exc: BaseException) -> JSONResponse: return JSONResponse(status_code=getattr(exc, 'status_code', 500), content=mkresp('error', type(exc).__name__, 'Can\'t find the template.' if isinstance(exc, TemplateNotFound) else str(exc)))
+
+@app.exception_handler(404)
+async def not_found(request: Request, exc: BaseException) -> HTMLResponse:
+    try: user = await auth(request)
+    except: RedirectResponse(url='/home', status_code=302)
+    return await render('pages/error', {'code': '404', 'error': 'Tidak Ditemukan', 'user': user}, status_code=404)
 
 app.include_router(pages)
 app.include_router(api, prefix='/api')
