@@ -14,7 +14,6 @@ body > div > main > div > a {
     height: calc(64 * var(--scaling-factor));
     padding: calc(8 * var(--scaling-factor));
     border-radius: calc(8 * var(--scaling-factor));
-    flex-grow: 1;
     background: rgb(var(--bg-color-2));
     text-decoration: none;
     gap: calc(8 * var(--scaling-factor));
