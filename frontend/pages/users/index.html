@@ -1,0 +1,23 @@
+{% extends 'templates/page.html' %}
+
+{% block title %}User - ZIS{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/css/pages/users/index.css">
+    <script type="module" src="/static/js/users/index.js"></script>
+{% endblock %}
+
+{% block main %}
+    <h2>Daftar User</h2>
+    <div>
+        {% for user in users %}
+            <a href="users/{{ user.username }}">
+                <div>{% include 'components/svg/user.html' %}</div>
+                <div>
+                    <h3>{{ user.name }}</h3>
+                    <p>{{ user.username }}</p>
+                </div>
+            </a>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,54 @@
+@import '../base.css';
+
+body > div > main > div {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(calc(256 * var(--scaling-factor)), 100%), 1fr));
+    gap: calc(8 * var(--scaling-factor));
+}
+
+body > div > main > div > a {
+    display: flex;
+    flex-direction: row;
+    justify-content: start;
+    align-items: center;
+    height: calc(64 * var(--scaling-factor));
+    padding: calc(8 * var(--scaling-factor));
+    border-radius: calc(8 * var(--scaling-factor));
+    flex-grow: 1;
+    background: rgb(var(--bg-color-2));
+    text-decoration: none;
+    gap: calc(8 * var(--scaling-factor));
+}
+
+body > div > main > div > a > div:has(> svg:only-child) {
+    aspect-ratio: 1 / 1;
+    height: 100%;
+    padding: calc(8 * var(--scaling-factor));
+}
+
+body > div > main > div > a > div:not(:has(> svg:only-child)) {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: start;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+body > div > main > div > a > div:not(:has(> svg:only-child)) > * {
+    line-height: normal;
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+body > div > main > div > a > div:not(:has(> svg:only-child)) > h3 {
+    font-size: calc(20 * var(--scaling-factor));
+}
+
+body > div > main > div > a > div:not(:has(> svg:only-child)) > p {
+    font-size: calc(16 * var(--scaling-factor));
+    color: rgb(var(--fg-color-2));
+}
