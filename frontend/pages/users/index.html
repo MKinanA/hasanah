@@ -10,12 +10,12 @@
 {% block main %}
     <h2>Daftar User</h2>
     <div>
-        {% for user in users %}
-            <a href="users/{{ user.username }}">
+        {% for target_user in users %}
+            <a href="users/{{ target_user.username }}" {% if user.username == target_user.username %}id="you"{% endif %}>
                 <div>{% include 'components/svg/user.html' %}</div>
                 <div>
-                    <h3>{{ user.name }}</h3>
-                    <p>{{ user.username }}</p>
+                    <h3>{{ target_user.name }}</h3>
+                    <p>{{ target_user.username }}</p>
                 </div>
             </a>
         {% endfor %}

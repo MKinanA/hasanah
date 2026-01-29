@@ -20,6 +20,22 @@ body > div > main > div > a {
     gap: calc(8 * var(--scaling-factor));
 }
 
+body > div > main > div > a#you::after {
+    content: 'Anda';
+    position: absolute;
+    top: calc(-2 * var(--scaling-factor));
+    right: calc(-2 * var(--scaling-factor));
+    height: max-content;
+    width: max-content;
+    color: rgb(var(--bg-color));
+    background: rgb(var(--fg-color));   
+    border-radius: calc(4 * var(--scaling-factor)) calc(8 * var(--scaling-factor));
+    padding: calc(2 * var(--scaling-factor)) calc(4 * var(--scaling-factor));
+    line-height: normal;
+    font-size: calc(12 * var(--scaling-factor));
+    font-weight: 500;
+}
+
 body > div > main > div > a > div:has(> svg:only-child) {
     aspect-ratio: 1 / 1;
     height: 100%;
