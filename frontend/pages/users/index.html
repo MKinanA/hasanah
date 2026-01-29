@@ -11,7 +11,7 @@
     <h2>Daftar User</h2>
     <div>
         {% for target_user in users %}
-            <a href="users/{{ target_user.username }}" {% if user.username == target_user.username %}id="you"{% endif %}>
+            <a href="users/{{ target_user.username }}" {% if user.username == target_user.username %}id="you" data-label="Anda"{% endif %}>
                 <div>{% include 'components/svg/user.html' %}</div>
                 <div>
                     <h3>{{ target_user.name }}</h3>
