@@ -1,6 +1,6 @@
 {% extends 'templates/page.html' %}
 
-{% block title %}{{ 'Profil Anda' if user.username == target_user.username else target_user.name }}{% endblock %}
+{% block title %}{{ target_user.name }}{% endblock %}
 
 {% block head %}
     <link rel="stylesheet" href="/static/css/pages/users/show.css">
@@ -8,11 +8,11 @@
 {% endblock %}
 
 {% block main %}
-    <div {% if user.username == target_user.username %}id="you" data-label="Anda"{% endif %}>{% include 'components/svg/user.html' %}</div>
+    <div {% if user is defined and user.username == target_user.username %}id="you" data-label="Anda"{% endif %}>{% include 'components/svg/user.html' %}</div>
     <h2>{{ target_user.name }}</h2>
     <p>{{ target_user.username }}</p>
-    <a href="{{ target_user.username }}/accesses"><p>Akses</p></a>
-    {% if user.username == target_user.username %}
-    <a href="/logout"><p>Logout</p></a>
+    {% if user is defined %}
+    {% if (show_admin_options | default(false)) or user.username == target_user.username %}<a href="{{ target_user.username }}/accesses"><p>Akses</p></a>{% endif %}
+    {% if user.username == target_user.username %}<a href="/logout"><p>Logout</p></a>{% endif %}
     {% endif %}
 {% endblock %}
