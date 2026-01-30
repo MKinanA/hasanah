@@ -27,7 +27,7 @@ body > div > main > div > a#you::after {
     height: max-content;
     width: max-content;
     color: rgb(var(--bg-color));
-    background: rgb(var(--fg-color));   
+    background: rgb(var(--fg-color));
     border-radius: calc(4 * var(--scaling-factor)) calc(8 * var(--scaling-factor));
     padding: calc(2 * var(--scaling-factor)) calc(4 * var(--scaling-factor));
     line-height: normal;
