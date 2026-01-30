@@ -20,7 +20,7 @@ body > div > main > div > a {
 }
 
 body > div > main > div > a#you::after {
-    content: attr(data-label, 'Anda');
+    content: attr(data-label, 'You');
     position: absolute;
     top: calc(-2 * var(--scaling-factor));
     right: calc(-2 * var(--scaling-factor));
