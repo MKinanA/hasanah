@@ -1,0 +1,74 @@
+@import '../base.css';
+
+body > div > main {
+    align-items: center;
+}
+
+body > div > main > * {
+    width: unset;
+    text-align: center;
+    line-height: 100%;
+}
+
+body > div > main > div:has(> svg:only-child) {
+    aspect-ratio: 1 / 1;
+    height: calc(96 * var(--scaling-factor));
+    padding: calc(16 * var(--scaling-factor));
+    background: rgb(var(--bg-color-2));
+    border-radius: 100%;
+}
+
+body > div > main > div:has(> svg:only-child)#you::after {
+    content: attr(data-label, 'You');
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translate(-50%, 50%);
+    height: max-content;
+    width: max-content;
+    color: rgb(var(--bg-color));
+    background: rgb(var(--fg-color));
+    border-radius: 100vmax;
+    padding: calc(2 * var(--scaling-factor)) calc(4 * var(--scaling-factor));
+    line-height: normal;
+    font-size: calc(12 * var(--scaling-factor));
+    font-weight: 500;
+}
+
+body > div > main > :is(h2, p) {
+    user-select: text;
+}
+
+body > div > main > h2:first-of-type:has(+ p) {
+    margin-bottom: calc(-4 * var(--scaling-factor));
+}
+
+body > div > main > p:is(h2:first-of-type + p) {
+    margin-top: calc(-4 * var(--scaling-factor));
+}
+
+body > div > main > a {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: calc(8 * var(--scaling-factor));
+    height: calc(48 * var(--scaling-factor));
+    width: 100%;
+    padding: calc(16 * var(--scaling-factor));
+    border-radius: calc(8 * var(--scaling-factor));
+    background: rgb(var(--bg-color-2));
+    text-decoration: none;
+}
+
+body > div > main > a::after {
+    content: '⟩';
+    font-size: calc(16 * var(--scaling-factor));
+    line-height: normal;
+}
+
+body > div > main > a > * {
+    flex-grow: 1;
+    text-align: start;
+    line-height: 100%;
+}
