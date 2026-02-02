@@ -62,6 +62,7 @@ async def payments_xlsx(request: Request):
         if username not in users: users[username] = created_by
         updated_by = users[username] if (username := payment['updated_by']) in users else (await User.get(username=username))
         if username not in users: users[username] = updated_by
+        ws.append(())
         ws.append((*(f'\'x' if isinstance(x, str) and x.startswith('=') else x for x in (
             counter,
             payment['payer_name'],
