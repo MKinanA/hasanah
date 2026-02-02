@@ -2,6 +2,7 @@ from io import BytesIO
 from time import time
 from datetime import datetime
 from random import Random
+from colorsys import hls_to_rgb
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import RedirectResponse, StreamingResponse
 from openpyxl import Workbook, styles
@@ -91,15 +92,13 @@ async def payments_xlsx(request: Request):
         for col in (
             {'col': 14, 'username': created_by.username if created_by is not None else ''},
             {'col': 16, 'username': updated_by.username if updated_by is not None else ''},
-        ):
-            (to_style := ws.cell(
-                row=ws.max_row,
-                column=col['col'],
-            )).fill = styles.PatternFill(
-                start_color=(lambda x: f'{Random(f"r{x}").randint(0,256):02X}{Random(f"g{x}").randint(0,256):02X}{Random(f"b{x}").randint(0,256):02X}')(col['username']),
-                fill_type='solid',
-            )
-            to_style.font = styles.Font(color='FFFFFF', name='Calibri')
+        ): ws.cell(
+            row=ws.max_row,
+            column=col['col'],
+        ).fill = styles.PatternFill(
+            start_color=(lambda x: f'{round((c := hls_to_rgb(Random(x).randint(0, 255) / 255, 0.5, 1))[0] * 255):02X}{round(c[1] * 255):02X}{round(c[2] * 255):02X}')(col['username']),
+            fill_type='solid',
+        )
         line_counter = 1
         for line in payment['lines'][1:]:
             line_counter += 1
