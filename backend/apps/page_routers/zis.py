@@ -1,9 +1,10 @@
 from io import BytesIO
 from time import time
 from datetime import datetime
+from random import Random
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import RedirectResponse, StreamingResponse
-from openpyxl import Workbook
+from openpyxl import Workbook, styles
 from ...models.user import User, Access
 from ...models.zis_payment import Payment, PaymentCategory, PaymentUnit
 from ..dependencies import auth, NoAuthToken, UserSessionNotFound
@@ -41,6 +42,7 @@ async def payments_xlsx(request: Request):
         'No. Telp.',
         'Email',
         'Alamat',
+        'Nomor',
         'Nama',
         'Kategori',
         'Jumlah',
@@ -69,6 +71,7 @@ async def payments_xlsx(request: Request):
             payment['payer_number'],
             payment['payer_email'],
             payment['payer_address'],
+            1,
             payment['lines'][0]['payer_name'],
             payment['lines'][0]['category'].capitalize(),
             payment['lines'][0]['amount'],
@@ -81,19 +84,35 @@ async def payments_xlsx(request: Request):
             f'{updated_by.name} ({updated_by.username})' if updated_by is not None else '[Gagal mendapatkan informasi user]',
             payment['payment'],
         )),))
-        for col in (12, 14): ws.cell(
+        for col in (13, 15): ws.cell(
             row=ws.max_row,
             column=col,
         ).number_format = 'dd/mm/yyyy hh:mm:ss'
-        for line in payment['lines'][1:]: ws.append((*(f'\'x' if isinstance(x, str) and x.startswith('=') else x for x in (
-            *(None,) * 5,
-            line['payer_name'],
-            line['category'].capitalize(),
-            line['amount'],
-            line['unit'].capitalize(),
-            line['note'],
-        )),))
-        for col in (*range(1, 6), *range(11, 17)):
+        for col in (
+            {'col': 14, 'username': created_by.username if created_by is not None else ''},
+            {'col': 16, 'username': updated_by.username if updated_by is not None else ''},
+        ):
+            (to_style := ws.cell(
+                row=ws.max_row,
+                column=col['col'],
+            )).fill = styles.PatternFill(
+                start_color=(lambda x: f'{Random(f"r{x}").randint(0,256):02X}{Random(f"g{x}").randint(0,256):02X}{Random(f"b{x}").randint(0,256):02X}')(col['username']),
+                fill_type='solid',
+            )
+            to_style.font = styles.Font(color='FFFFFF', name='Calibri')
+        line_counter = 1
+        for line in payment['lines'][1:]:
+            line_counter += 1
+            ws.append((*(f'\'x' if isinstance(x, str) and x.startswith('=') else x for x in (
+                *(None,) * 5,
+                line_counter,
+                line['payer_name'],
+                line['category'].capitalize(),
+                line['amount'],
+                line['unit'].capitalize(),
+                line['note'],
+            )),))
+        for col in (*range(1, 6), *range(12, 18)):
             if len(payment['lines']) > 1: ws.merge_cells(
                 start_row=ws.max_row - len(payment['lines']) + 1,
                 start_column=col,
