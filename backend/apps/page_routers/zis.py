@@ -5,7 +5,7 @@ from random import Random
 from colorsys import hls_to_rgb
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import RedirectResponse, StreamingResponse
-from openpyxl import Workbook, styles
+from openpyxl import Workbook, styles as wstyles
 from ...models.user import User, Access
 from ...models.zis_payment import Payment, PaymentCategory, PaymentUnit
 from ..dependencies import auth, NoAuthToken, UserSessionNotFound
@@ -38,24 +38,42 @@ async def payments_xlsx(request: Request):
     if ws is None: raise RuntimeError('Failed to get active sheet of workbook object (using openpyxl).')
     ws.title = 'Pembayaran Zakat'
     ws.append((
-        'Nomor',
-        'Nama pembayar',
-        'No. Telp.',
-        'Email',
-        'Alamat',
-        'Nomor',
+        'Nomor Zakat',
+        'Nomor Transaksi',
         'Nama',
+        'Alamat',
         'Kategori',
-        'Jumlah',
-        'Satuan',
-        'Catatan',
-        'Catatan pembayar',
-        'Dibuat pada',
-        'Dibuat oleh',
-        'Terakhir diedit pada',
-        'Terakhir diedit oleh',
-        'UUID pembayaran',
+        None,
+        None,
+        None,
+        'Beras',
+        None,
+        'Uang',
+        'Admin',
+        'Edit',
+        'UUID',
     ))
+    for start, end in ((5, 8), (9, 10)): ws.merge_cells(
+        start_row=ws.max_row,
+        start_column=start,
+        end_row=ws.max_row,
+        end_column=end,
+    )
+    ws.append((
+        *(None,) * 4,
+        'Fitrah',
+        'Maal',
+        'Fidyah',
+        'Infaq',
+        'Kilogram',
+        'Liter',
+    ))
+    for col in (*range(1, 5), *range(11, 15)): ws.merge_cells(
+        start_row=ws.max_row - 1,
+        start_column=col,
+        end_row=ws.max_row,
+        end_column=col,
+    )
     counter = 0
     users = {}
     for payment in await Payment.query():
@@ -70,38 +88,35 @@ async def payments_xlsx(request: Request):
             start_row=ws.max_row+1,
             start_column=1,
             end_row=ws.max_row+1,
-            end_column=17,
+            end_column=14,
         )
         ws.append((*(f'\'x' if isinstance(x, str) and x.startswith('=') else x for x in (
             counter,
-            payment['payer_name'],
-            payment['payer_number'],
-            payment['payer_email'],
-            payment['payer_address'],
             1,
             payment['lines'][0]['payer_name'],
-            payment['lines'][0]['category'].capitalize(),
-            payment['lines'][0]['amount'],
-            payment['lines'][0]['unit'].capitalize(),
-            payment['lines'][0]['note'],
-            payment['note'],
-            datetime.fromtimestamp(payment['created_at']),
+            payment['payer_address'],
+            '✓' if payment['lines'][0]['category'] == 'zakat fitrah' else None,
+            '✓' if payment['lines'][0]['category'] == 'zakat maal' else None,
+            '✓' if payment['lines'][0]['category'] == 'fidyah' else None,
+            '✓' if payment['lines'][0]['category'] == 'infaq' else None,
+            payment['lines'][0]['amount'] if payment['lines'][0]['unit'] == 'kilogram beras' else None,
+            payment['lines'][0]['amount'] if payment['lines'][0]['unit'] == 'liter beras' else None,
+            payment['lines'][0]['amount'] if payment['lines'][0]['unit'] == 'rupiah' else None,
             f'{created_by.name} ({created_by.username})' if created_by is not None else '[Gagal mendapatkan informasi user]',
-            datetime.fromtimestamp(payment['updated_at']),
             f'{updated_by.name} ({updated_by.username})' if updated_by is not None else '[Gagal mendapatkan informasi user]',
             payment['payment'],
         )),))
-        for col in (13, 15): ws.cell(
+        ws.cell(
             row=ws.max_row,
-            column=col,
-        ).number_format = 'dd/mm/yyyy hh:mm:ss'
+            column=11,
+        ).number_format = '[$Rp-421]#,##0'
         for col in (
-            {'col': 14, 'username': created_by.username if created_by is not None else ''},
-            {'col': 16, 'username': updated_by.username if updated_by is not None else ''},
+            {'col': 12, 'username': created_by.username if created_by is not None else ''},
+            {'col': 13, 'username': updated_by.username if updated_by is not None else ''},
         ): ws.cell(
             row=ws.max_row,
             column=col['col'],
-        ).fill = styles.PatternFill(
+        ).fill = wstyles.PatternFill(
             start_color=(lambda x: f'{round((c := hls_to_rgb(Random(x).randint(0, 255) / 255, 0.5, 1))[0] * 255):02X}{round(c[1] * 255):02X}{round(c[2] * 255):02X}')(col['username']),
             fill_type='solid',
         )
@@ -109,22 +124,30 @@ async def payments_xlsx(request: Request):
         for line in payment['lines'][1:]:
             line_counter += 1
             ws.append((*(f'\'x' if isinstance(x, str) and x.startswith('=') else x for x in (
-                *(None,) * 5,
+                None,
                 line_counter,
                 line['payer_name'],
-                line['category'].capitalize(),
-                line['amount'],
-                line['unit'].capitalize(),
-                line['note'],
+                None,
+                '✓' if line['category'] == 'zakat fitrah' else None,
+                '✓' if line['category'] == 'zakat maal' else None,
+                '✓' if line['category'] == 'fidyah' else None,
+                '✓' if line['category'] == 'infaq' else None,
+                line['amount'] if line['unit'] == 'kilogram beras' else None,
+                line['amount'] if line['unit'] == 'liter beras' else None,
+                line['amount'] if line['unit'] == 'rupiah' else None,
             )),))
-        for col in (*range(1, 6), *range(12, 18)):
+            ws.cell(
+                row=ws.max_row,
+                column=11,
+            ).number_format = '[$Rp-421]#,##0'
+        for col in (1, 4, *range(12, 15)):
             if len(payment['lines']) > 1: ws.merge_cells(
                 start_row=ws.max_row - len(payment['lines']) + 1,
                 start_column=col,
                 end_row=ws.max_row,
                 end_column=col,
             )
-        for col in 'ABCDEFGHIJKLMNOPQ': ws.column_dimensions[col].auto_size = True
+        for col in 'ABCDEFGHIJKLMN': ws.column_dimensions[col].auto_size = True
     wb.save(buffer := BytesIO())
     buffer.seek(0)
     return StreamingResponse(
