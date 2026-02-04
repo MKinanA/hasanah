@@ -66,6 +66,12 @@ async def payments_xlsx(request: Request):
         updated_by = users[username] if (username := payment['updated_by']) in users else (await User.get(username=username))
         if username not in users: users[username] = updated_by
         ws.append(())
+        ws.merge_cells(
+            start_row=ws.max_row+1,
+            start_column=1,
+            end_row=ws.max_row+1,
+            end_column=17,
+        )
         ws.append((*(f'\'x' if isinstance(x, str) and x.startswith('=') else x for x in (
             counter,
             payment['payer_name'],
@@ -118,6 +124,7 @@ async def payments_xlsx(request: Request):
                 end_row=ws.max_row,
                 end_column=col,
             )
+        for col in 'ABCDEFGHIJKLMNOPQ': ws.column_dimensions[col].auto_size = True
     wb.save(buffer := BytesIO())
     buffer.seek(0)
     return StreamingResponse(
