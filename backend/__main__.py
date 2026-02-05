@@ -2,8 +2,8 @@ from asyncio import run as async_run
 from uvicorn import run as uvicorn_run
 from .helpers.db_connect import db_connect
 from .helpers.log import log
-from fastapi import FastAPI, Request
-from fastapi.responses import JSONResponse, HTMLResponse, RedirectResponse
+from fastapi import FastAPI, Request, Response
+from fastapi.responses import JSONResponse, RedirectResponse
 from .apps.api import api
 from fastapi.staticfiles import StaticFiles
 from jinja2 import TemplateNotFound
@@ -20,10 +20,11 @@ app = FastAPI()
 async def exception_handler(request: Request, exc: BaseException) -> JSONResponse: return JSONResponse(status_code=getattr(exc, 'status_code', 500), content=mkresp('error', type(exc).__name__, 'Can\'t find the template.' if isinstance(exc, TemplateNotFound) else str(exc)))
 
 @app.exception_handler(404)
-async def not_found(request: Request, exc: BaseException) -> HTMLResponse:
+async def not_found(request: Request, exc: BaseException) -> Response:
+    user = None
     try: user = await auth(request)
     except: RedirectResponse(url='/home', status_code=302)
-    return await render('pages/error', {'code': '404', 'error': 'Tidak Ditemukan', 'user': user}, status_code=404)
+    return await render('pages/error', {'code': '404', 'error': 'Tidak Ditemukan', **({'use_header': False} if user is None else {'user': user})}, status_code=404)
 
 app.include_router(pages)
 app.include_router(api, prefix='/api')
