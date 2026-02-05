@@ -103,6 +103,7 @@ body > div > main > form > div#main > div.wrap-table > div > table > tbody > tr 
 
 body > div > main > form > div#main > div.wrap-table > div > table > tbody > tr > td:first-child * {
     font-weight: 600;
+    width: max-content;
 }
 
 body > div > main > form > div#main > div.wrap-table > div > table > tbody > tr > td:nth-child(2) {
