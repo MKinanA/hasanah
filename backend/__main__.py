@@ -23,7 +23,7 @@ async def exception_handler(request: Request, exc: BaseException) -> JSONRespons
 async def not_found(request: Request, exc: BaseException) -> Response:
     user = None
     try: user = await auth(request)
-    except: RedirectResponse(url='/home', status_code=302)
+    except: return RedirectResponse(url='/login', status_code=302)
     return await render('pages/error', {'code': '404', 'error': 'Tidak Ditemukan', **({'use_header': False} if user is None else {'user': user})}, status_code=404)
 
 app.include_router(pages)
