@@ -14,4 +14,13 @@ document.addEventListener('DOMContentLoaded', () => {
         })}).then(resp => resp.json().then(body => ({status: resp.status, ...body}))).then(body => (Math.floor(body.status / 100) === 2) && (body.type === 'success') ? body.name : username);
         cell.textContent = await names[username];
     });
+    document.querySelector('#scrolltop-button').addEventListener('click', () => {
+        if (document.body.scrollTop !== 0) document.body.scrollTop = 0;
+        else {
+            setTimeout(() => {
+                document.body.scrollTop = 0;
+            }, 125);
+            document.body.scrollTop = window.innerHeight / 16;
+        };
+    });
 });

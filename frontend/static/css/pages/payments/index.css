@@ -69,7 +69,7 @@ body > div > main > div#table > table > tbody > tr > td:first-child > a[href]:em
     z-index: 1;
 }
 
-body > div > main > div:last-child:not(:has(> :not(a))) {
+body > div > main > div:last-child:not(:has(> :not(a, button))) {
     flex-direction: row;
     justify-content: end;
     gap: calc(24 * var(--scaling-factor));
@@ -80,7 +80,7 @@ body > div > main > div:last-child:not(:has(> :not(a))) {
     pointer-events: none;
 }
 
-body > div > main > div:last-child:not(:has(> :not(a))) > a {
+body > div > main > div:last-child:not(:has(> :not(a, button))) > :is(a, button) {
     display: block;
     z-index: 2;
     pointer-events: all;
@@ -89,12 +89,13 @@ body > div > main > div:last-child:not(:has(> :not(a))) > a {
     background: rgb(var(--bg-color-2));
     border-radius: calc(10 * var(--scaling-factor));
     box-shadow: 0 0 calc(calc(12 * var(--scaling-factor))) calc(calc(12 * var(--scaling-factor))) rgb(var(--bg-color));
+    cursor: pointer;
 }
 
-body > div > main > div:last-child:not(:has(> :not(a))) > a:active {
+body > div > main > div:last-child:not(:has(> :not(a, button))) > :is(a, button):active {
     box-shadow: none;
 }
 
-body > div > main > div:last-child:not(:has(> :not(a))) > a > svg:not(.plus) {
+body > div > main > div:last-child:not(:has(> :not(a, button))) > :is(a, button) > svg:not(.plus, .up) {
     margin: calc(8 * var(--scaling-factor));
 }
