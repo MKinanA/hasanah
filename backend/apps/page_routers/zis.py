@@ -18,7 +18,7 @@ PAYMENT_QUERY_NON_FILTER_PARAMS = {
     'limit': int,
     'offset': int,
 }
-parse_query_params = lambda params: {'filters': {key.replace('-', '_'): value for key, value in dict(params).items() if key not in PAYMENT_QUERY_NON_FILTER_PARAMS}, **{key.replace('-', '_'): PAYMENT_QUERY_NON_FILTER_PARAMS[key.replace('-', '_')](value.replace('-', '_')) for key, value in dict(params).items() if key in PAYMENT_QUERY_NON_FILTER_PARAMS}}
+parse_query_params = lambda params: {'filters': {key.replace('-', '_'): value for key, value in dict(params).items() if key.replace('-', '_') not in PAYMENT_QUERY_NON_FILTER_PARAMS}, **{key.replace('-', '_'): PAYMENT_QUERY_NON_FILTER_PARAMS[key.replace('-', '_')](value.replace('-', '_')) for key, value in dict(params).items() if key.replace('-', '_') in PAYMENT_QUERY_NON_FILTER_PARAMS}}
 
 router = APIRouter()
 payments = APIRouter()
