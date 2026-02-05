@@ -1,6 +1,5 @@
 from io import BytesIO
 from time import time
-from datetime import datetime
 from random import Random
 from colorsys import hls_to_rgb
 from fastapi import APIRouter, Request, Response
@@ -8,8 +7,18 @@ from fastapi.responses import RedirectResponse, StreamingResponse
 from openpyxl import Workbook, styles as wstyles
 from ...models.user import User, Access
 from ...models.zis_payment import Payment, PaymentCategory, PaymentUnit
+from ...helpers.str_to_bool import str_to_bool
 from ..dependencies import auth, NoAuthToken, UserSessionNotFound
 from ..render import render
+
+PAYMENT_QUERY_NON_FILTER_PARAMS = {
+    'include_deleted': str_to_bool,
+    'only_deleted': str_to_bool,
+    'sort': str,
+    'limit': int,
+    'offset': int,
+}
+parse_query_params = lambda params: {'filters': {key.replace('-', '_'): value for key, value in dict(params).items() if key not in PAYMENT_QUERY_NON_FILTER_PARAMS}, **{key.replace('-', '_'): PAYMENT_QUERY_NON_FILTER_PARAMS[key.replace('-', '_')](value.replace('-', '_')) for key, value in dict(params).items() if key in PAYMENT_QUERY_NON_FILTER_PARAMS}}
 
 router = APIRouter()
 payments = APIRouter()
@@ -24,7 +33,7 @@ async def payments_index(request: Request):
         await user.require_access(Access.ZIS_PAYMENT_READ)
     except (NoAuthToken, UserSessionNotFound): return RedirectResponse(url='/login', status_code=302)
     except Access.AccessDenied: return RedirectResponse(url='/home', status_code=302)
-    return await render('pages/zis/payments', {'user': user, 'payments': [(await (await payment.latest).to_dict) for payment in await Payment.query()]}, expose='payments')
+    return await render('pages/zis/payments', {'user': user, 'payments': [(await (await payment.latest).to_dict) for payment in await Payment.query(**parse_query_params(request.query_params))]}, expose='payments')
 
 @payments.get('/export-xlsx')
 async def payments_xlsx(request: Request):
@@ -76,7 +85,7 @@ async def payments_xlsx(request: Request):
     )
     counter = 0
     users = {}
-    for payment in (await Payment.query())[::-1]:
+    for payment in (await Payment.query(**parse_query_params(request.query_params)))[::-1]:
         counter += 1
         payment = await (await payment.latest).to_dict
         created_by = users[username] if (username := payment['created_by']) in users else (await User.get(username=username))
