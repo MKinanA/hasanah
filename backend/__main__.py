@@ -23,7 +23,7 @@ async def exception_handler(request: Request, exc: BaseException) -> Response:
         user = None
         try: user = await auth(request)
         except: pass
-        return await render('pages/error', {'code': f'{getattr(exc, "status_code", 500)}', 'error': f'{type(exc).__name__}: {"Couldn't find the template." if isinstance(exc, TemplateNotFound) else str(exc)}', **({'use_header': False} if user is None else {'user': user})}, status_code=getattr(exc, "status_code", 500))
+        return await render('pages/error', {'code': str(getattr(exc, "status_code", 500)), 'error': type(exc).__name__ + ': ' + ('Couldn\'t find the template.' if isinstance(exc, TemplateNotFound) else str(exc)), **({'use_header': False} if user is None else {'user': user})}, status_code=getattr(exc, "status_code", 500))
 
 @app.exception_handler(404)
 async def not_found(request: Request, exc: BaseException) -> Response:
