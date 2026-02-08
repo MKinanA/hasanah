@@ -17,14 +17,22 @@ from .apps.dependencies import auth
 app = FastAPI()
 
 @app.exception_handler(Exception)
-async def exception_handler(request: Request, exc: BaseException) -> JSONResponse: return JSONResponse(status_code=getattr(exc, 'status_code', 500), content=mkresp('error', type(exc).__name__, 'Can\'t find the template.' if isinstance(exc, TemplateNotFound) else str(exc)))
+async def exception_handler(request: Request, exc: BaseException) -> Response:
+    if request.url.path.startswith('/api'): return JSONResponse(status_code=getattr(exc, 'status_code', 500), content=mkresp('error', type(exc).__name__, 'Couldn\'t find the template.' if isinstance(exc, TemplateNotFound) else str(exc)))
+    else:
+        user = None
+        try: user = await auth(request)
+        except: pass
+        return await render('pages/error', {'code': f'{getattr(exc, "status_code", 500)}', 'error': f'{type(exc).__name__}: {"Couldn't find the template." if isinstance(exc, TemplateNotFound) else str(exc)}', **({'use_header': False} if user is None else {'user': user})}, status_code=getattr(exc, "status_code", 500))
 
 @app.exception_handler(404)
 async def not_found(request: Request, exc: BaseException) -> Response:
-    user = None
-    try: user = await auth(request)
-    except: return RedirectResponse(url='/login', status_code=302)
-    return await render('pages/error', {'code': '404', 'error': 'Tidak Ditemukan', **({'use_header': False} if user is None else {'user': user})}, status_code=404)
+    if request.url.path.startswith('/api'): return JSONResponse(status_code=404, content=mkresp('error', 'Not Found', 'Couldn\'t find what you were looking for.'))
+    else:
+        user = None
+        try: user = await auth(request)
+        except: pass
+        return await render('pages/error', {'code': '404', 'error': 'Tidak Ditemukan', **({'use_header': False} if user is None else {'user': user})}, status_code=404)
 
 app.include_router(pages)
 app.include_router(api, prefix='/api')
