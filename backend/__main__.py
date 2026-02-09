@@ -16,6 +16,13 @@ from .apps.dependencies import auth
 
 app = FastAPI()
 
+@app.middleware('http')
+async def middleware(request: Request, call_next):
+    try: await auth(request)
+    except: pass
+    response = await call_next(request)
+    return response
+
 @app.exception_handler(Exception)
 async def exception_handler(request: Request, exc: BaseException) -> Response:
     if request.url.path.startswith('/api'): return JSONResponse(status_code=getattr(exc, 'status_code', 500), content=mkresp('error', type(exc).__name__, 'Couldn\'t find the template.' if isinstance(exc, TemplateNotFound) else str(exc)))
