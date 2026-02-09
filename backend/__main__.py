@@ -3,7 +3,7 @@ from uvicorn import run as uvicorn_run
 from .helpers.db_connect import db_connect
 from .helpers.log import log
 from fastapi import FastAPI, Request, Response
-from fastapi.responses import JSONResponse, RedirectResponse
+from fastapi.responses import JSONResponse
 from .apps.api import api
 from fastapi.staticfiles import StaticFiles
 from jinja2 import TemplateNotFound
