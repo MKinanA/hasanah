@@ -69,7 +69,7 @@ class Payment:
             'first_created_in_timespan': lambda seconds: int(seconds),
             'last_updated_in_timespan': lambda seconds: int(seconds),
             'first_created_between': lambda span: (*(int(time) for time in str(span).split('-')),),
-            'first_created_between': lambda span: (*(int(time) for time in str(span).split('-')),),
+            'last_updated_between': lambda span: (*(int(time) for time in str(span).split('-')),),
         }
         filters_parser = {
             'first_created_by': lambda value: (f'fv.created_by = ?', value),
