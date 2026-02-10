@@ -1,0 +1,63 @@
+{% extends 'templates/page.html' %}
+
+{% block title %}Filter Pembayaran - ZIS{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/css/pages/payments/filter.css">
+    <script type="module" src="/static/js/payments/filter.js"></script>
+{% endblock %}
+
+{% block main %}
+    <h2>Filter Pembayaran</h2>
+    <form>
+        <div>
+            <label>
+                <h3>Dibuat oleh</h3>
+                <input type="text" name="first_created_by" placeholder="Username" title="Hanya tampilkan pembayaran yang dibuat oleh user dengan username ini">
+            </label>
+            <label>
+                <h3>Terakhir diedit oleh</h3>
+                <input type="text" name="last_updated_by" placeholder="Username" title="Hanya tampilkan pembayaran yang terakhir diedit oleh user dengan username ini">
+            </label>
+            <div>
+                <h3>Dibuat antara</h3>
+                <div title="Hanya tampilkan pembayaran yang dibuat antara kedua waktu ini">
+                    <input type="datetime-local" name="first_created_in_timespan_start" placeholder="Waktu awal">
+                    <p>&ndash;</p>
+                    <input type="datetime-local" name="first_created_in_timespan_end" placeholder="Waktu akhir">
+                </div>
+            </div>
+            <div>
+                <h3>Terakhir diedit antara</h3>
+                <div title="Hanya tampilkan pembayaran yang terakhir diedit antara kedua waktu ini">
+                    <input type="datetime-local" name="last_updated_in_timespan_start" placeholder="Waktu awal">
+                    <p>&ndash;</p>
+                    <input type="datetime-local" name="last_updated_in_timespan_end" placeholder="Waktu akhir">
+                </div>
+            </div>
+            <label>
+                <h3>Urutkan berdasarkan</h3>
+                <select name="sort">
+                    <option value="" title="Paling terakhir diedit muncul pertama" selected>Terakhir diedit</option>
+                    <option value="last_created" title="Paling terakhir dibuat (bukan diedit) muncul pertama">Terakhir dibuat</option>
+                    <option value="first_created" title="Paling pertama dibuat muncul pertama">Pertama dibuat</option>
+                    <option value="name_asc" title="Urutkan berdasarkan nama secara ascending (dari A-Z)">Nama (A-Z)</option>
+                    <option value="name_desc" title="Urutkan berdasarkan nama secara descending (dari Z-A)">Nama (Z-A)</option>
+                </select>
+            </label>
+            <label>
+                <h3>Tampilkan yang dihapus</h3>
+                <select name="include_deleted">
+                    <option value="" title="Hanya tampilkan yang belum dihapus" selected>Tidak</option>
+                    <option value="true" title="Tampilkan yang belum dan sudah dihapus">Ya</option>
+                    <option value="only_deleted" title="Hanya tampilkan yang sudah dihapus">Hanya yang dihapus</option>
+                </select>
+            </label>
+        </div>
+        <div></div>
+        <div>
+            <a href="../payments" id="apply-button"><p>Tampilkan</p></a>
+            <a id="cancel-button"><p>Batal</p></a>
+        </div>
+    </form>
+{% endblock %}

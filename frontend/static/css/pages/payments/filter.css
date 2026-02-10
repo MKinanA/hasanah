@@ -1,0 +1,112 @@
+@import '../base.css';
+
+body > div > main > form {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    gap: calc(24 * var(--scaling-factor));
+}
+
+body > div > main > form > div {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: start;
+    align-items: start;
+    gap: var(--main-padding);
+    width: 100%;
+}
+
+body > div > main > form > div > label {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    align-items: start;
+    gap: calc(4 * var(--scaling-factor));
+    flex-grow: 1;
+    min-width: min(100%, max-content);
+    max-width: 100%;
+}
+
+body > div > main > form > div > :is(label, div):not(.non-filling) {
+    flex-basis: 100%;
+}
+
+body > div > main > form > div > :is(label, div) > :first-child {
+    min-width: max-content;
+    font-weight: 500;
+    font-size: calc(20 * var(--scaling-factor));
+}
+
+body > div > main > form :is(input, select) {
+    width: 100%;
+    min-width: max-content;
+    field-sizing: content;
+    font-size: calc(18 * var(--scaling-factor));
+    background: rgb(var(--bg-color-2));
+    padding: calc(8 * var(--scaling-factor)) calc(12 * var(--scaling-factor));
+    border-radius: calc(12 * var(--scaling-factor));
+}
+
+body > div > main > form :is(input:is([type*="date"], [type*="time"]), select) {
+    cursor: pointer;
+}
+
+body > div > main > form > div > div {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: start;
+    align-items: start;
+    gap: calc(4 * var(--scaling-factor));
+    flex-grow: 1;
+    min-width: min(100%, max-content);
+    max-width: 100%;
+}
+
+body > div > main > form > div > div > div:has(input) {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: start;
+    align-items: center;
+    width: 100%;
+    min-width: max-content;
+    gap: calc(4 * var(--scaling-factor));
+}
+
+body > div > main > form > div:has(> :is(a, button)) * {
+    text-decoration: none;
+    font-weight: 600;
+    text-align: center;
+}
+
+body > div > main > form > div > :is(a, button) {
+    display: flex;
+    padding: calc(8 * var(--scaling-factor)) calc(16 * var(--scaling-factor));
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    min-width: min(100%, calc(256 * var(--scaling-factor)));
+    max-width: 100%;
+    background: rgb(var(--bg-color-2));
+    border-radius: calc(12 * var(--scaling-factor));
+    cursor: pointer;
+}
+
+body > div > main > form > div > #apply-button {
+    background: green;
+}
+
+body > div > main > form > div > #apply-button * {
+    color: rgb(var(--light));
+}
+
+/* body > div > main > form > div > #cancel-button {
+    background: red;
+}
+
+body > div > main > form > div > #cancel-button * {
+    color: rgb(var(--light));
+} */
