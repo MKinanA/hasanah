@@ -39,6 +39,7 @@
     -webkit-user-drag: none;
     -webkit-tap-highlight-color: transparent;
     interpolate-size: allow-keywords;
+    color-scheme: light;
 }
 
 :root, html, body {
@@ -101,5 +102,9 @@ p {font-size: calc(16 * var(--scaling-factor));}
     --fg-color-2: var(--darker-light);
     --bg-color: var(--dark);
     --bg-color-2: var(--lighter-dark);
+  }
+
+  *, *::before, *::after {
+    color-scheme: dark;
   }
 }
