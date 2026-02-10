@@ -13,7 +13,7 @@ from ..render import render
 
 PAYMENT_QUERY_NON_FILTER_PARAMS = {
     'include_deleted': str_to_bool,
-    'only_deleted': str_to_bool,
+    'include_undeleted': str_to_bool,
     'sort': str,
     'limit': int,
     'offset': int,
@@ -34,6 +34,15 @@ async def payments_index(request: Request):
     except (NoAuthToken, UserSessionNotFound): return RedirectResponse(url='/login', status_code=302)
     except Access.AccessDenied: return RedirectResponse(url='/home', status_code=302)
     return await render('pages/zis/payments', {'user': user, 'payments': [(await (await payment.latest).to_dict) for payment in await Payment.query(**parse_query_params(request.query_params))]}, expose='payments')
+
+@payments.get('/filter')
+async def payments_filter(request: Request):
+    try:
+        user = await auth(request)
+        await user.require_access(Access.ZIS_PAYMENT_READ)
+    except (NoAuthToken, UserSessionNotFound): return RedirectResponse(url='/login', status_code=302)
+    except Access.AccessDenied: return RedirectResponse(url='/home', status_code=302)
+    return await render('pages/zis/payments/filter', {'user': user})
 
 @payments.get('/export-xlsx')
 async def payments_xlsx(request: Request):

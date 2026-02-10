@@ -54,7 +54,7 @@ class Payment:
             return [cls(row['uuid'], row['id']) for row in rows]
 
     @classmethod
-    async def query(cls, filters: 'dict | None' = None, include_deleted: bool = False, only_deleted: bool = False, sort: str = 'last_updated', limit: int = -1, offset: int = 0) -> 'list[Payment]':
+    async def query(cls, filters: 'dict | None' = None, include_deleted: bool = False, include_undeleted: bool = True, sort: str = 'last_updated', limit: int = -1, offset: int = 0) -> 'list[Payment]':
         order_by = {
             'last_updated': 'pv.created_at DESC',
             'last_created': 'fv.created_at DESC',
@@ -81,7 +81,8 @@ class Payment:
         }
         parsed_filters = [filters_parser[key](await multisteps_async(lambda: value, *(parser if isinstance(parser := filter_values_parser[key], (tuple, list)) else (parser,)))) for key, value in (filters or {}).items()]
         where = ' AND '.join(x for x in (
-            'pv.is_deleted = 0' if not include_deleted else 'pv.is_deleted = 1' if only_deleted else None,
+            'pv.is_deleted = 0' if not include_deleted else None,
+            'pv.is_deleted = 1' if not include_undeleted else None,
             *(parsed_filter[0] for parsed_filter in parsed_filters)
         ) if x is not None)
         nested_parameters = (*(parsed_filter_parameters if isinstance(parsed_filter_parameters := parsed_filter[1], (tuple, list)) else (parsed_filter_parameters,) for parsed_filter in parsed_filters),)
