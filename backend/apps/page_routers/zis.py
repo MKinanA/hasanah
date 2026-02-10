@@ -85,7 +85,7 @@ async def payments_xlsx(request: Request):
     )
     counter = 0
     users = {}
-    for payment in (await Payment.query(**parse_query_params(request.query_params)))[::-1]:
+    for payment in (await Payment.query(**parse_query_params(request.query_params))):
         counter += 1
         payment = await (await payment.latest).to_dict
         created_by = users[username] if (username := payment['created_by']) in users else (await User.get(username=username))
