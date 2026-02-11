@@ -99,3 +99,20 @@ body > div > main > div:last-child:not(:has(> :not(a, button))) > :is(a, button)
 body > div > main > div:last-child:not(:has(> :not(a, button))) > :is(a, button) > svg:not(.plus, .up) {
     margin: calc(8 * var(--scaling-factor));
 }
+
+body > div > main > div:last-child:not(:has(> :not(a, button))) > :is(a, button)#filter-button[data-filters]::after {
+    content: attr(data-filters, '0');
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translate(50%, 50%);
+    height: max-content;
+    width: max-content;
+    color: rgb(var(--bg-color));
+    background: rgb(var(--fg-color));
+    border-radius: 100vmax;
+    padding: calc(2 * var(--scaling-factor)) calc(4 * var(--scaling-factor));
+    line-height: normal;
+    font-size: calc(12 * var(--scaling-factor));
+    font-weight: 500;
+}

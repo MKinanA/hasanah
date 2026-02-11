@@ -24,4 +24,5 @@ document.addEventListener('DOMContentLoaded', () => {
     //     };
     // });
     ['#export-button', '#filter-button'].forEach(buttonID => document.querySelector(buttonID).setAttribute('href', document.querySelector(buttonID).getAttribute('href') + location.search.substring(document.querySelector(buttonID).getAttribute('href').includes('?') ? 1 : 0)));
+    if (new URL(location.href).searchParams.size > 0) document.querySelector('#filter-button').dataset.filters = new URL(location.href).searchParams.size;
 });
