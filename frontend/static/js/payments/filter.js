@@ -12,7 +12,7 @@ function updateTargetHref() {
     ['first_created_by', 'last_updated_by'].forEach(name => {
         if (rawValues.hasOwnProperty(name)) values[name] = rawValues[name];
     });
-    ['first_created_in_timespan', 'last_updated_in_timespan'].forEach(name => {
+    ['first_created_between', 'last_updated_between'].forEach(name => {
         if (rawValues.hasOwnProperty(name + '_start') || rawValues.hasOwnProperty(name + '_end')) values[name] = `${rawValues.hasOwnProperty(name + '_start') ? Math.floor(new Date(rawValues[name + '_start']).getTime() / 1000) : ''}-${rawValues.hasOwnProperty(name + '_end') ? Math.floor(new Date(rawValues[name + '_end']).getTime() / 1000) : ''}`;
     });
     if (rawValues.hasOwnProperty('sort')) values['sort'] = rawValues['sort'];
