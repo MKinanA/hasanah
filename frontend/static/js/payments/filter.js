@@ -28,4 +28,25 @@ function updateTargetHref() {
 
 document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('input, select').forEach(element => element.addEventListener('change', updateTargetHref));
+    document.querySelector('a#apply-button').addEventListener('click', updateTargetHref);
+
+    const params = new URL(location.href).searchParams;
+    ['first_created_by', 'last_updated_by'].forEach(param => {
+        if (params.get(param)) document.querySelector(`input[name="${param}"]`).value = params.get(param);
+        console.log(params.get(param));
+    });
+    ['first_created_between', 'last_updated_between'].forEach(param => {
+        if (params.get(param)) [
+            parseInt(params.get(param).split('-')[0]) ? ['start', new Date(parseInt(params.get(param).split('-')[0]) * 1000)] : null,
+            parseInt(params.get(param).split('-')[1]) ? ['end', new Date(parseInt(params.get(param).split('-')[1]) * 1000)] : null,
+        ].filter(x => x !== null).forEach(
+            dt => document.querySelector(`input[name="${param}_${dt[0]}"]`).value = `${dt[1].getFullYear()}-${(dt[1].getMonth() + 1).toString().padStart(2, '0')}-${dt[1].getDate().toString().padStart(2, '0')}T${dt[1].getHours().toString().padStart(2, '0')}:${dt[1].getMinutes().toString().padStart(2, '0')}:${dt[1].getSeconds().toString().padStart(2, '0')}`
+        );
+        console.log(params.get(param));
+    });
+    if (params.get('sort')) document.querySelector(`select[name="sort"]`).value = params.get('sort');
+    if (params.get('include_deleted') == 1) {
+        if (params.get('include_undeleted') == 0) document.querySelector(`select[name="include_deleted"]`).value = 'only_deleted';
+        else document.querySelector(`select[name="include_deleted"]`).value = 'true';
+    };
 });

@@ -23,5 +23,5 @@ document.addEventListener('DOMContentLoaded', () => {
     //         document.body.scrollTop = window.innerHeight / 16;
     //     };
     // });
-    document.querySelector('#export-button').setAttribute('href', document.querySelector('#export-button').getAttribute('href') + location.search.substring(document.querySelector('#export-button').getAttribute('href').includes('?') ? 1 : 0));
+    ['#export-button', '#filter-button'].forEach(buttonID => document.querySelector(buttonID).setAttribute('href', document.querySelector(buttonID).getAttribute('href') + location.search.substring(document.querySelector(buttonID).getAttribute('href').includes('?') ? 1 : 0)));
 });
