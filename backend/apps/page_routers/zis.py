@@ -66,7 +66,6 @@ async def payments_xlsx(request: Request):
         None,
         'Beras',
         None,
-        'Uang',
         'Admin',
         'Edit',
         'UUID',
@@ -113,24 +112,23 @@ async def payments_xlsx(request: Request):
             1,
             payment['lines'][0]['payer_name'],
             payment['payer_address'],
-            '✓' if payment['lines'][0]['category'] == 'zakat fitrah' else None,
-            '✓' if payment['lines'][0]['category'] == 'zakat maal' else None,
-            '✓' if payment['lines'][0]['category'] == 'fidyah' else None,
-            '✓' if payment['lines'][0]['category'] == 'infaq' else None,
+            (payment['lines'][0]['amount'] if payment['lines'][0]['unit'] == 'rupiah' else 0) if payment['lines'][0]['category'] == 'zakat fitrah' else None,
+            (payment['lines'][0]['amount'] if payment['lines'][0]['unit'] == 'rupiah' else 0) if payment['lines'][0]['category'] == 'zakat maal' else None,
+            (payment['lines'][0]['amount'] if payment['lines'][0]['unit'] == 'rupiah' else 0) if payment['lines'][0]['category'] == 'fidyah' else None,
+            (payment['lines'][0]['amount'] if payment['lines'][0]['unit'] == 'rupiah' else 0) if payment['lines'][0]['category'] == 'infaq' else None,
             payment['lines'][0]['amount'] if payment['lines'][0]['unit'] == 'kilogram beras' else None,
             payment['lines'][0]['amount'] if payment['lines'][0]['unit'] == 'liter beras' else None,
-            payment['lines'][0]['amount'] if payment['lines'][0]['unit'] == 'rupiah' else None,
             f'{created_by.name} ({created_by.username})' if created_by is not None else '[Gagal mendapatkan informasi user]',
             f'{updated_by.name} ({updated_by.username})' if updated_by is not None else '[Gagal mendapatkan informasi user]',
             payment['payment'],
         )),))
-        ws.cell(
+        for col in range(5, 9): ws.cell(
             row=ws.max_row,
-            column=11,
+            column=col,
         ).number_format = '[$Rp-421]#,##0'
         for col in (
-            {'col': 12, 'username': created_by.username if created_by is not None else ''},
-            {'col': 13, 'username': updated_by.username if updated_by is not None else ''},
+            {'col': 11, 'username': created_by.username if created_by is not None else ''},
+            {'col': 12, 'username': updated_by.username if updated_by is not None else ''},
         ): ws.cell(
             row=ws.max_row,
             column=col['col'],
@@ -146,26 +144,25 @@ async def payments_xlsx(request: Request):
                 line_counter,
                 line['payer_name'],
                 None,
-                '✓' if line['category'] == 'zakat fitrah' else None,
-                '✓' if line['category'] == 'zakat maal' else None,
-                '✓' if line['category'] == 'fidyah' else None,
-                '✓' if line['category'] == 'infaq' else None,
+                (line['amount'] if line['unit'] == 'rupiah' else 0) if line['category'] == 'zakat fitrah' else None,
+                (line['amount'] if line['unit'] == 'rupiah' else 0) if line['category'] == 'zakat maal' else None,
+                (line['amount'] if line['unit'] == 'rupiah' else 0) if line['category'] == 'fidyah' else None,
+                (line['amount'] if line['unit'] == 'rupiah' else 0) if line['category'] == 'infaq' else None,
                 line['amount'] if line['unit'] == 'kilogram beras' else None,
                 line['amount'] if line['unit'] == 'liter beras' else None,
-                line['amount'] if line['unit'] == 'rupiah' else None,
             )),))
-            ws.cell(
+            for col in range(5, 9): ws.cell(
                 row=ws.max_row,
-                column=11,
+                column=col,
             ).number_format = '[$Rp-421]#,##0'
-        for col in (1, 4, *range(12, 15)):
+        for col in (1, 4, *range(11, 14)):
             if len(payment['lines']) > 1: ws.merge_cells(
                 start_row=ws.max_row - len(payment['lines']) + 1,
                 start_column=col,
                 end_row=ws.max_row,
                 end_column=col,
             )
-        for col in 'ABCDEFGHIJKLMN': ws.column_dimensions[col].auto_size = True
+        for col in 'ABCDEFGHIJKLM': ws.column_dimensions[col].auto_size = True
     wb.save(buffer := BytesIO())
     buffer.seek(0)
     return StreamingResponse(
