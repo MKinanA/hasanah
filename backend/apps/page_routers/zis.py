@@ -85,7 +85,7 @@ async def payments_xlsx(request: Request):
         'Kilogram',
         'Liter',
     ))
-    for col in (*range(1, 5), *range(11, 15)): ws.merge_cells(
+    for col in (*range(1, 5), *range(11, 14)): ws.merge_cells(
         start_row=ws.max_row - 1,
         start_column=col,
         end_row=ws.max_row,
