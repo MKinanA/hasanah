@@ -21,6 +21,9 @@ async def middleware(request: Request, call_next):
     try: await auth(request)
     except: pass
     response = await call_next(request)
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, proxy-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
     return response
 
 @app.exception_handler(Exception)
