@@ -1,15 +1,18 @@
 from io import BytesIO
 from time import time
+from datetime import datetime as dt
 from random import Random
 from colorsys import hls_to_rgb
 from fastapi import APIRouter, Request, Response
-from fastapi.responses import RedirectResponse, StreamingResponse
+from fastapi.responses import RedirectResponse, StreamingResponse, HTMLResponse
 from openpyxl import Workbook, styles as wstyles
+from playwright.async_api import async_playwright as pw
 from ...models.user import User, Access
 from ...models.zis_payment import Payment, PaymentCategory, PaymentUnit
 from ...helpers.str_to_bool import str_to_bool
 from ..dependencies import auth, NoAuthToken, UserSessionNotFound
-from ..render import render
+from ..render import env as jenv, render
+from ...helpers.datetime import days, months
 
 PAYMENT_QUERY_NON_FILTER_PARAMS = {
     'include_deleted': str_to_bool,
@@ -168,7 +171,7 @@ async def payments_xlsx(request: Request):
     return StreamingResponse(
         buffer,
         media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        headers={'Content-Disposition': f'attachment; filename=Export_Pembayaran_ZIS_{int(time())}.xlsx'}
+        headers={'Content-Disposition': f'{"attachment" if "download" in dict(request.query_params).keys() else "inline"}; filename=Export_Pembayaran_ZIS_{int(time())}.xlsx'}
     )
 
 @payments.get('/new')
@@ -201,5 +204,38 @@ async def payment_edit(request: Request, response: Response, uuid: str):
     payment = await Payment.get(uuid=uuid)
     if payment is None: return await render('pages/error', {'code': '404', 'error': 'Pembayaran Tidak Ditemukan', 'user': user}, status_code=404)
     return await render('pages/zis/payments/edit', {'user': user, 'payment': await (await payment.latest).to_dict, 'categories': (*({'value': category, 'name': category.capitalize()} for id, category in (await PaymentCategory.get_all()).items()),), 'units': (*({'value': unit, 'name': unit.capitalize()} for id, unit in (await PaymentUnit.get_all()).items()),)}, expose='payment')
+
+@payments.get('/{uuid}/receipt')
+async def payment_receipt(request: Request, response: Response, uuid: str):
+    query_params = dict(request.query_params)
+    try:
+        user = await auth(request)
+        await user.require_access(Access.ZIS_PAYMENT_READ)
+    except (NoAuthToken, UserSessionNotFound): return RedirectResponse(url='/login', status_code=302)
+    except Access.AccessDenied: return RedirectResponse(url='/home', status_code=302)
+    payment = await Payment.get(uuid=uuid)
+    if payment is None: return await render('pages/error', {'code': '404', 'error': 'Pembayaran Tidak Ditemukan', 'user': user}, status_code=404)
+    payment = await (await payment.latest).to_dict
+    ca = dt.fromtimestamp(payment['created_at'])
+    payment['created_at'] = f'{days[(ca.weekday() + 1) % 7]}, {ca.day} {months[ca.month - 1]} {ca.year}'
+    payment['created_by'] = await User.get(username=payment['created_by'])
+    if payment['created_by'] is None: raise RuntimeError('Failed to fetch user from payment.created_by')
+    payment['created_by'] = payment['created_by'].name
+    html = jenv.get_template('pdf/zis_payment_receipt.html').render(payment)
+    if 'html' in query_params: return HTMLResponse(html)
+    async with pw() as p:
+        browser = await p.chromium.launch(headless=True)
+        try:
+            page = await browser.new_page()
+            try:
+                await page.set_content(html)
+                pdf = await page.pdf(format=query_params['format'] if 'format' in query_params else 'A5', print_background=True)
+            finally: await page.close()
+        finally: await browser.close()
+    return StreamingResponse(
+        BytesIO(pdf),
+        media_type='application/pdf',
+        headers={'Content-Disposition': f'{"attachment" if "download" in query_params else "inline"}; filename={payment["payment"]}.pdf'}
+    )
 
 router.include_router(payments, prefix='/payments')
