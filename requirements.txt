@@ -9,3 +9,4 @@ aiosqlite
 aiofiles
 jinja2
 openpyxl
+playwright
