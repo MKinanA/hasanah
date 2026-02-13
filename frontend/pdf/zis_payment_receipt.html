@@ -139,7 +139,7 @@
                 <td><p class="align-end">{{ loop.index }}</p></td>
                 <td><p>{{ line.payer_name }}</p></td>
                 <td><p class="first-letter-upper">{{ line.category }}</p></td>
-                <td><p class="align-end">{{ (line.amount | int) if (line.amount | int) == line.amount else line.amount }}</p></td>
+                <td><p class="align-end">{{ format_number((line.amount | int) if (line.amount | int) == line.amount else line.amount) }}</p></td>
                 <td><p class="first-letter-upper">{{ line.unit }}</p></td>
                 <td><p>{{ line.note or '-' }}</p></td>
             </tr>
