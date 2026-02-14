@@ -51,6 +51,9 @@
         .align-end {
             text-align: end;
         }
+        .align-center {
+            text-align: center;
+        }
         .first-letter-upper::first-letter {
             text-transform: uppercase;
         }
@@ -90,7 +93,6 @@
 </head>
 <body>
     <h1>Tanda Terima Pembayaran</h1>
-    <p></p>
     <p>Telah diterima pembayaran dari&colon;</p>
     <table class="indent">
         <tbody>
@@ -150,6 +152,21 @@
         <p><span class="bolder">Catatan</span>&colon;</p>
         <p>{{ note or '-' }}</p>
     </div>
+    <table class="border w-full">
+        <tbody>
+            <tr>
+                <th rowspan="2"><p class="bolder">Total</p></th>
+                {% for total in totals %}
+                <th><p class="bolder first-letter-upper">{{ total }}</p></th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for total in totals.values() %}
+                <td><p class="align-center">{{ format_number((total | int) if (total | int) == total else total) }}</p></td>
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
     <table>
         <tbody>
             <tr>
@@ -160,7 +177,12 @@
             <tr>
                 <td><p><span class="bolder">Admin</span></p></td>
                 <td><p>&colon;&nbsp;</p></td>
-                <td><p class="indent">{{ created_by }}</p></td>
+                <td><p class="indent">{{ created_by }}{{ (' (data diperbarui oleh ' + updated_by + ')') if created_by != updated_by else ''}}</p></td>
+            </tr>
+            <tr>
+                <td><p><span class="bolder">UUID</span></p></td>
+                <td><p>&colon;&nbsp;</p></td>
+                <td><p class="indent">{{ payment }}</p></td>
             </tr>
         </tbody>
     </table>

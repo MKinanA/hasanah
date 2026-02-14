@@ -221,6 +221,13 @@ async def payment_receipt(request: Request, response: Response, uuid: str):
     payment['created_by'] = await User.get(username=payment['created_by'])
     if payment['created_by'] is None: raise RuntimeError('Failed to fetch user from payment.created_by')
     payment['created_by'] = payment['created_by'].name
+    payment['updated_by'] = await User.get(username=payment['updated_by'])
+    if payment['updated_by'] is None: raise RuntimeError('Failed to fetch user from payment.updated_by')
+    payment['updated_by'] = payment['updated_by'].name
+    payment['totals'] = {}
+    for line in payment['lines']:
+        if line['unit'] not in payment['totals']: payment['totals'][line['unit']] = 0
+        payment['totals'][line['unit']] += line['amount']
     html = jenv.get_template('pdf/zis_payment_receipt.html').render(payment, format_number=lambda x: f'{x:,}')
     if 'html' in query_params: return HTMLResponse(html)
     async with pw() as p:
