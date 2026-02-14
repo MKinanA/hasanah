@@ -25,4 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('#delete-button').classList.remove('loading');
         };
     });
+
+    document.querySelector('#receipt-button').setAttribute('href', document.querySelector('#receipt-button').getAttribute('href') + location.search.substring(document.querySelector('#receipt-button').getAttribute('href').includes('?') ? 1 : 0));
 });
