@@ -106,11 +106,11 @@
                 <td><p>&colon;&nbsp;</p></td>
                 <td><p class="indent">{{ payer_number or '-' }}</p></td>
             </tr>
-            <tr>
+            <!-- <tr>
                 <td><p><span class="bolder">Email</span></p></td>
                 <td><p>&colon;&nbsp;</p></td>
                 <td><p class="indent">{{ payer_email or '-' }}</p></td>
-            </tr>
+            </tr> -->
             <tr>
                 <td><p><span class="bolder">Alamat</span></p></td>
                 <td><p>&colon;&nbsp;</p></td>
@@ -130,8 +130,9 @@
                 <th><p class="bolder">No.</p></th>
                 <th><p class="bolder">Nama</p></th>
                 <th><p class="bolder">Kategori</p></th>
-                <th><p class="bolder">Jumlah</p></th>
-                <th><p class="bolder">Satuan</p></th>
+                {% for unit in units %}
+                <th><p class="bolder first-letter-upper">{{ unit }}</p></th>
+                {% endfor %}
                 <th><p class="bolder">Catatan</p></th>
             </tr>
         </thead>
@@ -141,8 +142,9 @@
                 <td><p class="align-end">{{ loop.index }}</p></td>
                 <td><p>{{ line.payer_name }}</p></td>
                 <td><p class="first-letter-upper">{{ line.category }}</p></td>
-                <td><p class="align-end">{{ format_number((line.amount | int) if (line.amount | int) == line.amount else line.amount) }}</p></td>
-                <td><p class="first-letter-upper">{{ line.unit }}</p></td>
+                {% for unit in units %}
+                <td><p class="align-end">{{ format_number((line.amount | int) if (line.amount | int) == line.amount else line.amount) if line.unit == unit else '' }}</p></td>
+                {% endfor %}
                 <td><p>{{ line.note or '-' }}</p></td>
             </tr>
             {% endfor %}

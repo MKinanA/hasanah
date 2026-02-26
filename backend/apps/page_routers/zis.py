@@ -216,6 +216,9 @@ async def payment_receipt(request: Request, response: Response, uuid: str):
     payment = await Payment.get(uuid=uuid)
     if payment is None: return await render('pages/error', {'code': '404', 'error': 'Pembayaran Tidak Ditemukan', 'user': user}, status_code=404)
     payment = await (await payment.latest).to_dict
+    payment['units'] = []
+    for line in payment['lines']:
+        if not line['unit'] in payment['units']: payment['units'].append(line['unit'])
     ca = dt.fromtimestamp(payment['created_at'])
     payment['created_at'] = f'{days[(ca.weekday() + 1) % 7]}, {ca.day} {months[ca.month - 1]} {ca.year}'
     payment['created_by'] = await User.get(username=payment['created_by'])
