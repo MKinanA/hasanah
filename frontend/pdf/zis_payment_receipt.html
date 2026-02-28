@@ -27,6 +27,14 @@
             padding: 4vh 4vw;
             /* background: color-mix(in oklab, #fff, #0f0 12.5%); */
         }
+        @media print {
+            body {
+                padding: 0;
+            }
+            @page {
+                margin: 4vh 4vw;
+            }
+        }
         h1 {
             font-size: 24px;
         }
@@ -66,6 +74,12 @@
         }
         table {
             border-spacing: 0;
+        }
+        table > :is(thead, tbody) {
+            display: table-row-group;
+        }
+        table > :is(thead, tbody) > tr {
+            break-inside: avoid;
         }
         table > :is(thead, tbody) > tr:not(:last-child) > :is(th, td) > * {
             margin-bottom: 16px;
