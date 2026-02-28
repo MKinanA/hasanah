@@ -1,3 +1,5 @@
+from . import load_env
+load_env()
 from asyncio import run as async_run
 from uvicorn import run as uvicorn_run
 from .helpers.db_connect import db_connect

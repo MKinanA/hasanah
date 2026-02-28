@@ -1,19 +1,15 @@
-from dotenv import load_dotenv as env
-from os import getenv
+from os import environ as env
 from ..models.user import User, Access
-from ..helpers.get_package_path import get_package_path
 from ..helpers.log import log
 
 async def seed() -> None:
-    env(get_package_path(__name__, __file__)/'.env')
-
     for name, value in vars(Access).items():
         if name.isupper() and isinstance(value, str): await Access.create(value)
 
     admin = User(
-        username=str(getenv('USERNAME_AKUN_ADMIN')),
-        name=str(getenv('NAMA_AKUN_ADMIN')),
-        password=str(getenv('PASSWORD_AKUN_ADMIN')),
+        username=str(env['USERNAME_AKUN_ADMIN']),
+        name=str(env['NAMA_AKUN_ADMIN']),
+        password=str(env['PASSWORD_AKUN_ADMIN']),
     )
     await admin.save()
     await admin.grant_access(Access.ADMIN)
