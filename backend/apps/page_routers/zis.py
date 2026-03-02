@@ -208,13 +208,11 @@ async def payment_edit(request: Request, response: Response, uuid: str):
 @payments.get('/{uuid}/receipt')
 async def payment_receipt(request: Request, response: Response, uuid: str):
     query_params = dict(request.query_params)
-    try:
-        user = await auth(request)
-        await user.require_access(Access.ZIS_PAYMENT_READ)
-    except (NoAuthToken, UserSessionNotFound): return RedirectResponse(url='/login', status_code=302)
-    except Access.AccessDenied: return RedirectResponse(url='/home', status_code=302)
+    user = None
+    try: user = await auth(request)
+    except (NoAuthToken, UserSessionNotFound): pass
     payment = await Payment.get(uuid=uuid)
-    if payment is None: return await render('pages/error', {'code': '404', 'error': 'Pembayaran Tidak Ditemukan', 'user': user}, status_code=404)
+    if payment is None: return await render('pages/error', {'code': '404', 'error': 'Pembayaran Tidak Ditemukan', **({'user': user} if user is not None else {'use_header': False})}, status_code=404)
     payment = await (await payment.latest).to_dict
     payment['units'] = []
     for line in payment['lines']:
