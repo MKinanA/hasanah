@@ -1,9 +1,12 @@
+from os import environ as env
 from inspect import signature
 from fastapi import APIRouter, Request, Response, Depends
 from ...models.user import User, Access
 from ...models.zis_payment import Payment, PaymentVersion
 from ...helpers.api_response import api_response as mkresp
 from ..dependencies import auth, json_body
+from ...senders.whatsapp import send as send_wa
+from ...helpers.format_phone_number import format_phone_number
 
 PAYMENT_QUERY_PARAMS = (*signature(Payment.query).parameters.keys(),)
 
@@ -99,3 +102,28 @@ async def delete_payment(request: Request, response: Response, user: User = Depe
         response.status_code = 500
         return mkresp('error', 'Failed to Delete', 'Payment deletion was attempted but couldn\'t be verified.')
     return mkresp('success', 'Payment Deleted', 'Successfully deleted payment.')
+
+@router.post('/payment/send-receipt')
+async def send_payment_receipt(request: Request, response: Response, body: dict = Depends(json_body), payment_resp: dict = Depends(payment)) -> dict:
+    if payment_resp['type'] != 'success': return payment_resp
+    payment: dict = payment_resp['payment']
+    via = body.get('via')
+    if not isinstance(via, str):
+        response.status_code = 400
+        return mkresp('error', 'Invalid `via`', f'`via` must be string.')
+    try: message = (channels := {
+        'wa': lambda: send_wa(
+            to=format_phone_number(payment['payer_number']),
+            content='receipt',
+            variables={
+                'name': f'Bapak/Ibu {payment["payer_name"]}',
+                'file': f'{env["PROTOCOL"]}://{env["DOMAIN"]}/zis/payments/{payment["payment"]}/receipt',
+            },
+        ).sid
+    })[via]()
+    except KeyError:
+        if via not in channels:
+            response.status_code = 400
+            return mkresp('error', 'Invalid `via`', (lambda channels: f'Please provide a valid channel for sending ({", ".join(channels)}).')(f"`'{channel}'`" for channel in channels))
+        else: raise
+    return mkresp('success', 'Payment Receipt Sent', f'Sending via `{via}` was succesfully attempted, please do check if the message is received by recipient.', message_id=message)
