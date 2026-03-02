@@ -1,4 +1,4 @@
-from . import apps, models, seeders, helpers, run_schema_and_seed
+from . import apps, models, seeders, helpers, run_schema_and_seed, senders
 
 def load_env():
     from dotenv import load_dotenv as env
