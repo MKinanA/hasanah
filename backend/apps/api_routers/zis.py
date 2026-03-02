@@ -36,7 +36,7 @@ async def payment(request: Request, response: Response, user: User = Depends(aut
     if payment_version is None:
         response.status_code = 404
         return mkresp('error', 'Payment Version Not Found', 'Couldn\'t fetch payment with provided UUID and version.')
-    return mkresp('success', 'Payments Fetched', 'Successfully fetched payments.', payment=await payment_version.to_dict)
+    return mkresp('success', 'Payment Fetched', 'Successfully fetched payment.', payment=await payment_version.to_dict)
 
 @router.post('/payment/create')
 async def create_payment(request: Request, response: Response, user: User = Depends(auth), body: dict = Depends(json_body)) -> dict:
