@@ -1,0 +1,79 @@
+@import '../base.css';
+
+body > div > main a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    outline: calc(2 * var(--scaling-factor)) solid transparent;
+    outline-offset: 0;
+    pointer-events: none;
+    border-radius: calc(2 * var(--scaling-factor));
+}
+
+body > div > main a:focus-visible::after {
+    outline-offset: calc(2 * var(--scaling-factor));
+    outline-color: currentColor;
+}
+
+body > div > main > iframe {
+    --width: max(75%, calc(256 * var(--scaling-factor))); 
+    width: var(--width);
+    height: calc(100vh * calc(100vw / var(--width)));
+    align-self: center;
+    border-radius: calc(8 * var(--scaling-factor));
+}
+
+body > div > main > div:not(:has(> :not(a, button))) {
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: var(--main-padding);
+}
+
+body > div > main > div:not(:has(> :not(a, button))) * {
+    text-decoration: none;
+    font-weight: 600;
+    text-align: center;
+}
+
+body > div > main > div:not(:has(> :not(a, button))) > * {
+    display: flex;
+    padding: calc(8 * var(--scaling-factor)) calc(16 * var(--scaling-factor));
+    justify-content: center;
+    align-items: center;
+    flex-grow: 1;
+    min-width: min(100%, calc(256 * var(--scaling-factor)));
+    max-width: 100%;
+    background: rgb(var(--bg-color-2));
+    border-radius: calc(12 * var(--scaling-factor));
+    cursor: pointer;
+}
+
+body > div > main > div:not(:has(> :not(a, button))) > [disabled] {
+    pointer-events: none;
+    opacity: 50%;
+    cursor: not-allowed;
+}
+
+body > div > main > div:not(:has(> :not(a, button))) > .loading {
+    pointer-events: none;
+    opacity: 50%;
+    cursor: progress;
+}
+
+body > div > main > div:not(:has(> :not(a, button))) > .loading::after {
+    content: '';
+    display: block;
+    position: absolute;
+    right: calc(12 * var(--scaling-factor));
+    left: initial;
+    top: 50%;
+    transform: translateY(-50%);
+    transform-origin: top;
+    width: calc(16 * var(--scaling-factor));
+    height: calc(16 * var(--scaling-factor));
+    border: calc(4 * var(--scaling-factor)) solid rgb(var(--light));
+    border-bottom-color: transparent;
+    border-radius: 100%;
+    animation: spin 1s linear infinite;
+}

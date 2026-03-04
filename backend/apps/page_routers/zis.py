@@ -246,4 +246,15 @@ async def payment_receipt(request: Request, response: Response, uuid: str):
         headers={'Content-Disposition': f'{"attachment" if "download" in query_params else "inline"}; filename={payment["payment"]}.pdf'}
     )
 
+@payments.get('/{uuid}/send-receipt')
+async def send_payment_receipt(request: Request, response: Response, uuid: str):
+    try:
+        user = await auth(request)
+        await user.require_access(Access.ZIS_PAYMENT_READ)
+    except (NoAuthToken, UserSessionNotFound): return RedirectResponse(url='/login', status_code=302)
+    except Access.AccessDenied: return RedirectResponse(url='/home', status_code=302)
+    payment = await Payment.get(uuid=uuid)
+    if payment is None: return await render('pages/error', {'code': '404', 'error': 'Pembayaran Tidak Ditemukan', 'user': user}, status_code=404)
+    return await render('pages/zis/payments/send-receipt', {'user': user, 'payment': await (await payment.latest).to_dict}, expose='payment')
+
 router.include_router(payments, prefix='/payments')
