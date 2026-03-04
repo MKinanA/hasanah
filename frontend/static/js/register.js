@@ -18,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if ((Math.round(resp.status / 100) === 2) && (body.type === 'success')) {
                     storeToken(body.token);
                     location.replace('/home');
-                } else alert(body.message ?? body.detail ?? 'Username atau password salah.');
+                } else alert(body.message ?? body.detail ?? 'Terjadi kesalahan, silahkan hubungi admin.');
             } else alert(checks.map(check => `\n• ${check}`).join('\n'));
             document.querySelector('body > form > fieldset').removeAttribute('disabled');
         };

@@ -41,3 +41,31 @@ async def logout(request: Request, response: Response, user: User = Depends(auth
 
     await Session.delete(token)
     return mkresp('success', 'Sesi Diakhiri', 'Logout berhasil, sesi telah dihapus.')
+
+@router.post('/register')
+async def register(request: Request, response: Response, body: dict = Depends(json_body)):
+    username = body.get('username')
+    password = body.get('password')
+
+    if type(username) != str:
+        response.status_code = 400
+        return mkresp('error', 'Permintaan Buruk', 'Username tidak valid.')
+    if type(password) != str:
+        response.status_code = 400
+        return mkresp('error', 'Permintaan Buruk', 'Password tidak valid.')
+    try: User.validate_username(username)
+    except User.InvalidUsername as e:
+        response.status_code = 400
+        return mkresp('error', 'Permintaan Buruk', str(e))
+    try: User.validate_password(password)
+    except User.InvalidUsername as e:
+        response.status_code = 400
+        return mkresp('error', 'Permintaan Buruk', str(e))
+    if (await User.get(username=username)) is not None:
+        response.status_code = 400
+        return mkresp('error', 'Username Tidak Tersedia', 'Username yang anda pilih tidak bisa digunakan, silahkan buat username yang berbeda.')
+
+    user = User(username=username, name=username, password=password)
+    await user.save()
+    token = await user.create_session()
+    return mkresp('success', 'Registrasi Berhasil', 'Registrasi + login berhasil, user dan sesi baru telah dibuat.', token=token)
