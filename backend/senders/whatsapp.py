@@ -7,7 +7,7 @@ CONTENTS = {
     'receipt': 'HXac58814218dcdadd8c4836c4d859492f',
 }
 
-def send(to: str, body: 'str | None' = None, content: 'str | None' = None, variables: 'dict | None' = None, media_url: 'str | list[str] | None' = None):
+async def send(to: str, body: 'str | None' = None, content: 'str | None' = None, variables: 'dict | None' = None, media_url: 'str | list[str] | None' = None):
     global CLIENT
     return (CLIENT if isinstance(CLIENT, Client) else (CLIENT := Client(
         env['TWILIO_ACCOUNT_SID'],
