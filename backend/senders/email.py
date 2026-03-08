@@ -10,11 +10,11 @@ SMTP_PASSWORD = None
 CONTENTS = {
     'receipt': {
         'subject': 'Tanda Terima Pembayaran Zakat, Infaq, Shadaqah - Masjid Al-Hasanah',
-        'content': 'Assalamu\'alaikum Bapak/Ibu {name}, berikut adalah tanda terima pembayaran anda, jazakumullah khairan.'
+        'content': 'Assalamu\'alaikum {name}, berikut adalah tanda terima pembayaran anda, jazakumullah khairan.'
     }
 }
 
-async def send(to: str, content: 'dict | str', variables: 'dict | None' = None, files: 'tuple[dict] | list[dict] | None' = None):
+async def send(to: str, content: 'dict | str', variables: 'dict | None' = None, files: 'tuple | list | None' = None):
     global EMAIL_SENDER_ADDRESS, SMTP_SERVER, SMTP_PORT, SMTP_USERNAME, SMTP_PASSWORD
 
     if not isinstance(content, dict): content = CONTENTS[content]
