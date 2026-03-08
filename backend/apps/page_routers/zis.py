@@ -1,18 +1,16 @@
 from io import BytesIO
 from time import time
-from datetime import datetime as dt
 from random import Random
 from colorsys import hls_to_rgb
 from fastapi import APIRouter, Request, Response
 from fastapi.responses import RedirectResponse, StreamingResponse, HTMLResponse
 from openpyxl import Workbook, styles as wstyles
-from playwright.async_api import async_playwright as pw
 from ...models.user import User, Access
 from ...models.zis_payment import Payment, PaymentCategory, PaymentUnit
+from ..utils.zis import generate_receipt
 from ...helpers.str_to_bool import str_to_bool
 from ..dependencies import auth, NoAuthToken, UserSessionNotFound
-from ..render import env as jenv, render
-from ...helpers.datetime import days, months
+from ..render import render
 
 PAYMENT_QUERY_NON_FILTER_PARAMS = {
     'include_deleted': str_to_bool,
@@ -214,34 +212,11 @@ async def payment_receipt(request: Request, response: Response, uuid: str):
     payment = await Payment.get(uuid=uuid)
     if payment is None: return await render('pages/error', {'code': '404', 'error': 'Pembayaran Tidak Ditemukan', **({'user': user} if user is not None else {'use_header': False})}, status_code=404)
     payment = await (await payment.latest).to_dict
-    payment['units'] = []
-    for line in payment['lines']:
-        if not line['unit'] in payment['units']: payment['units'].append(line['unit'])
-    ca = dt.fromtimestamp(payment['created_at'])
-    payment['created_at'] = f'{days[(ca.weekday() + 1) % 7]}, {ca.day} {months[ca.month - 1]} {ca.year}'
-    payment['created_by'] = await User.get(username=payment['created_by'])
-    if payment['created_by'] is None: raise RuntimeError('Failed to fetch user from payment.created_by')
-    payment['created_by'] = payment['created_by'].name
-    payment['updated_by'] = await User.get(username=payment['updated_by'])
-    if payment['updated_by'] is None: raise RuntimeError('Failed to fetch user from payment.updated_by')
-    payment['updated_by'] = payment['updated_by'].name
-    payment['totals'] = {}
-    for line in payment['lines']:
-        if line['unit'] not in payment['totals']: payment['totals'][line['unit']] = 0
-        payment['totals'][line['unit']] += line['amount']
-    html = jenv.get_template('pdf/zis_payment_receipt.html').render(payment, format_number=lambda x: f'{x:,}')
-    if 'html' in query_params: return HTMLResponse(html)
-    async with pw() as p:
-        browser = await p.chromium.launch(headless=True)
-        try:
-            page = await browser.new_page()
-            try:
-                await page.set_content(html)
-                pdf = await page.pdf(format=query_params['format'] if 'format' in query_params else 'A5', print_background=True)
-            finally: await page.close()
-        finally: await browser.close()
+    receipt = await generate_receipt(payment=payment, format=query_params['format'] if 'format' in query_params else None, html=(html := 'html' in query_params))
+    if html: return receipt
+    if not isinstance(receipt, bytes): raise RuntimeError()
     return StreamingResponse(
-        BytesIO(pdf),
+        BytesIO(receipt),
         media_type='application/pdf',
         headers={'Content-Disposition': f'{"attachment" if "download" in query_params else "inline"}; filename={payment["payment"]}.pdf'}
     )
