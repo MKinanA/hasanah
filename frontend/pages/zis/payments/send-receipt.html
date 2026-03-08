@@ -11,7 +11,7 @@
     <h2>Kirim Tanda Terima Pembayaran</h2>
     <div>
         <button class="send-button" data-via="wa" {% if payment.payer_number is none %}disabled{% endif %}><p>Kirim via WhatsApp</p></button>
-        <!-- <button class="send-button" data-via="email" {% if payment.payer_email is none %}disabled{% endif %}><p>Kirim via Email</p></button> -->
+        <button class="send-button" data-via="email" {% if payment.payer_email is none %}disabled{% endif %}><p>Kirim via Email</p></button>
     </div>
     <iframe src="receipt"></iframe>
 {% endblock %}
