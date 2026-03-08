@@ -1,1 +1,1 @@
-from . import whatsapp
+from . import whatsapp, email
