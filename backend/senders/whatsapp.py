@@ -1,4 +1,5 @@
 from os import environ as env
+from asyncio import get_running_loop
 from json import dumps
 from twilio.rest import Client
 
@@ -9,10 +10,11 @@ CONTENTS = {
 
 async def send(to: str, body: 'str | None' = None, content: 'str | None' = None, variables: 'dict | None' = None, media_url: 'str | list[str] | None' = None):
     global CLIENT
-    return (CLIENT if isinstance(CLIENT, Client) else (CLIENT := Client(
+    client = CLIENT if isinstance(CLIENT, Client) else (CLIENT := Client(
         env['TWILIO_ACCOUNT_SID'],
         env['TWILIO_AUTH_TOKEN'],
-    ))).messages.create(
+    ))
+    return await get_running_loop().run_in_executor(None, lambda: client.messages.create(
         from_=f'whatsapp:{env["WHATSAPP_SENDER_NUMBER"]}',
         to=f'whatsapp:{to}',
         **({
@@ -27,4 +29,4 @@ async def send(to: str, body: 'str | None' = None, content: 'str | None' = None,
         **({
             'media_url': media_url if isinstance(media_url, list) else [media_url],
         } if isinstance(media_url, (str, list)) else {}),
-    )
+    ))
