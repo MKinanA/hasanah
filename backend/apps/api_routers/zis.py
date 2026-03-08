@@ -6,6 +6,8 @@ from ...models.zis_payment import Payment, PaymentVersion
 from ...helpers.api_response import api_response as mkresp
 from ..dependencies import auth, json_body
 from ...senders.whatsapp import send as send_wa
+from ...senders.email import send as send_email
+from ..utils.zis import generate_receipt
 from ...helpers.format_phone_number import format_phone_number
 
 PAYMENT_QUERY_PARAMS = (*signature(Payment.query).parameters.keys(),)
@@ -119,6 +121,18 @@ async def send_payment_receipt(request: Request, response: Response, body: dict 
             'file': f'{env["PROTOCOL"]}://{env["DOMAIN"]}/zis/payments/{payment["payment"]}/receipt',
         },
     )).sid
+    elif via == 'email': message = (await send_email(
+        to=payment['payer_email'],
+        content='receipt',
+        variables={
+            'name': f'Bapak/Ibu {payment["payer_name"]}',
+        },
+        files=({
+            'content': await generate_receipt(payment=payment, format=body.get('format')),
+            'mimetype': 'application/pdf',
+            'name': payment['payment'],
+        },),
+    ))[1].split()[3]
     else:
         response.status_code = 400
         return mkresp('error', 'Invalid `via`', (lambda channels: f'Please provide a valid channel for sending ({", ".join(channels)}).')(f"`'{channel}'`" for channel in ('wa', 'email')))
