@@ -13,10 +13,20 @@ body > div > main > div > label {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
+    cursor: pointer;
+}
+
+body > div > main > div > label:has(input[disabled]) {
+    cursor: not-allowed;
+    opacity: 75%;
 }
 
 body > div > main > div > label:is(:hover, :has(:focus-visible)) {
     background: rgb(var(--bg-color-2));
+}
+
+body > div > main > div > label:has(input[disabled]):is(:hover, :has(:focus-visible)) {
+    background: transparent;
 }
 
 body > div > main > div > label > input[type="checkbox"] {
