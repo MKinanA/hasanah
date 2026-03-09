@@ -1,0 +1,56 @@
+@import '../base.css';
+
+body > div > main > div {
+    gap: 0;
+}
+
+body > div > main > div > label {
+    padding: calc(16 * var(--scaling-factor)) calc(8 * var(--scaling-factor));
+    margin: 0 calc(-8 * var(--scaling-factor));
+    border-radius: calc(16 * var(--scaling-factor));
+    width: calc(100% + calc(16 * var(--scaling-factor)));
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+body > div > main > div > label:is(:hover, :has(:focus-visible)) {
+    background: rgb(var(--bg-color-2));
+}
+
+body > div > main > div > label > input[type="checkbox"] {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+body > div > main > div > label > .slider {
+    --height: calc(24 * var(--scaling-factor));
+    aspect-ratio: 2 / 1;
+    height: var(--height);
+    border-radius: 100vmax;
+    background: rgb(var(--fg-color-2));
+    box-shadow: 0 0 var(--height) 0 rgb(var(--bg-color-2)) inset;
+}
+
+body > div > main > div > label > .slider::before {
+    --padding: calc(4 * var(--scaling-factor));
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: calc(var(--padding) / 2);
+    aspect-ratio: 1 / 1;
+    height: calc(100% - var(--padding));
+    background: rgb(var(--fg-color));
+    border-radius: 100vmax;
+    transform: translateY(-50%);
+}
+
+body > div > main > div > label:has(input:checked) > .slider {
+    background: color-mix(in oklab, rgb(var(--fg-color)), green 96%);
+}
+
+body > div > main > div > label:has(input:checked) > .slider::before {
+    transform: translateY(-50%) translateX(calc(var(--height)));
+}

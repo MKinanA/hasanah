@@ -1,0 +1,21 @@
+{% extends 'templates/page.html' %}
+
+{% block title %}{{ target_user.name }} - Akses{% endblock %}
+
+{% block head %}
+    <link rel="stylesheet" href="/static/css/pages/users/accesses.css">
+    <script type="module" src="/static/js/users/accesses.js"></script>
+{% endblock %}
+
+{% block main %}
+    <h2>Akses {{ target_user.name }}</h2>
+    <div>
+        {% for access, owned in accesses.items() %}
+            <label class="toggle">
+                <p>{{ access }}</p>
+                <input type="checkbox" name="{{ access }}" {% if owned %}checked{% endif %}>
+                <div class="slider"></div>
+            </label>
+        {% endfor %}
+    </div>
+{% endblock %}
