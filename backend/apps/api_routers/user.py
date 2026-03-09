@@ -17,17 +17,19 @@ async def user(request: Request, response: Response, user: User = Depends(auth),
     return mkresp('success', 'User Found', 'User info fetched successfully.', username=requested_user.username, name=requested_user.name, **({'accesses': await requested_user.accesses} if await user.has_access(Access.ADMIN) else {}))
 
 @router.post('/grant-access')
-async def grant_access(request: Request, response: Response, user_resp: dict = Depends(user), body: dict = Depends(json_body)):
+async def grant_access(request: Request, response: Response, user: User = Depends(auth), user_resp: dict = Depends(user), body: dict = Depends(json_body)):
+    await user.require_access(Access.ADMIN)
     if user_resp['type'] != 'success': return user_resp
-    user = await User.get(username=user_resp['username'])
-    if user is None: raise RuntimeError('Failed to fetch user from username.')
-    await user.grant_access(access := body['access'])
-    return mkresp('success', 'Access Granted', 'Access has been successfully granted to user.', username=user.username, name=user.name, access=access)
+    target_user = await User.get(username=user_resp['username'])
+    if target_user is None: raise RuntimeError('Failed to fetch user from username.')
+    await target_user.grant_access(access := body['access'])
+    return mkresp('success', 'Access Granted', 'Access has been successfully granted to user.', username=target_user.username, name=target_user.name, access=access)
 
 @router.post('/revoke-access')
-async def revoke_access(request: Request, response: Response, user_resp: dict = Depends(user), body: dict = Depends(json_body)):
+async def revoke_access(request: Request, response: Response, user: User = Depends(auth), user_resp: dict = Depends(user), body: dict = Depends(json_body)):
+    await user.require_access(Access.ADMIN)
     if user_resp['type'] != 'success': return user_resp
-    user = await User.get(username=user_resp['username'])
-    if user is None: raise RuntimeError('Failed to fetch user from username.')
-    await user.revoke_access(access := body['access'])
-    return mkresp('success', 'Access Revoked', 'Access has been successfully revoked from user.', username=user.username, name=user.name, access=access)
+    target_user = await User.get(username=user_resp['username'])
+    if target_user is None: raise RuntimeError('Failed to fetch user from username.')
+    await target_user.revoke_access(access := body['access'])
+    return mkresp('success', 'Access Revoked', 'Access has been successfully revoked from user.', username=target_user.username, name=target_user.name, access=access)
