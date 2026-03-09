@@ -19,17 +19,23 @@ async def user(request: Request, response: Response, user: User = Depends(auth),
 @router.post('/grant-access')
 async def grant_access(request: Request, response: Response, user: User = Depends(auth), user_resp: dict = Depends(user), body: dict = Depends(json_body)):
     await user.require_access(Access.ADMIN)
+    if (access := body['access']) == Access.ADMIN:
+        response.status_code = 400
+        return mkresp('error', 'Bad Request', f'Can\'t grant {access} access via API.')
     if user_resp['type'] != 'success': return user_resp
     target_user = await User.get(username=user_resp['username'])
     if target_user is None: raise RuntimeError('Failed to fetch user from username.')
-    await target_user.grant_access(access := body['access'])
+    await target_user.grant_access(access)
     return mkresp('success', 'Access Granted', 'Access has been successfully granted to user.', username=target_user.username, name=target_user.name, access=access)
 
 @router.post('/revoke-access')
 async def revoke_access(request: Request, response: Response, user: User = Depends(auth), user_resp: dict = Depends(user), body: dict = Depends(json_body)):
     await user.require_access(Access.ADMIN)
+    if (access := body['access']) == Access.ADMIN:
+        response.status_code = 400
+        return mkresp('error', 'Bad Request', f'Can\'t grant {access} access via API.')
     if user_resp['type'] != 'success': return user_resp
     target_user = await User.get(username=user_resp['username'])
     if target_user is None: raise RuntimeError('Failed to fetch user from username.')
-    await target_user.revoke_access(access := body['access'])
+    await target_user.revoke_access(access)
     return mkresp('success', 'Access Revoked', 'Access has been successfully revoked from user.', username=target_user.username, name=target_user.name, access=access)
