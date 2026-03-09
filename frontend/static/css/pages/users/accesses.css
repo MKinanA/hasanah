@@ -29,6 +29,22 @@ body > div > main > div > label:has(input[disabled]):is(:hover, :has(:focus-visi
     background: transparent;
 }
 
+body > div > main > div > label.loading::after {
+    content: '';
+    display: block;
+    position: absolute;
+    right: calc(64 * var(--scaling-factor));
+    top: 50%;
+    transform: translateY(-50%);
+    transform-origin: top;
+    width: calc(16 * var(--scaling-factor));
+    height: calc(16 * var(--scaling-factor));
+    border: calc(4 * var(--scaling-factor)) solid rgb(var(--light));
+    border-bottom-color: transparent;
+    border-radius: 100%;
+    animation: spin 1s linear infinite;
+}
+
 body > div > main > div > label > input[type="checkbox"] {
     opacity: 0;
     width: 0;
