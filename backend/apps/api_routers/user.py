@@ -14,7 +14,7 @@ async def user(request: Request, response: Response, user: User = Depends(auth),
     if requested_user is None:
         response.status_code = 404
         return mkresp('error', 'Not Found', 'The requested user is not found based on the provided queries.')
-    return mkresp('success', 'User Found', 'User info fetched successfully.', username=requested_user.username, name=requested_user.name, **({'accesses': await requested_user.accesses} if user.has_access(Access.ADMIN) else {}))
+    return mkresp('success', 'User Found', 'User info fetched successfully.', username=requested_user.username, name=requested_user.name, **({'accesses': await requested_user.accesses} if await user.has_access(Access.ADMIN) else {}))
 
 @router.post('/grant-access')
 async def grant_access(request: Request, response: Response, user_resp: dict = Depends(user), body: dict = Depends(json_body)):
