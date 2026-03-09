@@ -6,7 +6,7 @@ from ..dependencies import auth, json_body
 router = APIRouter()
 
 @router.post('')
-async def payments(request: Request, response: Response, user: User = Depends(auth), body: dict = Depends(json_body)) -> dict:
+async def user(request: Request, response: Response, user: User = Depends(auth), body: dict = Depends(json_body)) -> dict:
     requested_user = await User.get(**body)
     if requested_user is None:
         response.status_code = 404
