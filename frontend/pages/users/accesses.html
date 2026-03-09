@@ -13,7 +13,7 @@
         {% for access, owned in accesses.items() %}
             <label class="toggle">
                 <p>{{ access }}</p>
-                <input type="checkbox" name="{{ access }}" {% if owned %}checked{% endif %} {% if access == admin %}disabled{% endif %}>
+                <input type="checkbox" name="{{ access }}" {% if owned %}checked{% endif %} {% if access == admin or (not accesses[admin] and user.username == target_user.username) %}disabled{% endif %}>
                 <div class="slider"></div>
             </label>
         {% endfor %}
