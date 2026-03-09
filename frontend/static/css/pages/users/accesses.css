@@ -56,21 +56,22 @@ body > div > main > div > label > .slider {
     aspect-ratio: 2 / 1;
     height: var(--height);
     border-radius: 100vmax;
-    background: rgb(var(--fg-color-2));
-    box-shadow: 0 0 var(--height) 0 rgb(var(--bg-color-2)) inset;
+    background: rgb(var(--darker-light));
+    box-shadow: 0 0 var(--height) 0 rgb(var(--lighter-dark)) inset;
 }
 
 body > div > main > div > label > .slider::before {
-    --padding: calc(4 * var(--scaling-factor));
+    --padding: calc(8 * var(--scaling-factor));
     content: '';
     position: absolute;
     top: 50%;
     left: calc(var(--padding) / 2);
     aspect-ratio: 1 / 1;
     height: calc(100% - var(--padding));
-    background: rgb(var(--fg-color));
+    background: rgb(var(--light));
     border-radius: 100vmax;
     transform: translateY(-50%);
+    box-shadow: 0 0 var(--height) 0 rgb(var(--lighter-dark));
 }
 
 body > div > main > div > label:has(input:checked) > .slider {
