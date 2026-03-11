@@ -24,7 +24,8 @@ async def update_name(request: Request, response: Response, user: User = Depends
     if not (target_user.username == user.username or user.has_access(Access.ADMIN)):
         response.status_code = 403
         return mkresp('error', 'Access Denied', 'You have no authority to update this user\'s name.')
-    target_user.username = body.get('new_name') or ''
+    target_user.name = body.get('new_name') or ''
+    await target_user.save()
     return mkresp('success', 'Name Updated', 'User\'s name has been updated successfully.', username=target_user.username, name=target_user.name)
 
 @router.post('/grant-access')
