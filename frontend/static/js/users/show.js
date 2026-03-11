@@ -6,13 +6,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
     nameEditButton.addEventListener('click', async e => {
         nameEditButton.classList.add('loading');
-        const resp = await fetch(`/api/user/update-name`, {method: 'POST', body: JSON.stringify({
-            username: data.target_user.username,
-            new_name: prompt('Masukkan nama baru:'),
-        })});
-        const body = await resp.json();
-        if ((Math.floor(resp.status / 100) === 2) && (body.type === 'success')) location.reload();
-        else alert(`Error: ${body.message ?? body.detail ?? '?'}`);
+        const newName = prompt('Masukkan nama baru:');
+        if (newName !== null) {
+            const resp = await fetch(`/api/user/update-name`, {method: 'POST', body: JSON.stringify({
+                username: data.target_user.username,
+                new_name: newName,
+            })});
+            const body = await resp.json();
+            if ((Math.floor(resp.status / 100) === 2) && (body.type === 'success')) location.reload();
+            else alert(`Error: ${body.message ?? body.detail ?? '?'}`);
+        }
         nameEditButton.classList.remove('loading');
     });
 });
