@@ -43,6 +43,47 @@ body > div > main > h2:first-of-type:has(+ p) {
     margin-bottom: calc(-4 * var(--scaling-factor));
 }
 
+body > div > main > h2:first-of-type:has(+ p) > #name-edit-button {
+    position: absolute;
+    top: 50%;
+    right: calc(-8 * var(--scaling-factor));
+    transform: translate(100%, -50%);
+    aspect-ratio: 1 / 1;
+    height: calc(32 * var(--scaling-factor));
+    padding: calc(8 * var(--scaling-factor));
+    border-radius: calc(8 * var(--scaling-factor));
+    cursor: pointer;
+    background: transparent;
+}
+
+body > div > main > h2:first-of-type:has(+ p) > #name-edit-button.loading {
+    pointer-events: none;
+}
+
+body > div > main > h2:first-of-type:has(+ p) > #name-edit-button.loading::after {
+    content: '';
+    display: block;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    transform-origin: top left;
+    width: calc(16 * var(--scaling-factor));
+    height: calc(16 * var(--scaling-factor));
+    border: calc(4 * var(--scaling-factor)) solid rgb(var(--light));
+    border-bottom-color: transparent;
+    border-radius: 100%;
+    animation: spin 1s linear infinite;
+}
+
+body > div > main > h2:first-of-type:has(+ p) > #name-edit-button.loading > svg {
+    opacity: 0;
+}
+
+body > div > main > h2:first-of-type:has(+ p) > #name-edit-button:hover {
+    background: rgb(var(--bg-color-2));
+}
+
 body > div > main > p:is(h2:first-of-type + p) {
     margin-top: calc(-4 * var(--scaling-factor));
 }
