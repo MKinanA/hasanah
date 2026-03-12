@@ -7,7 +7,7 @@ from ...helpers.datetime import days, months
 from ..render import env as jenv
 from ...helpers.log import log
 
-DEBUG_FORCE_PDFKIT = True
+DEBUG_FORCE_PDFKIT = False
 
 async def generate_receipt(payment: 'Payment | PaymentVersion | dict', format: 'str | None' = None, html: 'bool' = False) -> 'bytes | str':
     if isinstance(payment, Payment): payment = await payment.latest
