@@ -42,6 +42,7 @@ async def generate_receipt(payment: 'Payment | PaymentVersion | dict', format: '
             finally: await browser.close()
     except NotImplementedError as e:
         print(log(__name__, f'Playwright PDF generation failed, falling back to pdfkit. Error: {type(e).__name__}({e})'))
+        html_render = jenv.get_template('pdf/zis_payment_receipt_wkhtmltopdf.html').render(payment, format_number=lambda x: f'{x:,}')
         pdf = pdfkit_from_string(html_render, False, options={
             'page-size': format if isinstance(format, str) else 'A5',
             'print-media-type': '',
