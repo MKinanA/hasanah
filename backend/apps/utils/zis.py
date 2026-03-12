@@ -5,6 +5,7 @@ from ...models.user import User
 from ...models.zis_payment import Payment, PaymentVersion
 from ...helpers.datetime import days, months
 from ..render import env as jenv
+from ...helpers.log import log
 
 DEBUG_FORCE_PDFKIT = False
 
@@ -39,7 +40,8 @@ async def generate_receipt(payment: 'Payment | PaymentVersion | dict', format: '
                     pdf = await page.pdf(format=format if isinstance(format, str) else 'A5', print_background=True)
                 finally: await page.close()
             finally: await browser.close()
-    except NotImplementedError:
+    except NotImplementedError as e:
+        print(log(__name__, f'Playwright PDF generation failed, falling back to pdfkit. Error: {type(e).__name__}({e})'))
         pdf = pdfkit_from_string(html_render, False, options={'format': format if isinstance(format, str) else 'A5'})
         if not isinstance(pdf, bytes): raise RuntimeError('pdfkit did not return bytes.')
     return pdf
