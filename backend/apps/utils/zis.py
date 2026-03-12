@@ -1,9 +1,12 @@
 from datetime import datetime as dt
 from playwright.async_api import async_playwright as pw
+from pdfkit import from_string as pdfkit_from_string
 from ...models.user import User
 from ...models.zis_payment import Payment, PaymentVersion
 from ...helpers.datetime import days, months
 from ..render import env as jenv
+
+DEBUG_FORCE_PDFKIT = False
 
 async def generate_receipt(payment: 'Payment | PaymentVersion | dict', format: 'str | None' = None, html: 'bool' = False) -> 'bytes | str':
     if isinstance(payment, Payment): payment = await payment.latest
@@ -25,13 +28,18 @@ async def generate_receipt(payment: 'Payment | PaymentVersion | dict', format: '
         payment['totals'][line['unit']] += line['amount']
     html_render = jenv.get_template('pdf/zis_payment_receipt.html').render(payment, format_number=lambda x: f'{x:,}')
     if html: return html_render
-    async with pw() as p:
-        browser = await p.chromium.launch(headless=True)
-        try:
-            page = await browser.new_page()
+    try:
+        if DEBUG_FORCE_PDFKIT: raise NotImplementedError('Forced pdfkit for testing purposes.')
+        async with pw() as p:
+            browser = await p.chromium.launch(headless=True)
             try:
-                await page.set_content(html_render)
-                pdf = await page.pdf(format=format if isinstance(format, str) else 'A5', print_background=True)
-            finally: await page.close()
-        finally: await browser.close()
+                page = await browser.new_page()
+                try:
+                    await page.set_content(html_render)
+                    pdf = await page.pdf(format=format if isinstance(format, str) else 'A5', print_background=True)
+                finally: await page.close()
+            finally: await browser.close()
+    except NotImplementedError:
+        pdf = pdfkit_from_string(html_render, False, options={'format': format if isinstance(format, str) else 'A5'})
+        if not isinstance(pdf, bytes): raise RuntimeError('pdfkit did not return bytes.')
     return pdf
