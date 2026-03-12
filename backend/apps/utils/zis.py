@@ -45,6 +45,7 @@ async def generate_receipt(payment: 'Payment | PaymentVersion | dict', format: '
         pdf = pdfkit_from_string(html_render, False, options={
             'page-size': format if isinstance(format, str) else 'A5',
             'print-media-type': '',
+            'disable-smart-shrinking': '',
         })
         if not isinstance(pdf, bytes): raise RuntimeError('pdfkit did not return bytes.')
     return pdf
