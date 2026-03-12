@@ -213,7 +213,7 @@ async def payment_receipt(request: Request, response: Response, uuid: str):
     if payment is None: return await render('pages/error', {'code': '404', 'error': 'Pembayaran Tidak Ditemukan', **({'user': user} if user is not None else {'use_header': False})}, status_code=404)
     payment = await (await payment.latest).to_dict
     receipt = await generate_receipt(payment=payment, format=query_params['format'] if 'format' in query_params else None, html=(html := 'html' in query_params))
-    if html: return receipt
+    if html: return HTMLResponse(receipt)
     if not isinstance(receipt, bytes): raise RuntimeError()
     return StreamingResponse(
         BytesIO(receipt),
