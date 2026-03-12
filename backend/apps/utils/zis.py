@@ -7,7 +7,7 @@ from ...helpers.datetime import days, months
 from ..render import env as jenv
 from ...helpers.log import log
 
-DEBUG_FORCE_PDFKIT = False
+DEBUG_FORCE_PDFKIT = True
 
 async def generate_receipt(payment: 'Payment | PaymentVersion | dict', format: 'str | None' = None, html: 'bool' = False) -> 'bytes | str':
     if isinstance(payment, Payment): payment = await payment.latest
@@ -42,6 +42,9 @@ async def generate_receipt(payment: 'Payment | PaymentVersion | dict', format: '
             finally: await browser.close()
     except NotImplementedError as e:
         print(log(__name__, f'Playwright PDF generation failed, falling back to pdfkit. Error: {type(e).__name__}({e})'))
-        pdf = pdfkit_from_string(html_render, False, options={'format': format if isinstance(format, str) else 'A5'})
+        pdf = pdfkit_from_string(html_render, False, options={
+            'page-size': format if isinstance(format, str) else 'A5',
+            'print-media-type': '',
+        })
         if not isinstance(pdf, bytes): raise RuntimeError('pdfkit did not return bytes.')
     return pdf
