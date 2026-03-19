@@ -117,7 +117,7 @@ async def send_payment_receipt(request: Request, response: Response, body: dict 
         to=format_phone_number(payment['payer_number']),
         content='receipt',
         variables={
-            'name': f'Bapak/Ibu {payment["payer_name"]}',
+            'name': {payment["payer_name"]},
             'file': f'{env["PROTOCOL"]}://{env["DOMAIN"]}/zis/payments/{payment["payment"]}/receipt',
         },
     )).sid
@@ -125,7 +125,7 @@ async def send_payment_receipt(request: Request, response: Response, body: dict 
         to=payment['payer_email'],
         content='receipt',
         variables={
-            'name': f'Bapak/Ibu {payment["payer_name"]}',
+            'name': {payment["payer_name"]},
         },
         files=({
             'content': await generate_receipt(payment=payment, format=body.get('format')),
