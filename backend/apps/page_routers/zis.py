@@ -7,7 +7,7 @@ from fastapi.responses import RedirectResponse, StreamingResponse, HTMLResponse
 from openpyxl import Workbook, styles as wstyles
 from ...models.user import User, Access
 from ...models.zis_payment import Payment, PaymentCategory, PaymentUnit
-from ..utils.zis import generate_receipt
+from ..utils.zis import generate_receipt, generate_report_custom_new
 from ...helpers.str_to_bool import str_to_bool
 from ..dependencies import auth, NoAuthToken, UserSessionNotFound
 from ..render import render
@@ -170,6 +170,21 @@ async def payments_xlsx(request: Request):
         buffer,
         media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         headers={'Content-Disposition': f'{"attachment" if "download" in dict(request.query_params).keys() else "inline"}; filename=Export_Pembayaran_ZIS_{int(time())}.xlsx'}
+    )
+
+@payments.get('/export-xlsx-new')
+async def payments_xlsx_new(request: Request):
+    try:
+        user = await auth(request)
+        await user.require_access(Access.ZIS_PAYMENT_READ)
+    except (NoAuthToken, UserSessionNotFound): return RedirectResponse(url='/login', status_code=302)
+    except Access.AccessDenied: return await render('pages/error', {'code': '403', 'error': 'Akses Ditolak', 'user': user}, status_code=403)
+    (await generate_report_custom_new()).save(buffer := BytesIO())
+    buffer.seek(0)
+    return StreamingResponse(
+        buffer,
+        media_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        headers={'Content-Disposition': f'{"attachment" if "download" in dict(request.query_params).keys() else "inline"}; filename=Export_Pembayaran_ZIS_{int(time())}_baru.xlsx'}
     )
 
 @payments.get('/new')
