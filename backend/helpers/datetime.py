@@ -4,7 +4,7 @@ days = (
     "Selasa",
     "Rabu",
     "Kamis",
-    "Jum'at",
+    "Jumat",
     "Sabtu",
 )
 
