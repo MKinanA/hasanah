@@ -110,6 +110,7 @@ async def generate_report_custom_new(time_range_seconds: 'int | None' = None) ->
                         row=ws.max_row,
                         column=col,
                     ).number_format = '[$Rp-421]#,##0'
+                    for col in 'ABCDEFGHIJKLMN': ws.column_dimensions[col].auto_size = True
                 days_sum[payment_date_str] = day_sum.copy()
                 for key in day_sum.keys(): day_sum[key] = 0.0
 
@@ -307,6 +308,7 @@ async def generate_report_custom_new(time_range_seconds: 'int | None' = None) ->
         row=ws.max_row,
         column=col,
     ).number_format = '[$Rp-421]#,##0'
+    for col in 'ABCDEFGHIJ': ws.column_dimensions[col].auto_size = True
 
     for ws in wb.worksheets:
         for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
