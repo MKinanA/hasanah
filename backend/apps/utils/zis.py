@@ -317,3 +317,10 @@ async def generate_report_custom_new(time_range_seconds: 'int | None' = None) ->
                 bottom=wstyles.Side(style='thin')
             )
     return wb
+
+async def change_pv_created_at(pv: PaymentVersion, to: int):
+    if pv.id is None: raise ValueError('`pv` doesn\'t have an id.')
+    async with db_connect() as conn:
+        cursor = await conn.cursor()
+        await cursor.execute(*sql.update('zis_payment_version', where={'id': pv.id}, set={'created_at': to}))
+        await conn.commit()
