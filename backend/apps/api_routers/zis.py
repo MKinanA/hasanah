@@ -125,7 +125,7 @@ async def send_payment_receipt(request: Request, response: Response, body: dict 
         to=payment['payer_email'],
         content='receipt',
         variables={
-            'name': {payment["payer_name"]},
+            'name': payment["payer_name"],
         },
         files=({
             'content': await generate_receipt(payment=payment, format=body.get('format')),
